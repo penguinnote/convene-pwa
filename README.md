@@ -48,16 +48,7 @@
 
 ## 아키텍처
 
-```mermaid
-flowchart TD
-    A[관리자 admin 로그인] -->|공지 작성| B[Firestore announcements]
-    B -->|onCreate 트리거| C[Cloud Function]
-    D[Firestore tokens] -->|토큰 조회| C
-    C -->|FCM 일괄 발송| E[참가자 폰 SW]
-    E -->|백그라운드 알림| F[잠금화면 푸시]
-    B -.->|실시간 구독| G[홈 공지 배너]
-    H[사용자] -->|알림 권한 허용| D
-```
+![아키텍처](docs/architecture.png)
 
 - **DB**: Firestore — `announcements`(공지), `tokens`(FCM 토큰)
 - **푸시**: Firebase Cloud Messaging (웹 푸시 / VAPID)
