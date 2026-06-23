@@ -1,0 +1,35 @@
+@import url("https://cdn.jsdelivr.net/gh/spoqa/spoqa-han-sans@latest/css/SpoqaHanSansNeo.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: "Spoqa Han Sans Neo", "Apple SD Gothic Neo", -apple-system,
+    BlinkMacSystemFont, system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  word-break: keep-all; /* 한글 단어 단위 줄바꿈 */
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: #f4f7f2; /* basil-50 — 앱 바깥 여백 */
+  color: #1c211b;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 가로 스크롤바 숨김 (일정 일자 탭 등) */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
