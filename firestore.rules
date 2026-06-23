@@ -1,0 +1,15 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 공지: 누구나 읽기, 로그인한 관리자만 쓰기
+    match /announcements/{id} {
+      allow read: if true;
+      allow create, update, delete: if request.auth != null;
+    }
+    // 토큰: 누구나 자기 토큰 등록 가능, 읽기는 막음(서버 함수는 admin 권한이라 우회)
+    match /tokens/{token} {
+      allow create: if true;
+      allow read, update, delete: if false;
+    }
+  }
+}
