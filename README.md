@@ -149,9 +149,3 @@ npx firebase-tools deploy --only hosting
 - [ ] 포그라운드 알림 인앱 토스트 표시
 - [ ] GitHub Actions 기반 CI/CD 자동 배포
 - [ ] 홈 위젯 추가
-
----
-
-## 👤 만든 사람
-
-이윤종 · 로뎀 청년대학부 · 2026
