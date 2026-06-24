@@ -18,9 +18,15 @@ body,
   height: 100%;
 }
 
+html,
+body,
+#root {
+  /* 상태바 자리에 단색이 깔리지 않도록 투명 — 헤더 수채화 그라데이션이 그 위를 덮음 */
+  background-color: transparent;
+}
+
 body {
   margin: 0;
-  background: #f2f8fa; /* basil-50 — 앱 바깥 여백 */
   color: #21343c;
   -webkit-tap-highlight-color: transparent;
 }
