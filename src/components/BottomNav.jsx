@@ -12,7 +12,7 @@ const tabs = [
 
 export default function BottomNav() {
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-20 mx-auto max-w-md border-t border-[#D4E6EC] bg-white/90 backdrop-blur-md">
+    <nav className="shrink-0 border-t border-[#D4E6EC] bg-white/90 backdrop-blur-md">
       <div className="grid grid-cols-5 pb-[env(safe-area-inset-bottom)]">
         {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
@@ -91,8 +91,9 @@ function BedIcon({ active }) {
 function BookIcon({ active }) {
   return (
     <svg {...base(active)}>
-      <path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z" />
-      <path d="M19 19H6a2 2 0 0 0-2 2" />
+      {/* 펼친 책 (가운데 책등 + 좌우 페이지) */}
+      <path d="M12 7v14" />
+      <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
     </svg>
   );
 }
