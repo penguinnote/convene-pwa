@@ -36,22 +36,24 @@ export default function App() {
         <SplashScreen stage={splashStage} leaving={splashLeaving} />
       )}
 
-      <div className="mx-auto flex min-h-full max-w-md flex-col bg-white">
-      {/* 콘텐츠 영역 (하단 탭 높이만큼 패딩) */}
-      <main className="flex-1 pb-24">
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/schedule" element={<Schedule />} />
-          <Route path="/rooms" element={<Rooms />} />
-          <Route path="/verses" element={<Verses />} />
-          <Route path="/announcements" element={<Announcements />} />
-          <Route path="/announcements/:id" element={<AnnouncementDetail />} />
-          <Route path="/admin" element={<Admin />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
+      {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정 */}
+      {/* iOS standalone PWA에서 100dvh가 실제 뷰포트보다 짧게 잡히는 문제로 height:100% 체인 사용 */}
+      <div className="mx-auto flex h-full max-w-md flex-col bg-white">
+        {/* 콘텐츠 영역 (이 안에서만 스크롤) */}
+        <main className="flex-1 overflow-y-auto">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/schedule" element={<Schedule />} />
+            <Route path="/rooms" element={<Rooms />} />
+            <Route path="/verses" element={<Verses />} />
+            <Route path="/announcements" element={<Announcements />} />
+            <Route path="/announcements/:id" element={<AnnouncementDetail />} />
+            <Route path="/admin" element={<Admin />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
 
-      <BottomNav />
+        <BottomNav />
       </div>
     </>
   );
