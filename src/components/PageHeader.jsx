@@ -11,7 +11,7 @@ const headerBg = [
 export default function PageHeader({ eyebrow, title, subtitle }) {
   return (
     <header
-      className="sticky top-0 z-10 border-b border-basil-100 px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))]"
+      className="sticky top-0 z-10 border-b border-basil-100 px-5 pb-4 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]"
       style={{ background: headerBg }}
     >
       {eyebrow && (

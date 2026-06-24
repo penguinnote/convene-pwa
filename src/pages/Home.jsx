@@ -47,7 +47,7 @@ export default function Home() {
     <div>
       {/* 히어로 — 수채화 하늘빛 그라데이션 (안전영역까지 채움) */}
       <section
-        className="relative overflow-hidden px-6 pb-8 pt-[max(3.5rem,calc(env(safe-area-inset-top)+2.25rem))]"
+        className="relative overflow-hidden px-6 pb-8 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]"
         style={{
           background: [
             "radial-gradient(130px 95px at 16% 20%, rgba(255,250,220,.95), transparent 70%)",
