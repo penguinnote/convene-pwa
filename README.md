@@ -114,6 +114,12 @@ iOS는 `theme-color`로 상태바를 단색으로 칠하며, `apple-mobile-web-a
 GitHub에서 Mermaid 렌더링이 깨지는 문제가 있어, 아키텍처 다이어그램을 PNG 이미지로
 교체해 어디서든 동일하게 보이도록 했다.
 
+### 7. Android WebAPK 설치 경고 대응
+안드로이드는 PWA를 WebAPK로 설치하며, WebAPK의 targetSdkVersion이 낮으면 Google Play
+프로텍트가 "안전하지 않은 앱" 경고를 표시한다. 이 값은 브라우저와 구글의 WebAPK 생성
+서비스가 결정해 앱 코드로 제어할 수 없으므로, 첫날 온보딩 안내에서 "무시하고 설치"를
+안내하는 방식으로 대응했다.
+
 ---
 
 ## 프로젝트 구조
