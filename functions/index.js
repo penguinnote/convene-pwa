@@ -15,9 +15,11 @@ exports.sendAnnouncement = onDocumentCreated(
 
     // data-only 페이로드로 전송 → FCM 자동 표시 없이 서비스워커가 단 한 번만 표시
     // (notification 필드를 같이 보내면 FCM 자동 표시 + onBackgroundMessage 중복 발생)
+    // webpush Urgency:high → 삼성/안드로이드 절전 상태에서도 즉시 전달
     const res = await getMessaging().sendEachForMulticast({
       tokens,
-      data: { title: data.title ?? "", body: data.body ?? "" },
+      data: { title: String(data.title), body: String(data.body), id: event.params.id },
+      webpush: { headers: { Urgency: "high", TTL: "86400" } },
     });
 
     // 만료/무효 토큰 정리
