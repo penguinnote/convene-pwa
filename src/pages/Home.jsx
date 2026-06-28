@@ -4,6 +4,7 @@ import { collection, query, orderBy, limit, onSnapshot } from "firebase/firestor
 import { db } from "../firebase";
 import { enablePush } from "../lib/push";
 import { formatRelative } from "../lib/time";
+import { truncateTitle } from "../lib/text";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -136,11 +137,11 @@ export default function Home() {
                     </span>
                   </div>
                   <h2
-                    className={`mt-3 break-keep font-bold leading-snug text-title ${
+                    className={`mt-3 truncate font-bold leading-snug text-title ${
                       i === 0 ? "text-2xl" : "text-lg"
                     }`}
                   >
-                    {notice.title}
+                    {truncateTitle(notice.title)}
                   </h2>
                   {notice.body && (
                     <p className="mt-2 line-clamp-2 break-keep text-[15px] leading-relaxed text-ink-soft">

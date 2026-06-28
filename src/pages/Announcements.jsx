@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { collection, query, orderBy, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { formatRelative } from "../lib/time";
+import { truncateTitle } from "../lib/text";
 import PageHeader from "../components/PageHeader.jsx";
 
 export default function Announcements() {
@@ -35,8 +36,8 @@ export default function Announcements() {
                   className="block w-full rounded-2xl border border-basil-100 bg-white p-5 text-left"
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <h2 className="break-keep text-base font-bold leading-snug text-title">
-                      {notice.title}
+                    <h2 className="min-w-0 flex-1 truncate text-base font-bold leading-snug text-title">
+                      {truncateTitle(notice.title)}
                     </h2>
                     <span className="shrink-0 text-[11px] text-ink-faint">
                       {formatRelative(notice.createdAt)}
