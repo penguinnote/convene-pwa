@@ -1,7 +1,15 @@
-import { precacheAndRoute } from "workbox-precaching";
+import { clientsClaim } from "workbox-core";
+import { precacheAndRoute, cleanupOutdatedCaches } from "workbox-precaching";
 import { initializeApp } from "firebase/app";
 import { getMessaging, onBackgroundMessage } from "firebase/messaging/sw";
 import { incrementBadgeCount } from "./lib/badge";
+
+// 0) 새 SW가 즉시 활성화되고 모든 탭을 제어하게 함 + 오래된 캐시 정리.
+//    배포 후 재설치 없이 앱을 닫았다 열면 새 버전이 적용되고,
+//    옛/새 파일 불일치(청크 로드 실패)를 막는다.
+self.skipWaiting();
+clientsClaim();
+cleanupOutdatedCaches();
 
 // 1) 오프라인 캐싱 (vite-plugin-pwa가 이 자리에 매니페스트 주입)
 precacheAndRoute(self.__WB_MANIFEST);
