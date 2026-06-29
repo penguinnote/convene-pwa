@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { enablePush } from "../lib/push";
 import { formatRelative } from "../lib/time";
 import { truncateTitle } from "../lib/text";
+import { firstImageUrl, firstFile } from "../lib/blocks";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -112,44 +113,65 @@ export default function Home() {
             </div>
 
             <div className="space-y-3">
-              {notices.map((notice, i) => (
-                <button
-                  key={notice.id}
-                  type="button"
-                  onClick={() => navigate(`/announcements/${notice.id}`)}
-                  className={`block w-full text-left ${
-                    i === 0
-                      ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-6 shadow-sm"
-                      : "rounded-3xl border border-basil-100 bg-white p-5"
-                  }`}
-                >
-                  <div className="flex items-start justify-between gap-3">
-                    {i === 0 ? (
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
-                        <BellIcon />
-                        공지
-                      </span>
-                    ) : (
-                      <span />
-                    )}
-                    <span className="shrink-0 text-[11px] text-basil-400">
-                      {formatRelative(notice.createdAt)}
-                    </span>
-                  </div>
-                  <h2
-                    className={`mt-3 truncate font-bold leading-snug text-title ${
-                      i === 0 ? "text-2xl" : "text-lg"
+              {notices.map((notice, i) => {
+                const img = firstImageUrl(notice);
+                const file = firstFile(notice);
+                return (
+                  <button
+                    key={notice.id}
+                    type="button"
+                    onClick={() => navigate(`/announcements/${notice.id}`)}
+                    className={`block w-full text-left ${
+                      i === 0
+                        ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-6 shadow-sm"
+                        : "rounded-3xl border border-basil-100 bg-white p-5"
                     }`}
                   >
-                    {truncateTitle(notice.title)}
-                  </h2>
-                  {notice.body && (
-                    <p className="mt-2 line-clamp-2 break-keep text-[15px] leading-relaxed text-ink-soft">
-                      {notice.body}
-                    </p>
-                  )}
-                </button>
-              ))}
+                    <div className="flex items-start justify-between gap-3">
+                      {i === 0 ? (
+                        <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
+                          <BellIcon />
+                          공지
+                        </span>
+                      ) : (
+                        <span />
+                      )}
+                      <span className="shrink-0 text-[11px] text-basil-400">
+                        {formatRelative(notice.createdAt)}
+                      </span>
+                    </div>
+
+                    {/* A형: 좌측 본문 + 우측 64px 썸네일(밑단 정렬) */}
+                    <div className="mt-3 flex items-end gap-3">
+                      <div className="min-w-0 flex-1">
+                        <h2
+                          className={`truncate font-bold leading-snug text-title ${
+                            i === 0 ? "text-2xl" : "text-lg"
+                          }`}
+                        >
+                          {truncateTitle(notice.title)}
+                        </h2>
+                        {notice.body && (
+                          <p className="mt-2 line-clamp-2 break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
+                            {notice.body}
+                          </p>
+                        )}
+                        {file && (
+                          <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-100 px-2.5 py-1 text-[12px] text-basil-700">
+                            <ClipIcon />
+                            <span className="truncate">{chipName(file.name)}</span>
+                          </span>
+                        )}
+                      </div>
+                      {img && (
+                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-basil-100">
+                          <img src={img} alt="" className="h-full w-full object-cover" />
+                        </div>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
             </div>
           </>
         ) : (
@@ -194,6 +216,12 @@ export default function Home() {
   );
 }
 
+// 파일명이 10자 초과면 확장자 포함 앞 10자 + …
+function chipName(name) {
+  if (!name) return "";
+  return name.length > 10 ? name.slice(0, 10) + "…" : name;
+}
+
 /* --- 아이콘 --- */
 const sw = {
   fill: "none",
@@ -208,6 +236,14 @@ function BellIcon() {
     <svg width="16" height="16" viewBox="0 0 24 24" {...sw}>
       <path d="M6 9a6 6 0 1 1 12 0c0 5 2 6 2 6H4s2-1 2-6" />
       <path d="M10 19a2 2 0 0 0 4 0" />
+    </svg>
+  );
+}
+
+function ClipIcon() {
+  return (
+    <svg width="13" height="13" viewBox="0 0 24 24" {...sw} className="shrink-0">
+      <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48" />
     </svg>
   );
 }

@@ -106,7 +106,7 @@ export default function App() {
           (dvh/svh/%는 standalone에서 화면보다 짧게 잡혀 하단 공백이 생김) */}
       <div className="mx-auto flex h-screen max-w-md flex-col bg-white">
         {/* 콘텐츠 영역 (이 안에서만 스크롤) */}
-        <main className="flex-1 overflow-y-auto">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/schedule" element={<Schedule />} />
