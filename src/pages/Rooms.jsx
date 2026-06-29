@@ -1,9 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import PageHeader from "../components/PageHeader.jsx";
 import { rooms } from "../data/rooms.js";
+import { registerBackInterceptor } from "../hooks/useBackNavigation";
 
 export default function Rooms() {
   const [query, setQuery] = useState("");
+  const queryRef = useRef(query);
+  queryRef.current = query;
+
+  // 뒤로가기 시 검색어가 있으면 먼저 검색을 해제하고 페이지에 머문다.
+  // 검색어가 비어 있으면 인터셉터가 false를 반환해 계층 이동(홈)으로 진행.
+  useEffect(() => {
+    return registerBackInterceptor(() => {
+      if (queryRef.current.trim()) {
+        setQuery("");
+        return true;
+      }
+      return false;
+    });
+  }, []);
 
   const filtered = rooms.filter((room) => {
     const q = query.trim();
