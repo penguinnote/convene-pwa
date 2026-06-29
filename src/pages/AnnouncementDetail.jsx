@@ -56,36 +56,30 @@ export default function AnnouncementDetail() {
           </p>
         ) : (
           <article>
-            <h1 className="break-keep text-2xl font-bold leading-snug text-title">
+            <h1 className="break-keep [overflow-wrap:anywhere] text-2xl font-bold leading-snug text-title">
               {notice.title}
             </h1>
             <p className="mt-2 text-[13px] text-ink-faint">
               {formatRelative(notice.createdAt)}
-              {formatExact(notice.createdAt) && (
-                <span className="text-ink-faint"> · {formatExact(notice.createdAt)}</span>
-              )}
             </p>
-            {notice.body && renderBody(notice.body)}
+            {formatExact(notice.createdAt) && (
+              <p className="mt-0.5 text-[13px] text-ink-faint">
+                {formatExact(notice.createdAt)}
+              </p>
+            )}
 
-            {notice.attachments?.length > 0 && (
-              <div className="mt-6 rounded-2xl border border-basil-100 bg-basil-50 p-4">
-                <h2 className="text-sm font-semibold text-title">첨부파일</h2>
-                <ul className="mt-3 space-y-2">
-                  {notice.attachments.map((file, index) => (
-                    <li key={`${file.name}-${index}`}>
-                      <a
-                        href={file.url}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="flex items-center justify-between rounded-xl border border-basil-100 bg-white px-3 py-2.5 text-sm text-basil-700"
-                      >
-                        <span>{file.name}</span>
-                        <span className="text-xs text-basil-600">열기</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
+            {Array.isArray(notice.blocks) && notice.blocks.length > 0 ? (
+              <div className="mt-5 space-y-4">
+                {notice.blocks.map((block, i) => (
+                  <BlockView key={i} block={block} />
+                ))}
               </div>
+            ) : (
+              notice.body && (
+                <p className="mt-5 whitespace-pre-wrap break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink">
+                  {notice.body}
+                </p>
+              )
             )}
           </article>
         )}
@@ -94,50 +88,70 @@ export default function AnnouncementDetail() {
   );
 }
 
-function renderBody(body) {
-  const imagePattern = /!\[([^\]]*)\]\((https?:\/\/[^)]+)\)/g;
-  const matches = Array.from(body.matchAll(imagePattern));
-
-  if (matches.length === 0) {
-    return <p className="mt-5 whitespace-pre-wrap break-keep text-[15px] leading-relaxed text-ink">{body}</p>;
+function BlockView({ block }) {
+  if (block.type === "text") {
+    return (
+      <p className="whitespace-pre-wrap break-keep [overflow-wrap:anywhere] text-[15px] leading-[1.8] text-ink">
+        {block.value}
+      </p>
+    );
   }
 
-  const parts = [];
-  let lastIndex = 0;
-
-  matches.forEach((match, index) => {
-    const [fullMatch, altText, imageUrl] = match;
-    const startIndex = match.index;
-
-    if (startIndex > lastIndex) {
-      parts.push(
-        <span key={`text-${index}`} className="whitespace-pre-wrap">
-          {body.slice(lastIndex, startIndex)}
-        </span>
-      );
-    }
-
-    parts.push(
+  if (block.type === "image") {
+    return (
       <img
-        key={`img-${index}`}
-        src={imageUrl}
-        alt={altText || "공지 이미지"}
-        className="my-4 w-full rounded-2xl border border-basil-100 object-cover"
+        src={block.url}
+        alt=""
+        className="w-full max-w-full rounded-2xl"
+        style={{ height: "auto" }}
       />
     );
+  }
 
-    lastIndex = startIndex + fullMatch.length;
-  });
-
-  if (lastIndex < body.length) {
-    parts.push(
-      <span key="text-end" className="whitespace-pre-wrap">
-        {body.slice(lastIndex)}
-      </span>
+  if (block.type === "file") {
+    return (
+      <a
+        href={block.url}
+        target="_blank"
+        rel="noreferrer"
+        className="flex items-stretch gap-3 rounded-2xl border border-basil-100 bg-white p-3"
+      >
+        <span
+          className="flex h-[84px] w-[84px] shrink-0 flex-col items-center justify-center gap-1 rounded-xl text-basil-600"
+          style={{ background: "#f2f8fa" }}
+        >
+          <PdfIcon />
+          <span className="text-[11px] font-bold">PDF</span>
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col justify-center">
+          <span className="truncate font-semibold text-ink">{block.name}</span>
+          <span className="mt-1 text-sm font-medium text-basil-600">
+            보기 / 다운로드 ›
+          </span>
+        </span>
+      </a>
     );
   }
 
-  return <div className="mt-5 space-y-3 break-keep text-[15px] leading-relaxed text-ink">{parts}</div>;
+  return null;
+}
+
+function PdfIcon() {
+  return (
+    <svg
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.7"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <path d="M14 2v6h6" />
+    </svg>
+  );
 }
 
 function BackIcon() {
