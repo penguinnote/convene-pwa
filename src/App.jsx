@@ -26,7 +26,7 @@ export default function App() {
 
   // 포그라운드 새 공지 인앱 토스트
   const [toast, setToast] = useState(null); // { id, title }
-  const lastNoticeIdRef = useRef(null);
+  const lastCreatedRef = useRef(0); // 마지막으로 본 최신 공지의 createdAt(ms)
 
   useEffect(() => {
     const toStage2 = setTimeout(() => setSplashStage(2), SPLASH_TIMING.stage2At);
@@ -58,7 +58,8 @@ export default function App() {
     return () => document.removeEventListener("visibilitychange", clearBadge);
   }, []);
 
-  // 포그라운드에서 새 공지 감지 → 인앱 토스트 (알림 권한 무관, 홈 구독과 별개)
+  // 포그라운드에서 새 공지(added)만 감지 → 인앱 토스트.
+  // 수정(modified)·삭제(removed)에는 토스트를 띄우지 않는다.
   useEffect(() => {
     const q = query(
       collection(db, "announcements"),
@@ -67,20 +68,24 @@ export default function App() {
     );
     let initialized = false;
     return onSnapshot(q, (snap) => {
-      const doc = snap.empty ? null : snap.docs[0];
-      const id = doc?.id ?? null;
-      // 첫 스냅샷은 기준값만 저장하고 토스트를 띄우지 않음
+      // 첫 스냅샷은 기준 시각만 저장하고 토스트를 띄우지 않음
       if (!initialized) {
         initialized = true;
-        lastNoticeIdRef.current = id;
+        const ms = snap.docs[0]?.data().createdAt?.toMillis?.() ?? 0;
+        lastCreatedRef.current = ms;
         return;
       }
-      if (id && id !== lastNoticeIdRef.current) {
-        lastNoticeIdRef.current = id;
+      snap.docChanges().forEach((change) => {
+        if (change.type !== "added") return; // 수정/삭제 무시
+        const data = change.doc.data();
+        const ms = data.createdAt?.toMillis?.() ?? Date.now();
+        // 기준 시각보다 새 공지일 때만 (삭제로 밀려 들어온 옛 문서 제외)
+        if (ms <= lastCreatedRef.current) return;
+        lastCreatedRef.current = ms;
         if (document.visibilityState === "visible") {
-          setToast({ id, title: doc.data().title });
+          setToast({ id: change.doc.id, title: data.title });
         }
-      }
+      });
     });
   }, []);
 

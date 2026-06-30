@@ -6,11 +6,16 @@ import {
   getDocs,
   query,
   where,
+  orderBy,
+  onSnapshot,
   writeBatch,
+  deleteDoc,
   serverTimestamp,
 } from "firebase/firestore";
-import { auth, db } from "../firebase";
+import { ref as storageRef, deleteObject } from "firebase/storage";
+import { auth, db, storage } from "../firebase";
 import { resizeImage, uploadToStorage } from "../lib/upload";
+import { formatRelative } from "../lib/time";
 
 let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
@@ -25,11 +30,62 @@ export default function Admin() {
   const [isPinned, setIsPinned] = useState(false);
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
+  const [view, setView] = useState("list"); // "list"(공지 관리) | "editor"
+  const [editingId, setEditingId] = useState(null); // null=새 공지, id=수정
+  const [list, setList] = useState([]);
 
   const imageInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => onAuthStateChanged(auth, setUser), []);
+
+  // 로그인 후 공지 목록 구독 (최신순)
+  useEffect(() => {
+    if (!user) return;
+    const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+    return onSnapshot(q, (snap) =>
+      setList(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
+    );
+  }, [user]);
+
+  function openNew() {
+    setEditingId(null);
+    setTitle("");
+    setBlocks([emptyText()]);
+    setIsPinned(false);
+    setMsg("");
+    setView("editor");
+  }
+
+  function openEdit(item) {
+    setEditingId(item.id);
+    setTitle(item.title ?? "");
+    // 저장된 블록에 편집용 _id를 부여. 블록 없는 기존 공지는 body를 텍스트 블록으로.
+    const loaded =
+      Array.isArray(item.blocks) && item.blocks.length
+        ? item.blocks.map((b) => ({ _id: newId(), uploading: false, ...b }))
+        : [{ _id: newId(), type: "text", value: item.body ?? "" }];
+    setBlocks(loaded);
+    setIsPinned(!!item.pinned);
+    setMsg("");
+    setView("editor");
+  }
+
+  async function handleDelete(item) {
+    if (!window.confirm(`"${item.title}" 공지를 삭제할까요?`)) return;
+    try {
+      // 블록에 포함된 Storage 파일(path)도 함께 삭제
+      const paths = (item.blocks ?? []).map((b) => b.path).filter(Boolean);
+      await Promise.all(
+        paths.map((p) => deleteObject(storageRef(storage, p)).catch(() => {}))
+      );
+      await deleteDoc(doc(db, "announcements", item.id));
+      setMsg("삭제했습니다.");
+    } catch (err) {
+      console.error("delete failed", err);
+      setMsg("삭제에 실패했습니다.");
+    }
+  }
 
   async function login(e) {
     e.preventDefault();
@@ -137,30 +193,36 @@ export default function Admin() {
     setSending(true);
     try {
       const batch = writeBatch(db);
-      const newRef = doc(collection(db, "announcements"));
-      batch.set(newRef, {
-        title: title.trim(),
-        body,
-        blocks: cleaned,
-        pinned: isPinned,
-        createdAt: serverTimestamp(),
-      });
-      // 한 번에 하나만 고정: 기존 고정 공지들을 모두 해제
+      const ref = editingId
+        ? doc(db, "announcements", editingId)
+        : doc(collection(db, "announcements"));
+      const data = { title: title.trim(), body, blocks: cleaned, pinned: isPinned };
+      if (editingId) {
+        // 수정: createdAt 유지(목록 순서 보존), 푸시는 발생하지 않음
+        batch.update(ref, { ...data, updatedAt: serverTimestamp() });
+      } else {
+        batch.set(ref, { ...data, createdAt: serverTimestamp() });
+      }
+      // 한 번에 하나만 고정: 나를 제외한 기존 고정 공지를 모두 해제
       if (isPinned) {
         const prevPinned = await getDocs(
           query(collection(db, "announcements"), where("pinned", "==", true))
         );
-        prevPinned.forEach((d) => batch.update(d.ref, { pinned: false }));
+        prevPinned.forEach((d) => {
+          if (d.id !== ref.id) batch.update(d.ref, { pinned: false });
+        });
       }
       await batch.commit();
 
+      setMsg(editingId ? "공지를 수정했습니다." : "공지 발송 완료");
+      setEditingId(null);
       setTitle("");
       setBlocks([emptyText()]);
       setIsPinned(false);
-      setMsg("공지 발송 완료");
+      setView("list");
     } catch (err) {
       console.error("send failed", err);
-      setMsg("발송에 실패했습니다. 다시 시도해주세요.");
+      setMsg(editingId ? "수정에 실패했습니다." : "발송에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setSending(false);
     }
@@ -191,10 +253,82 @@ export default function Admin() {
     );
   }
 
+  // 공지 관리 목록
+  if (view === "list") {
+    return (
+      <div className="space-y-4 p-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold text-ink">공지 관리</h1>
+          <button type="button" onClick={() => signOut(auth)} className="text-sm text-ink-faint">
+            로그아웃
+          </button>
+        </div>
+
+        <button
+          type="button"
+          onClick={openNew}
+          className="w-full rounded-xl bg-basil-600 py-2.5 font-semibold text-white"
+        >
+          + 새 공지 작성
+        </button>
+        {msg && <p className="text-sm text-basil-600">{msg}</p>}
+
+        <div className="space-y-2.5">
+          {list.length === 0 ? (
+            <p className="rounded-2xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
+              등록된 공지가 없습니다.
+            </p>
+          ) : (
+            list.map((item) => (
+              <div key={item.id} className="rounded-2xl border border-basil-100 bg-white p-4">
+                <div className="flex items-center gap-2">
+                  {item.pinned && (
+                    <span className="shrink-0 rounded-full bg-basil-600 px-2 py-0.5 text-[11px] font-semibold text-white">
+                      고정
+                    </span>
+                  )}
+                  <p className="min-w-0 flex-1 truncate font-bold text-title">{item.title}</p>
+                </div>
+                <p className="mt-0.5 text-xs text-ink-faint">
+                  {formatRelative(item.createdAt)}
+                </p>
+                <div className="mt-3 flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => openEdit(item)}
+                    className="rounded-lg border border-basil-200 px-3 py-1.5 text-sm font-medium text-basil-700"
+                  >
+                    수정
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(item)}
+                    className="rounded-lg border border-basil-100 px-3 py-1.5 text-sm font-medium text-ink-faint"
+                  >
+                    삭제
+                  </button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={send} className="space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-ink">공지 작성</h1>
+        <button
+          type="button"
+          onClick={() => setView("list")}
+          className="text-sm font-medium text-basil-600"
+        >
+          ‹ 목록
+        </button>
+        <h1 className="text-base font-bold text-ink">
+          {editingId ? "공지 수정" : "새 공지 작성"}
+        </h1>
         <button type="button" onClick={() => signOut(auth)} className="text-sm text-ink-faint">
           로그아웃
         </button>
@@ -283,8 +417,19 @@ export default function Admin() {
         disabled={sending}
         className="w-full rounded-xl bg-basil-600 py-2.5 font-semibold text-white disabled:opacity-60"
       >
-        {sending ? "발송 중…" : "공지 발송 (푸시)"}
+        {editingId
+          ? sending
+            ? "저장 중…"
+            : "수정 저장"
+          : sending
+          ? "발송 중…"
+          : "공지 발송 (푸시)"}
       </button>
+      {editingId && (
+        <p className="text-center text-xs text-ink-faint">
+          수정은 새 푸시 알림을 보내지 않습니다.
+        </p>
+      )}
       {msg && <p className="text-sm text-basil-600">{msg}</p>}
     </form>
   );
