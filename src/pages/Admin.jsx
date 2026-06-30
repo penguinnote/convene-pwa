@@ -21,6 +21,16 @@ let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
 const emptyText = () => ({ _id: newId(), type: "text", value: "" });
 
+// 네트워크 응답이 없을 때 무한 대기를 막는 타임아웃 래퍼.
+function withTimeout(promise, ms = 15000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error("timeout")), ms)
+    ),
+  ]);
+}
+
 export default function Admin() {
   const [user, setUser] = useState(null);
   const [email, setEmail] = useState("");
@@ -205,14 +215,14 @@ export default function Admin() {
       }
       // 한 번에 하나만 고정: 나를 제외한 기존 고정 공지를 모두 해제
       if (isPinned) {
-        const prevPinned = await getDocs(
-          query(collection(db, "announcements"), where("pinned", "==", true))
+        const prevPinned = await withTimeout(
+          getDocs(query(collection(db, "announcements"), where("pinned", "==", true)))
         );
         prevPinned.forEach((d) => {
           if (d.id !== ref.id) batch.update(d.ref, { pinned: false });
         });
       }
-      await batch.commit();
+      await withTimeout(batch.commit());
 
       setMsg(editingId ? "공지를 수정했습니다." : "공지 발송 완료");
       setEditingId(null);
@@ -222,7 +232,7 @@ export default function Admin() {
       setView("list");
     } catch (err) {
       console.error("send failed", err);
-      setMsg(editingId ? "수정에 실패했습니다." : "발송에 실패했습니다. 다시 시도해주세요.");
+      setMsg("저장에 실패했습니다. 다시 시도해주세요.");
     } finally {
       setSending(false);
     }
