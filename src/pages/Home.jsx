@@ -23,6 +23,14 @@ export default function Home() {
   const location = useLocation();
 
   useEffect(() => {
+    function syncPermission() {
+      if (document.visibilityState === "visible") setPermission(initialPermission());
+    }
+    document.addEventListener("visibilitychange", syncPermission);
+    return () => document.removeEventListener("visibilitychange", syncPermission);
+  }, []);
+
+  useEffect(() => {
     const qRecent = query(
       collection(db, "announcements"),
       orderBy("createdAt", "desc"),
@@ -58,6 +66,10 @@ export default function Home() {
 
   async function handleEnablePush() {
     setPushMsg("");
+    if (permission === "denied") {
+      setPushMsg("알림이 차단되어 있어요. 기기(브라우저) 설정에서 이 앱의 알림을 허용해주세요.");
+      return;
+    }
     const result = await enablePush();
     setPermission(initialPermission());
     if (result.ok) {
@@ -65,7 +77,8 @@ export default function Home() {
     } else if (result.reason === "unsupported") {
       setPushMsg("이 기기/브라우저에서는 알림을 지원하지 않아요.");
     } else if (result.reason === "denied") {
-      setPushMsg("알림 권한이 거부되었어요. 브라우저 설정에서 허용해주세요.");
+      setPushMsg("알림이 차단되어 있어요. 기기(브라우저) 설정에서 이 앱의 알림을 허용해주세요.");
+      setPermission("denied");
     } else {
       setPushMsg("알림 설정에 실패했어요. 다시 시도해주세요.");
     }
@@ -219,7 +232,7 @@ export default function Home() {
           </div>
         )}
 
-        {permission === "default" && (
+        {permission !== "granted" && permission !== "unsupported" && (
           <>
             <button
               type="button"

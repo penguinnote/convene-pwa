@@ -30,7 +30,7 @@ export default function BottomNav() {
 
   return (
     <nav className="shrink-0 border-t border-[#D4E6EC] bg-white/90 backdrop-blur-md">
-      <div className="grid grid-cols-5 pb-[env(safe-area-inset-bottom)]">
+      <div className="grid grid-cols-5 pb-[max(6px,calc(env(safe-area-inset-bottom)-12px))]">
         {tabs.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
