@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { collection, query, orderBy, limit, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import { enablePush } from "../lib/push";
 import { formatRelative } from "../lib/time";
 import { truncateTitle } from "../lib/text";
 import { firstImageUrl, firstFile } from "../lib/blocks";
-import { goToAnnouncement } from "../lib/nav";
+import { goToAnnouncement, goChild } from "../lib/nav";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -133,9 +133,13 @@ export default function Home() {
           <>
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold text-ink">공지</p>
-              <Link to="/announcements" className="text-sm font-medium text-basil-600">
+              <button
+                type="button"
+                onClick={() => goChild(navigate, location.pathname, "/announcements")}
+                className="text-sm font-medium text-basil-600"
+              >
                 전체 보기 ›
-              </Link>
+              </button>
             </div>
 
             <div className="space-y-3">

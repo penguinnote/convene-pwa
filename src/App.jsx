@@ -7,6 +7,7 @@ import SplashScreen, { SPLASH_TIMING } from "./components/SplashScreen.jsx";
 import Toast from "./components/Toast.jsx";
 import { setBadgeCount } from "./lib/badge";
 import { goToAnnouncement } from "./lib/nav";
+import { useBackControl } from "./hooks/useBackControl";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
 import Rooms from "./pages/Rooms.jsx";
@@ -27,6 +28,18 @@ export default function App() {
   // 포그라운드 새 공지 인앱 토스트
   const [toast, setToast] = useState(null); // { id, title }
   const lastCreatedRef = useRef(0); // 마지막으로 본 최신 공지의 createdAt(ms)
+
+  // 홈에서 뒤로가기 종료 안내
+  const [exitHint, setExitHint] = useState(false);
+  const exitHintTimerRef = useRef(null);
+  useBackControl({
+    onExitHint: () => {
+      setExitHint(true);
+      clearTimeout(exitHintTimerRef.current);
+      exitHintTimerRef.current = setTimeout(() => setExitHint(false), 2000);
+    },
+  });
+  useEffect(() => () => clearTimeout(exitHintTimerRef.current), []);
 
   useEffect(() => {
     const toStage2 = setTimeout(() => setSplashStage(2), SPLASH_TIMING.stage2At);
@@ -106,6 +119,15 @@ export default function App() {
           }}
           onClose={() => setToast(null)}
         />
+      )}
+
+      {/* 홈 뒤로가기 종료 안내 (하단 중앙) */}
+      {exitHint && (
+        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[95] flex justify-center px-6">
+          <div className="rounded-full bg-ink/90 px-4 py-2 text-sm font-medium text-white shadow-lg">
+            뒤로가기를 한 번 더 누르면 종료됩니다
+          </div>
+        </div>
       )}
 
       {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정 */}
