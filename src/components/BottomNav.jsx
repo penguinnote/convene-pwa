@@ -1,4 +1,5 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
+import { goChild, goHome } from "../lib/nav";
 
 // Google Photos 공유 앨범 URL
 const PHOTO_ALBUM_URL = "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A";
@@ -14,18 +15,16 @@ export default function BottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // history를 [홈] 또는 [홈, 현재화면]으로만 유지한다.
-  // 홈→탭은 push, 탭→탭은 replace, 탭→홈은 replace로 탭 기록을 쌓지 않는다.
+  // 히스토리를 [홈] 또는 [홈, 자식]으로만 유지한다.
+  // 자식 탭은 항상 교체(누적 방지), 홈은 pop으로 접어 홈 하나만 남긴다.
   function handleTab(e, to) {
     e.preventDefault();
     const path = location.pathname;
     if (to === path) return;
     if (to === "/") {
-      navigate("/", { replace: true });
-    } else if (path === "/") {
-      navigate(to);
+      goHome(navigate, path);
     } else {
-      navigate(to, { replace: true });
+      goChild(navigate, path, to);
     }
   }
 
