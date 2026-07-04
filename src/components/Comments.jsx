@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore";
 import { db } from "../firebase";
 import { formatRelative } from "../lib/time";
+import { useUserProfiles } from "../hooks/useUserProfiles";
 
 export default function Comments({ announcementId, user, nickname, mokjang, photoURL, isAdmin }) {
   const [comments, setComments] = useState([]);
@@ -28,6 +29,20 @@ export default function Comments({ announcementId, user, nickname, mokjang, phot
       setComments(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
     });
   }, [announcementId]);
+
+  const authorUids = [...new Set(comments.map((c) => c.authorUid).filter(Boolean))];
+  const profiles = useUserProfiles(authorUids);
+
+  // 표시용 작성자 정보 해석: 본인은 실시간 값, 그 외는 users 문서, 없으면 저장된 author* 폴백.
+  function resolveAuthor(c) {
+    const isSelf = c.authorUid && c.authorUid === user?.uid;
+    const p = isSelf ? { nickname, mokjang, photoURL } : profiles[c.authorUid];
+    return {
+      photo: p?.photoURL ?? c.authorPhoto ?? "",
+      name: p?.nickname || c.authorName || c.author || "익명",
+      mok: p?.mokjang ?? c.authorMokjang ?? "",
+    };
+  }
 
   const parents = comments.filter((c) => !c.parentId);
   const repliesMap = {};
@@ -108,6 +123,7 @@ export default function Comments({ announcementId, user, nickname, mokjang, phot
           <div key={c.id}>
             <CommentItem
               comment={c}
+              author={resolveAuthor(c)}
               canDelete={canDelete(c)}
               onDelete={() => handleDelete(c.id)}
               onReply={() => startReply(c.id)}
@@ -117,6 +133,7 @@ export default function Comments({ announcementId, user, nickname, mokjang, phot
               <div key={r.id} className="ml-10 mt-2">
                 <CommentItem
                   comment={r}
+                  author={resolveAuthor(r)}
                   canDelete={canDelete(r)}
                   onDelete={() => handleDelete(r.id)}
                   isReply
@@ -186,12 +203,10 @@ export default function Comments({ announcementId, user, nickname, mokjang, phot
   );
 }
 
-function CommentItem({ comment, canDelete, onDelete, onReply, isReply }) {
+function CommentItem({ comment, author, canDelete, onDelete, onReply, isReply }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const avatarSize = isReply ? 28 : 34;
-  const photo = comment.authorPhoto;
-  const name = comment.authorName || comment.author || "익명";
-  const mok = comment.authorMokjang;
+  const { photo, name, mok } = author;
 
   return (
     <div className={`flex gap-2.5 rounded-xl ${isReply ? "bg-basil-50/60 p-3" : "bg-basil-50 p-3.5"}`}>
