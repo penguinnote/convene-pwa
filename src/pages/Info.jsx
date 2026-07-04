@@ -1,5 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
+import Cropper from "react-easy-crop";
 import PageHeader from "../components/PageHeader.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 
@@ -20,6 +21,12 @@ export default function Info() {
   const [uploading, setUploading] = useState(false);
   const [showPhotoMenu, setShowPhotoMenu] = useState(false);
 
+  // 크롭 상태
+  const [cropSrc, setCropSrc] = useState(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState(null);
+
   useEffect(() => { setNick(nickname); }, [nickname]);
   useEffect(() => { setMok(mokjang); }, [mokjang]);
 
@@ -37,18 +44,35 @@ export default function Info() {
     setEditing(false);
   }
 
-  async function handlePhoto(e) {
+  function handleFileSelect(e) {
     const file = e.target.files?.[0];
     if (!file) return;
-    setShowPhotoMenu(false);
+    e.target.value = "";
+    const reader = new FileReader();
+    reader.onload = () => {
+      setCropSrc(reader.result);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  const onCropComplete = useCallback((_, area) => {
+    setCroppedArea(area);
+  }, []);
+
+  async function handleCropDone() {
+    if (!cropSrc || !croppedArea) return;
     setUploading(true);
+    setCropSrc(null);
     try {
+      const blob = await getCroppedBlob(cropSrc, croppedArea);
+      const file = new File([blob], "profile.jpg", { type: "image/jpeg" });
       await uploadPhoto(file);
     } catch {
-      // 업로드 실패 무시
+      // 크롭/업로드 실패 무시
     }
     setUploading(false);
-    e.target.value = "";
   }
 
   async function handleRemovePhoto() {
@@ -66,6 +90,57 @@ export default function Info() {
     <div>
       <PageHeader eyebrow="INFO" title="정보" />
 
+      {/* 크롭 모달 */}
+      {cropSrc && (
+        <div
+          className="fixed inset-0 z-50 flex flex-col bg-black"
+          style={{
+            paddingTop: "max(0px, env(safe-area-inset-top))",
+            paddingBottom: "max(0px, env(safe-area-inset-bottom))",
+          }}
+        >
+          <div className="relative flex-1">
+            <Cropper
+              image={cropSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={1}
+              cropShape="round"
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
+          </div>
+          <div className="shrink-0 bg-black px-6 pb-4 pt-3">
+            <input
+              type="range"
+              min={1}
+              max={3}
+              step={0.05}
+              value={zoom}
+              onChange={(e) => setZoom(Number(e.target.value))}
+              className="mb-4 h-1 w-full cursor-pointer appearance-none rounded-full bg-white/30 accent-basil-400"
+            />
+            <div className="flex gap-3">
+              <button
+                type="button"
+                onClick={() => setCropSrc(null)}
+                className="flex-1 rounded-xl border border-white/30 py-3 text-sm font-medium text-white"
+              >
+                취소
+              </button>
+              <button
+                type="button"
+                onClick={handleCropDone}
+                className="flex-1 rounded-xl bg-basil-600 py-3 text-sm font-bold text-white"
+              >
+                완료
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 프로필 카드 */}
       <section className="px-5 py-5">
         <div className="relative rounded-2xl border border-basil-100 bg-white p-5">
@@ -80,7 +155,6 @@ export default function Info() {
           )}
 
           <div className="flex flex-col items-center">
-            {/* 아바타 — 84×84 고정 정사각 원형 */}
             <div className="relative">
               <div
                 className="overflow-hidden rounded-full border-2 border-basil-200 bg-basil-50"
@@ -99,7 +173,6 @@ export default function Info() {
                 )}
               </div>
 
-              {/* 카메라 뱃지 */}
               <button
                 type="button"
                 onClick={() => setShowPhotoMenu(true)}
@@ -116,11 +189,10 @@ export default function Info() {
                 ref={fileRef}
                 type="file"
                 accept="image/*"
-                onChange={handlePhoto}
+                onChange={handleFileSelect}
                 className="hidden"
               />
 
-              {/* 사진 메뉴 */}
               {showPhotoMenu && (
                 <>
                   <div
@@ -233,6 +305,26 @@ export default function Info() {
       </section>
     </div>
   );
+}
+
+async function getCroppedBlob(src, cropArea) {
+  const img = await new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = reject;
+    image.crossOrigin = "anonymous";
+    image.src = src;
+  });
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  ctx.drawImage(
+    img,
+    cropArea.x, cropArea.y, cropArea.width, cropArea.height,
+    0, 0, 512, 512
+  );
+  return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
 }
 
 /* --- 아이콘 --- */
