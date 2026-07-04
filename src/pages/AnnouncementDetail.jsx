@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { formatRelative } from "../lib/time";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth.jsx";
 import Comments from "../components/Comments.jsx";
 
 // Firestore Timestamp → 정확한 날짜시간 문자열 (예: 2026. 6. 23. 오후 1:36)
@@ -22,7 +22,7 @@ function formatExact(createdAt) {
 export default function AnnouncementDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, nickname, saveNickname, isAdmin } = useAuth();
+  const { user, nickname, isAdmin } = useAuth();
   const [notice, setNotice] = useState(undefined); // undefined: 로딩, null: 없음
 
   useEffect(() => {
@@ -91,7 +91,6 @@ export default function AnnouncementDetail() {
               announcementId={id}
               user={user}
               nickname={nickname}
-              saveNickname={saveNickname}
               isAdmin={isAdmin}
             />
           </>

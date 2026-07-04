@@ -12,15 +12,12 @@ import {
 import { db } from "../firebase";
 import { formatRelative } from "../lib/time";
 
-export default function Comments({ announcementId, user, nickname, saveNickname, isAdmin }) {
+export default function Comments({ announcementId, user, nickname, isAdmin }) {
   const [comments, setComments] = useState([]);
   const [text, setText] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [replyText, setReplyText] = useState("");
-  const [nickInput, setNickInput] = useState("");
-  const [showNickPrompt, setShowNickPrompt] = useState(false);
-  const [pendingAction, setPendingAction] = useState(null);
-  const inputRef = useRef(null);
+  const [hint, setHint] = useState("");
   const replyInputRef = useRef(null);
 
   const colRef = collection(db, "announcements", announcementId, "comments");
@@ -41,30 +38,18 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
     }
   });
 
-  function ensureNickname(action) {
+  function checkNickname() {
     if (!nickname) {
-      setPendingAction(() => action);
-      setShowNickPrompt(true);
+      setHint("정보 탭에서 닉네임을 먼저 설정해주세요.");
       return false;
     }
+    setHint("");
     return true;
-  }
-
-  async function handleNickSubmit(e) {
-    e.preventDefault();
-    if (!nickInput.trim()) return;
-    await saveNickname(nickInput);
-    setShowNickPrompt(false);
-    setNickInput("");
-    if (pendingAction) {
-      pendingAction();
-      setPendingAction(null);
-    }
   }
 
   async function submitComment() {
     if (!text.trim() || !user) return;
-    if (!ensureNickname(submitComment)) return;
+    if (!checkNickname()) return;
     await addDoc(colRef, {
       text: text.trim(),
       author: nickname,
@@ -77,7 +62,7 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
 
   async function submitReply() {
     if (!replyText.trim() || !user || !replyTo) return;
-    if (!ensureNickname(submitReply)) return;
+    if (!checkNickname()) return;
     await addDoc(colRef, {
       text: replyText.trim(),
       author: nickname,
@@ -110,43 +95,6 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
         댓글 {comments.length > 0 && <span className="font-medium text-basil-600">{comments.length}</span>}
       </h3>
 
-      {/* 닉네임 입력 모달 */}
-      {showNickPrompt && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-6">
-          <form
-            onSubmit={handleNickSubmit}
-            className="w-full max-w-xs rounded-2xl bg-white p-5 shadow-xl"
-          >
-            <p className="text-sm font-bold text-ink">닉네임을 입력해주세요</p>
-            <p className="mt-1 text-xs text-ink-faint">댓글에 표시되는 이름입니다.</p>
-            <input
-              autoFocus
-              value={nickInput}
-              onChange={(e) => setNickInput(e.target.value)}
-              maxLength={20}
-              placeholder="닉네임"
-              className="mt-3 w-full rounded-xl border border-basil-200 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500"
-            />
-            <div className="mt-3 flex gap-2">
-              <button
-                type="button"
-                onClick={() => { setShowNickPrompt(false); setPendingAction(null); }}
-                className="flex-1 rounded-xl border border-basil-200 py-2.5 text-sm font-medium text-ink-soft"
-              >
-                취소
-              </button>
-              <button
-                type="submit"
-                disabled={!nickInput.trim()}
-                className="flex-1 rounded-xl bg-basil-600 py-2.5 text-sm font-bold text-white disabled:opacity-40"
-              >
-                확인
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
-
       {/* 댓글 목록 */}
       <div className="mt-4 space-y-4">
         {parents.map((c) => (
@@ -158,7 +106,6 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
               onReply={() => startReply(c.id)}
             />
 
-            {/* 답글 */}
             {repliesMap[c.id]?.map((r) => (
               <div key={r.id} className="ml-8 mt-2">
                 <CommentItem
@@ -170,7 +117,6 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
               </div>
             ))}
 
-            {/* 답글 입력 */}
             {replyTo === c.id && (
               <div className="ml-8 mt-2 flex gap-2">
                 <input
@@ -206,21 +152,13 @@ export default function Comments({ announcementId, user, nickname, saveNickname,
         <p className="mt-3 text-sm text-ink-faint">아직 댓글이 없습니다.</p>
       )}
 
-      {/* 닉네임 변경 */}
-      {nickname && (
-        <button
-          type="button"
-          onClick={() => { setNickInput(nickname); setShowNickPrompt(true); setPendingAction(null); }}
-          className="mt-4 text-xs text-ink-faint underline underline-offset-2"
-        >
-          닉네임 변경 ({nickname})
-        </button>
+      {hint && (
+        <p className="mt-3 text-sm font-medium text-basil-600">{hint}</p>
       )}
 
       {/* 댓글 입력 */}
       <div className="mt-4 flex gap-2">
         <input
-          ref={inputRef}
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && !e.nativeEvent.isComposing && submitComment()}
