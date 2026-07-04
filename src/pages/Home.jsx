@@ -7,6 +7,7 @@ import { formatRelative } from "../lib/time";
 import { truncateTitle } from "../lib/text";
 import { firstImageUrl, firstFile } from "../lib/blocks";
 import { goToAnnouncement, goChild } from "../lib/nav";
+import { getScheduleStatus } from "../lib/scheduleNow";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -19,8 +20,17 @@ export default function Home() {
   const [pinned, setPinned] = useState(null); // 고정 공지 (없으면 null)
   const [pushMsg, setPushMsg] = useState("");
   const [permission, setPermission] = useState(initialPermission);
+  const [now, setNow] = useState(() => new Date()); // 지금·다음 일정 카드 시간 인식
   const navigate = useNavigate();
   const location = useLocation();
+
+  // 1분마다 now 갱신 → 진행 중/다음 일정 자동 전환
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
+
+  const scheduleStatus = getScheduleStatus(now);
 
   useEffect(() => {
     const qRecent = query(
@@ -113,22 +123,8 @@ export default function Home() {
         </p>
       </section>
 
-      {/* 주제 말씀 */}
-      <section className="px-6 pb-9 pt-7">
-        <blockquote className="rounded-2xl border border-[#D4E6EC] bg-basil-50 p-5">
-          <p className="break-keep text-[15px] leading-relaxed text-ink">
-            여호와 하나님이 아담을 부르시며 이르시되
-            <br />
-            네가 어디 있느냐?
-          </p>
-          <footer className="mt-2 text-sm font-bold text-basil-600">
-            창세기 3:9
-          </footer>
-        </blockquote>
-      </section>
-
       {/* 공지 — Firestore 실시간 구독 (홈에서 가장 강조되는 영역) */}
-      <section className="px-6">
+      <section className="px-6 pt-7">
         {cards.length > 0 ? (
           <>
             <div className="mb-3 flex items-center justify-between">
@@ -239,10 +235,97 @@ export default function Home() {
         )}
       </section>
 
+      {/* 지금·다음 일정 — 시간 인식 카드 (공지보다 약한 톤으로 주인공 자리를 양보) */}
+      <section className="px-6 pt-7">
+        <ScheduleNowCard
+          status={scheduleStatus}
+          onClick={() => goChild(navigate, location.pathname, "/schedule")}
+        />
+      </section>
+
       <p className="px-6 py-9 text-center text-xs text-ink-faint">
         로뎀나무교회 청년대학부 · 말씀캠프 앱
       </p>
     </div>
+  );
+}
+
+// 캠프 전(D-Day) / 진행 중(지금·다음) / 종료 후 상태를 한 카드로 표시
+function ScheduleNowCard({ status, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="block w-full rounded-3xl border border-basil-100 bg-basil-50 p-5 text-left"
+    >
+      {status.phase === "before" && (
+        <>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
+            D-DAY
+          </p>
+          <p className="mt-1 text-3xl font-bold text-title">D-{status.dday}</p>
+          <p className="mt-2 text-sm font-semibold text-ink">
+            여름말씀캠프 · 7/29~8/1
+          </p>
+          <p className="mt-0.5 break-keep text-[13px] leading-relaxed text-ink-soft">
+            {status.startLabel}
+          </p>
+        </>
+      )}
+
+      {status.phase === "during" && (
+        <>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
+            지금 · 다음
+          </p>
+          {status.current ? (
+            <>
+              <p className="mt-1.5 text-[11px] font-semibold text-basil-600">
+                지금 진행 중
+              </p>
+              <p className="mt-0.5 break-keep text-lg font-bold text-title">
+                {status.current.time} {status.current.title}
+              </p>
+              <p className="mt-0.5 break-keep text-[13px] text-ink-soft">
+                {status.current.day} · {status.current.place}
+              </p>
+              {status.next && (
+                <p className="mt-2.5 break-keep text-[13px] text-ink-faint">
+                  다음 {status.next.time} {status.next.title} · {status.next.place}
+                </p>
+              )}
+            </>
+          ) : status.next ? (
+            <>
+              <p className="mt-1.5 text-[11px] font-semibold text-basil-600">
+                다음 일정
+              </p>
+              <p className="mt-0.5 break-keep text-lg font-bold text-title">
+                {status.next.time} {status.next.title}
+              </p>
+              <p className="mt-0.5 break-keep text-[13px] text-ink-soft">
+                {status.next.day} · {status.next.place}
+              </p>
+            </>
+          ) : (
+            <p className="mt-1.5 break-keep text-sm leading-relaxed text-ink-soft">
+              오늘 남은 일정이 없습니다.
+            </p>
+          )}
+        </>
+      )}
+
+      {status.phase === "after" && (
+        <>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
+            캠프 마침
+          </p>
+          <p className="mt-1.5 break-keep text-sm leading-relaxed text-ink">
+            캠프가 은혜 중에 마쳤습니다.
+          </p>
+        </>
+      )}
+    </button>
   );
 }
 

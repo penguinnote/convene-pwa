@@ -4,6 +4,7 @@ export const schedule = [
   {
     day: "1일차",
     date: "7/29 (수)",
+    dateISO: "2026-07-29",
     items: [
       { time: "14:00", title: "집결 및 출발", place: "교회 주차장" },
       { time: "17:00", title: "수련회장 도착 · 방배정", place: "리셉션" },
@@ -15,6 +16,7 @@ export const schedule = [
   {
     day: "2일차",
     date: "7/30 (목)",
+    dateISO: "2026-07-30",
     items: [
       { time: "07:00", title: "기상 · QT", place: "각 방" },
       { time: "08:00", title: "아침 식사", place: "식당" },
@@ -28,6 +30,7 @@ export const schedule = [
   {
     day: "3일차",
     date: "7/31 (금)",
+    dateISO: "2026-07-31",
     items: [
       { time: "07:00", title: "기상 · QT", place: "각 방" },
       { time: "08:00", title: "아침 식사", place: "식당" },
@@ -40,6 +43,7 @@ export const schedule = [
   {
     day: "4일차",
     date: "8/1 (토)",
+    dateISO: "2026-08-01",
     items: [
       { time: "07:00", title: "기상 · QT", place: "각 방" },
       { time: "08:00", title: "아침 식사 · 짐 정리", place: "식당" },
