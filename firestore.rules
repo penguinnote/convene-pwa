@@ -5,11 +5,25 @@ service cloud.firestore {
     match /announcements/{id} {
       allow read: if true;
       allow create, update, delete: if request.auth != null;
+
+      // 댓글: 누구나 읽기, 인증된 사용자 생성, 본인 또는 관리자(이메일 보유) 삭제
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if request.auth != null;
+        allow delete: if request.auth != null
+          && (request.auth.uid == resource.data.authorUid
+              || request.auth.token.email != null);
+      }
     }
     // 토큰: 누구나 자기 토큰 등록 가능, 읽기는 막음(서버 함수는 admin 권한이라 우회)
     match /tokens/{token} {
       allow create: if true;
       allow read, update, delete: if false;
+    }
+    // 사용자 닉네임: 누구나 읽기, 본인만 쓰기
+    match /users/{uid} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.uid == uid;
     }
   }
 }
