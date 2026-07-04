@@ -3,6 +3,8 @@ import { useParams, useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { formatRelative } from "../lib/time";
+import { useAuth } from "../hooks/useAuth";
+import Comments from "../components/Comments.jsx";
 
 // Firestore Timestamp → 정확한 날짜시간 문자열 (예: 2026. 6. 23. 오후 1:36)
 function formatExact(createdAt) {
@@ -20,6 +22,7 @@ function formatExact(createdAt) {
 export default function AnnouncementDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { user, nickname, saveNickname, isAdmin } = useAuth();
   const [notice, setNotice] = useState(undefined); // undefined: 로딩, null: 없음
 
   useEffect(() => {
@@ -55,33 +58,43 @@ export default function AnnouncementDetail() {
             공지를 찾을 수 없습니다.
           </p>
         ) : (
-          <article>
-            <h1 className="break-keep [overflow-wrap:anywhere] text-2xl font-bold leading-snug text-title">
-              {notice.title}
-            </h1>
-            <p className="mt-2 text-[13px] text-ink-faint">
-              {formatRelative(notice.createdAt)}
-            </p>
-            {formatExact(notice.createdAt) && (
-              <p className="mt-0.5 text-[13px] text-ink-faint">
-                {formatExact(notice.createdAt)}
+          <>
+            <article>
+              <h1 className="break-keep [overflow-wrap:anywhere] text-2xl font-bold leading-snug text-title">
+                {notice.title}
+              </h1>
+              <p className="mt-2 text-[13px] text-ink-faint">
+                {formatRelative(notice.createdAt)}
               </p>
-            )}
-
-            {Array.isArray(notice.blocks) && notice.blocks.length > 0 ? (
-              <div className="mt-5 space-y-4">
-                {notice.blocks.map((block, i) => (
-                  <BlockView key={i} block={block} />
-                ))}
-              </div>
-            ) : (
-              notice.body && (
-                <p className="mt-5 whitespace-pre-wrap break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink">
-                  {notice.body}
+              {formatExact(notice.createdAt) && (
+                <p className="mt-0.5 text-[13px] text-ink-faint">
+                  {formatExact(notice.createdAt)}
                 </p>
-              )
-            )}
-          </article>
+              )}
+
+              {Array.isArray(notice.blocks) && notice.blocks.length > 0 ? (
+                <div className="mt-5 space-y-4">
+                  {notice.blocks.map((block, i) => (
+                    <BlockView key={i} block={block} />
+                  ))}
+                </div>
+              ) : (
+                notice.body && (
+                  <p className="mt-5 whitespace-pre-wrap break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink">
+                    {notice.body}
+                  </p>
+                )
+              )}
+            </article>
+
+            <Comments
+              announcementId={id}
+              user={user}
+              nickname={nickname}
+              saveNickname={saveNickname}
+              isAdmin={isAdmin}
+            />
+          </>
         )}
       </div>
     </div>
