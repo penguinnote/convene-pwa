@@ -22,7 +22,7 @@ function formatExact(createdAt) {
 export default function AnnouncementDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { user, nickname, isAdmin } = useAuth();
+  const { user, nickname, mokjang, photoURL, isAdmin } = useAuth();
   const [notice, setNotice] = useState(undefined); // undefined: 로딩, null: 없음
 
   useEffect(() => {
@@ -91,6 +91,8 @@ export default function AnnouncementDetail() {
               announcementId={id}
               user={user}
               nickname={nickname}
+              mokjang={mokjang}
+              photoURL={photoURL}
               isAdmin={isAdmin}
             />
           </>
