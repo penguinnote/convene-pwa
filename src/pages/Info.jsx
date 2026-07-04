@@ -9,7 +9,7 @@ const MOKJANG_LIST = [
 ];
 
 export default function Info() {
-  const { user, nickname, mokjang, photoURL, saveProfile, uploadPhoto } = useAuth();
+  const { user, nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto } = useAuth();
   const navigate = useNavigate();
   const fileRef = useRef(null);
 
@@ -18,6 +18,7 @@ export default function Info() {
   const [mok, setMok] = useState(mokjang);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [showPhotoMenu, setShowPhotoMenu] = useState(false);
 
   useEffect(() => { setNick(nickname); }, [nickname]);
   useEffect(() => { setMok(mokjang); }, [mokjang]);
@@ -39,6 +40,7 @@ export default function Info() {
   async function handlePhoto(e) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setShowPhotoMenu(false);
     setUploading(true);
     try {
       await uploadPhoto(file);
@@ -49,6 +51,17 @@ export default function Info() {
     e.target.value = "";
   }
 
+  async function handleRemovePhoto() {
+    setShowPhotoMenu(false);
+    setUploading(true);
+    try {
+      await removePhoto();
+    } catch {
+      // 삭제 실패 무시
+    }
+    setUploading(false);
+  }
+
   return (
     <div>
       <PageHeader eyebrow="INFO" title="정보" />
@@ -56,7 +69,6 @@ export default function Info() {
       {/* 프로필 카드 */}
       <section className="px-5 py-5">
         <div className="relative rounded-2xl border border-basil-100 bg-white p-5">
-          {/* 수정 버튼 */}
           {!editing && (
             <button
               type="button"
@@ -67,22 +79,30 @@ export default function Info() {
             </button>
           )}
 
-          {/* 아바타 */}
           <div className="flex flex-col items-center">
+            {/* 아바타 — 84×84 고정 정사각 원형 */}
             <div className="relative">
-              <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-basil-200 bg-basil-50">
+              <div
+                className="overflow-hidden rounded-full border-2 border-basil-200 bg-basil-50"
+                style={{ width: 84, height: 84 }}
+              >
                 {photoURL ? (
-                  <img src={photoURL} alt="" className="h-full w-full object-cover" />
+                  <img
+                    src={photoURL}
+                    alt=""
+                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+                  />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-basil-300">
                     <DefaultAvatarIcon />
                   </div>
                 )}
               </div>
+
               {/* 카메라 뱃지 */}
               <button
                 type="button"
-                onClick={() => fileRef.current?.click()}
+                onClick={() => setShowPhotoMenu(true)}
                 disabled={uploading}
                 className="absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-basil-600 text-white shadow-sm disabled:opacity-50"
               >
@@ -99,6 +119,34 @@ export default function Info() {
                 onChange={handlePhoto}
                 className="hidden"
               />
+
+              {/* 사진 메뉴 */}
+              {showPhotoMenu && (
+                <>
+                  <div
+                    className="fixed inset-0 z-40"
+                    onClick={() => setShowPhotoMenu(false)}
+                  />
+                  <div className="absolute -bottom-2 left-1/2 z-50 w-44 -translate-x-1/2 translate-y-full overflow-hidden rounded-xl border border-basil-200 bg-white shadow-lg">
+                    <button
+                      type="button"
+                      onClick={() => { setShowPhotoMenu(false); fileRef.current?.click(); }}
+                      className="w-full px-4 py-3 text-left text-sm font-medium text-ink"
+                    >
+                      사진 변경
+                    </button>
+                    {photoURL && (
+                      <button
+                        type="button"
+                        onClick={handleRemovePhoto}
+                        className="w-full border-t border-basil-100 px-4 py-3 text-left text-sm font-medium text-red-500"
+                      >
+                        기본 이미지로 변경
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {editing ? (

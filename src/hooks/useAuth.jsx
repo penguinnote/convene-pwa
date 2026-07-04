@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { doc, getDoc, setDoc } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "../firebase";
 
 const AuthContext = createContext(null);
@@ -61,11 +61,23 @@ export function AuthProvider({ children }) {
     });
   }
 
+  async function removePhoto() {
+    if (!user) return;
+    try {
+      const folderRef = ref(storage, `profiles/${user.uid}`);
+      const list = await listAll(folderRef);
+      await Promise.all(list.items.map((item) => deleteObject(item)));
+    } catch {
+      // 삭제 실패 무시 (파일 없음 등)
+    }
+    await saveProfile({ photoURL: "" });
+  }
+
   const hasProfile = !!nickname;
 
   return (
     <AuthContext.Provider value={{
-      user, nickname, mokjang, photoURL, saveProfile, uploadPhoto,
+      user, nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto,
       ready, hasProfile, isAdmin: !!user?.email,
     }}>
       {children}
