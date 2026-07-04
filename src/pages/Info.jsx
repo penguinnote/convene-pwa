@@ -1,72 +1,159 @@
-import { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import PageHeader from "../components/PageHeader.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 
-export default function Info() {
-  const { user, nickname, mokjang, saveProfile } = useAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+const MOKJANG_LIST = [
+  "기쁨", "다소니", "마음", "밸리", "빛길", "사랑",
+  "새벽", "새싹", "에끌", "토브", "프레쉬", "하품",
+];
 
+export default function Info() {
+  const { user, nickname, mokjang, photoURL, saveProfile, uploadPhoto } = useAuth();
+  const navigate = useNavigate();
+  const fileRef = useRef(null);
+
+  const [editing, setEditing] = useState(false);
   const [nick, setNick] = useState(nickname);
   const [mok, setMok] = useState(mokjang);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => { setNick(nickname); }, [nickname]);
   useEffect(() => { setMok(mokjang); }, [mokjang]);
 
-  const dirty = nick.trim() !== nickname || mok.trim() !== mokjang;
-
   async function handleSave() {
-    if (!dirty || saving) return;
+    if (saving) return;
     setSaving(true);
     await saveProfile({ nickname: nick, mokjang: mok });
     setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 1500);
+    setEditing(false);
+  }
+
+  function handleCancel() {
+    setNick(nickname);
+    setMok(mokjang);
+    setEditing(false);
+  }
+
+  async function handlePhoto(e) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      await uploadPhoto(file);
+    } catch {
+      // 업로드 실패 무시
+    }
+    setUploading(false);
+    e.target.value = "";
   }
 
   return (
     <div>
       <PageHeader eyebrow="INFO" title="정보" />
 
-      {/* 내 정보 */}
+      {/* 프로필 카드 */}
       <section className="px-5 py-5">
-        <h2 className="mb-3 px-1 text-[13px] font-bold uppercase tracking-wider text-basil-600">
-          내 정보
-        </h2>
-        <div className="space-y-3 rounded-2xl border border-basil-100 bg-white p-4">
-          <div>
-            <label className="text-xs font-medium text-ink-faint">닉네임</label>
-            <input
-              value={nick}
-              onChange={(e) => setNick(e.target.value)}
-              maxLength={20}
-              placeholder="닉네임을 입력하세요"
-              disabled={!user}
-              className="mt-1 w-full rounded-xl border border-basil-200 bg-basil-50/50 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500 disabled:opacity-50"
-            />
+        <div className="relative rounded-2xl border border-basil-100 bg-white p-5">
+          {/* 수정 버튼 */}
+          {!editing && (
+            <button
+              type="button"
+              onClick={() => setEditing(true)}
+              className="absolute right-4 top-4 text-xs font-medium text-basil-600"
+            >
+              수정
+            </button>
+          )}
+
+          {/* 아바타 */}
+          <div className="flex flex-col items-center">
+            <div className="relative">
+              <div className="h-20 w-20 overflow-hidden rounded-full border-2 border-basil-200 bg-basil-50">
+                {photoURL ? (
+                  <img src={photoURL} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-basil-300">
+                    <DefaultAvatarIcon />
+                  </div>
+                )}
+              </div>
+              {/* 카메라 뱃지 */}
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={uploading}
+                className="absolute -bottom-0.5 -right-0.5 flex h-7 w-7 items-center justify-center rounded-full border-2 border-white bg-basil-600 text-white shadow-sm disabled:opacity-50"
+              >
+                {uploading ? (
+                  <span className="h-3 w-3 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                ) : (
+                  <CameraIcon />
+                )}
+              </button>
+              <input
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhoto}
+                className="hidden"
+              />
+            </div>
+
+            {editing ? (
+              <div className="mt-4 w-full space-y-3">
+                <div>
+                  <label className="text-xs font-medium text-ink-faint">닉네임</label>
+                  <input
+                    value={nick}
+                    onChange={(e) => setNick(e.target.value)}
+                    maxLength={20}
+                    className="mt-1 w-full rounded-xl border border-basil-200 bg-basil-50/50 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-ink-faint">목장</label>
+                  <select
+                    value={mok}
+                    onChange={(e) => setMok(e.target.value)}
+                    className="mt-1 w-full appearance-none rounded-xl border border-basil-200 bg-basil-50/50 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500"
+                  >
+                    <option value="" disabled>선택</option>
+                    {MOKJANG_LIST.map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    className="flex-1 rounded-xl border border-basil-200 py-2.5 text-sm font-medium text-ink-soft"
+                  >
+                    취소
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    disabled={!nick.trim() || saving}
+                    className="flex-1 rounded-xl bg-basil-600 py-2.5 text-sm font-bold text-white disabled:opacity-40"
+                  >
+                    {saving ? "저장 중…" : "저장"}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <>
+                <p className="mt-3 text-lg font-bold text-title">{nickname || "닉네임 없음"}</p>
+                {mokjang && (
+                  <span className="mt-1.5 rounded-full bg-basil-50 px-3 py-1 text-xs font-semibold text-basil-600">
+                    {mokjang}
+                  </span>
+                )}
+              </>
+            )}
           </div>
-          <div>
-            <label className="text-xs font-medium text-ink-faint">목장</label>
-            <input
-              value={mok}
-              onChange={(e) => setMok(e.target.value)}
-              maxLength={30}
-              placeholder="목장 이름을 입력하세요"
-              disabled={!user}
-              className="mt-1 w-full rounded-xl border border-basil-200 bg-basil-50/50 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500 disabled:opacity-50"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!dirty || saving || !user}
-            className="w-full rounded-xl bg-basil-600 py-2.5 text-sm font-bold text-white transition-opacity disabled:opacity-40"
-          >
-            {saved ? "저장 완료" : saving ? "저장 중…" : "저장"}
-          </button>
         </div>
       </section>
 
@@ -79,7 +166,7 @@ export default function Info() {
           <button
             type="button"
             onClick={() => navigate("/rooms")}
-            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+            className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
               <BedIcon />
@@ -87,26 +174,61 @@ export default function Info() {
             <span className="flex-1 font-bold text-title">방배정</span>
             <span className="text-basil-300">›</span>
           </button>
+          <div className="flex items-center gap-3 px-4 py-4 opacity-40">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
+              <MealIcon />
+            </span>
+            <span className="flex-1 font-bold text-ink-faint">식단표</span>
+            <span className="text-xs text-ink-faint">준비 중</span>
+          </div>
         </div>
       </section>
     </div>
   );
 }
 
+/* --- 아이콘 --- */
+const sw = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.8,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+};
+
+function DefaultAvatarIcon() {
+  return (
+    <svg width="36" height="36" viewBox="0 0 24 24" {...sw}>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1" />
+    </svg>
+  );
+}
+
+function CameraIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" {...sw} strokeWidth={2.2}>
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+      <circle cx="12" cy="13" r="4" />
+    </svg>
+  );
+}
+
 function BedIcon() {
   return (
-    <svg
-      width="20"
-      height="20"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
       <path d="M3 7v12M3 13h18v6M21 13v-2a3 3 0 0 0-3-3H9v5" />
       <circle cx="6.5" cy="10.5" r="1.5" />
+    </svg>
+  );
+}
+
+function MealIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
+      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
+      <path d="M7 2v20" />
+      <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
     </svg>
   );
 }
