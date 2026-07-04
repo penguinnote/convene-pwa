@@ -34,7 +34,7 @@ npx firebase-tools deploy --only functions   # Cloud Function 배포 (region: as
 - **스택**: React 18 + React Router + Vite 5 + Tailwind. 백엔드는 Firebase(Firestore·Auth·Storage·FCM·Functions·Hosting).
 - **데이터 위치** (중요):
   - **Firestore**: `announcements`(공지), `announcements/{id}/comments`(댓글), `tokens`(FCM 토큰), `users`(프로필: nickname·mokjang·photoURL)
-  - **정적 파일** `src/data/`: 일정(`schedule.js`)·방배정(`rooms.js`)·말씀(`verses.js`). 변동 없는 데이터라 읽기비용 절감을 위해 DB에 두지 않는다.
+  - **정적 파일** `src/data/`: 일정(`schedule.js`)·방배정(`rooms.js`)·말씀(`verses.js`). 변동 없는 데이터라 읽기비용 절감을 위해 DB에 두지 않는다. `schedule.js`의 각 day는 표시용 `date`("7/29 (수)")와 함께 절대 시각 판정용 `dateISO`("2026-07-29")를 갖는다. 홈의 "지금·다음 일정" 카드는 순수 함수 `src/lib/scheduleNow.js`의 `getScheduleStatus(now)`로 D-Day/진행 중/종료 상태를 계산한다.
 - **푸시 흐름**: Admin이 `announcements` 문서 생성 → Functions `onDocumentCreated` 트리거 → 전체 토큰에 **data-only** 페이로드 발송 → `src/sw.js`가 알림 표시 + 배지 증가.
 - **인증**: 익명 로그인(참가자, 프로필·댓글용) + 이메일 로그인(관리자). `isAdmin = !!user.email`.
 - **공지 데이터 모델**: `{ title, body, blocks[], pinned, createdAt }`. `blocks`는 `text`/`image`/`file`/`link` 타입의 순서 배열. `body`는 첫 텍스트 블록(미리보기·푸시 본문 하위호환). 첨부는 Storage 업로드, 이미지는 클라이언트 리사이즈.
