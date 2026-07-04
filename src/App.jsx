@@ -8,10 +8,12 @@ import Toast from "./components/Toast.jsx";
 import { setBadgeCount } from "./lib/badge";
 import { goToAnnouncement } from "./lib/nav";
 import { useBackControl } from "./hooks/useBackControl";
+import { AuthProvider } from "./hooks/useAuth.jsx";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
 import Rooms from "./pages/Rooms.jsx";
 import Verses from "./pages/Verses.jsx";
+import Info from "./pages/Info.jsx";
 import Admin from "./pages/Admin.jsx";
 import Announcements from "./pages/Announcements.jsx";
 import AnnouncementDetail from "./pages/AnnouncementDetail.jsx";
@@ -103,7 +105,7 @@ export default function App() {
   }, []);
 
   return (
-    <>
+    <AuthProvider>
       {splashVisible && (
         <SplashScreen stage={splashStage} leaving={splashLeaving} />
       )}
@@ -141,6 +143,7 @@ export default function App() {
             <Route path="/schedule" element={<Schedule />} />
             <Route path="/rooms" element={<Rooms />} />
             <Route path="/verses" element={<Verses />} />
+            <Route path="/info" element={<Info />} />
             <Route path="/announcements" element={<Announcements />} />
             <Route path="/announcements/:id" element={<AnnouncementDetail />} />
             <Route path="/admin" element={<Admin />} />
@@ -150,6 +153,6 @@ export default function App() {
 
         <BottomNav />
       </div>
-    </>
+    </AuthProvider>
   );
 }
