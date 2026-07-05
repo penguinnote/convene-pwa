@@ -1,15 +1,22 @@
+// 강의별 말씀 본문. 정적 데이터.
+// 각 item의 id는 스케줄 link(verseId)·상세 라우트(/verses/:id)와 매칭되는 안정적 키다.
+//   주제 강의 1~5강 → topic-1~5, 개회 → opening, 폐회 → closing,
+//   GBS 1~3강 → gbs-1~3, 새벽(아침묵상) 1~3강 → dawn-1~3.
+// 본문 text/textEn는 추후 입력한다(비어 있으면 상세에서 "준비 중" 폴백).
 export const verseGroups = [
   {
     group: "주제 강의",
     groupEn: "Topic Lectures",
     items: [
       {
+        id: "topic-1",
         label: "1강",
         title: "나도 너를 정죄하지 아니하노니",
         titleEn: "Neither Do I Condemn You",
         passages: [{ ref: "요한복음 8:1-12, 31-32", refEn: "John 8:1-12, 31-32", text: "", textEn: "" }],
       },
       {
+        id: "topic-2",
         label: "2강",
         title: "이 내 아들은 잃었다가 다시 얻었노라",
         titleEn: "This Son of Mine Was Lost and Is Found",
@@ -18,18 +25,21 @@ export const verseGroups = [
         passages: [{ ref: "누가복음 15:1-32", refEn: "Luke 15:1-32", text: "", textEn: "" }],
       },
       {
+        id: "topic-3",
         label: "3강",
         title: "네 이름이 무엇이냐?",
         titleEn: "What Is Your Name?",
         passages: [{ ref: "마가복음 5:1-20", refEn: "Mark 5:1-20", text: "", textEn: "" }],
       },
       {
+        id: "topic-4",
         label: "4강",
         title: "오늘 네가 나와 함께 낙원에 있으리라",
         titleEn: "Today You Will Be With Me in Paradise",
         passages: [{ ref: "누가복음 23:1-49", refEn: "Luke 23:1-49", text: "", textEn: "" }],
       },
       {
+        id: "topic-5",
         label: "5강",
         title: "나도 너희를 보내노라",
         titleEn: "I Am Sending You",
@@ -42,12 +52,14 @@ export const verseGroups = [
     groupEn: "Opening & Closing",
     items: [
       {
+        id: "opening",
         label: "개회",
         title: "아담아 네가 어디 있느냐?",
         titleEn: "Where Are You?",
         passages: [{ ref: "창세기 3:9", refEn: "Genesis 3:9", text: "", textEn: "" }],
       },
       {
+        id: "closing",
         label: "폐회",
         title: "너희는 가지니",
         titleEn: "You Are the Branches",
@@ -60,18 +72,21 @@ export const verseGroups = [
     groupEn: "GBS",
     items: [
       {
+        id: "gbs-1",
         label: "GBS 1강",
         title: "네 죄 사함을 받았느니라",
         titleEn: "Your Sins Are Forgiven",
         passages: [{ ref: "마가복음 2:1-12", refEn: "Mark 2:1-12", text: "", textEn: "" }],
       },
       {
+        id: "gbs-2",
         label: "GBS 2강",
         title: "삭개오야 속히 내려오라",
         titleEn: "Zacchaeus, Come Down",
         passages: [{ ref: "누가복음 19:1-10", refEn: "Luke 19:1-10", text: "", textEn: "" }],
       },
       {
+        id: "gbs-3",
         label: "GBS 3강",
         title: "청년아 일어나라",
         titleEn: "Young Man, Get Up",
@@ -84,12 +99,14 @@ export const verseGroups = [
     groupEn: "Dawn Devotions",
     items: [
       {
+        id: "dawn-1",
         label: "1강",
         title: "인격적 만남",
         titleEn: "A Personal Encounter",
         passages: [{ ref: "창세기 28:10-22", refEn: "Genesis 28:10-22", text: "", textEn: "" }],
       },
       {
+        id: "dawn-2",
         label: "2강",
         title: "존재의 변화",
         titleEn: "Transformation of Being",
@@ -99,6 +116,7 @@ export const verseGroups = [
         ],
       },
       {
+        id: "dawn-3",
         label: "3강",
         title: "내려놓음 그 너머",
         titleEn: "Beyond Surrender",
@@ -111,3 +129,12 @@ export const verseGroups = [
     ],
   },
 ];
+
+// id로 강의 항목을 찾아 소속 group 정보와 함께 반환. 없으면 null.
+export function getVerseById(id) {
+  for (const g of verseGroups) {
+    const item = g.items.find((it) => it.id === id);
+    if (item) return { ...item, group: g.group, groupEn: g.groupEn };
+  }
+  return null;
+}
