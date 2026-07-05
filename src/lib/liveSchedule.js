@@ -56,7 +56,7 @@ export function getAutoLive(now = new Date()) {
   }
 
   // 그날 첫 순서(07:00) 이전(=자정~07:00)에는 current가 없으므로 "취침"으로 채운다.
-  // next는 그대로 그날 첫 항목(07:00)을 가리킨다.
+  // next는 그대로 그날 첫 항목(07:00)을 가리킨다. 취침에는 관련 자료 링크를 두지 않는다.
   const currentView = current
     ? itemView(dayIndex, current)
     : {
@@ -64,7 +64,7 @@ export function getAutoLive(now = new Date()) {
         time: "",
         title: "취침",
         place: "",
-        link: { type: "playlist" },
+        link: null,
         rest: true,
       };
 
