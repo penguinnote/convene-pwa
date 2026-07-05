@@ -332,22 +332,14 @@ export default function Admin() {
 
         {/* 자동 계산된 현재/다음 순서 (읽기 전용) */}
         <div className="rounded-2xl border border-basil-100 bg-basil-50 p-4">
-          {current ? (
-            <>
-              <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
-                지금 진행 중 · {current.day}
-              </p>
-              <p className="mt-1 break-keep text-lg font-bold text-title">
-                {current.time} {current.title}
-              </p>
-              {current.place && (
-                <p className="mt-0.5 text-[13px] text-ink-soft">{current.place}</p>
-              )}
-            </>
-          ) : (
-            <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
-              다음 일정 · {next.day}
-            </p>
+          <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
+            지금 진행 중 · {current.day}
+          </p>
+          <p className="mt-1 break-keep text-lg font-bold text-title">
+            {current.rest ? "취침" : `${current.time} ${current.title}`}
+          </p>
+          {!current.rest && current.place && (
+            <p className="mt-0.5 text-[13px] text-ink-soft">{current.place}</p>
           )}
           {next && (
             <p className="mt-2 break-keep text-[13px] text-ink-faint">

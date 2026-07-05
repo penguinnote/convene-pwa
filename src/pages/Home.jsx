@@ -349,9 +349,9 @@ function LiveCard({ current, next, note, linkLabel, onLink, onCard }) {
           </div>
 
           <p className="mt-2 break-keep text-xl font-bold text-title">
-            {current.time} {current.title}
+            {current.rest ? "취침" : `${current.time} ${current.title}`}
           </p>
-          {current.place && (
+          {!current.rest && current.place && (
             <p className="mt-0.5 break-keep text-[13px] text-ink-soft">{current.place}</p>
           )}
 
