@@ -20,8 +20,9 @@ npm run build            # 프로덕션 빌드 → dist/
 npm run preview          # PWA(설치·오프라인) 테스트는 build 후 preview로
 
 # 배포
-npx firebase-tools deploy --only hosting     # 프론트 배포
-npx firebase-tools deploy --only functions   # Cloud Function 배포 (region: asia-northeast3)
+npx firebase-tools deploy --only hosting          # 프론트 배포
+npx firebase-tools deploy --only functions        # Cloud Function 배포 (region: asia-northeast3)
+npx firebase-tools deploy --only firestore:rules  # Firestore 보안 규칙 배포 (config/live 등 규칙 변경 시)
 ```
 
 - `.env.local`에 Firebase 설정값이 들어간다(`VITE_FIREBASE_*`, `VITE_FIREBASE_VAPID_KEY`). 커밋 금지.
@@ -33,12 +34,13 @@ npx firebase-tools deploy --only functions   # Cloud Function 배포 (region: as
 
 - **스택**: React 18 + React Router + Vite 5 + Tailwind. 백엔드는 Firebase(Firestore·Auth·Storage·FCM·Functions·Hosting).
 - **데이터 위치** (중요):
-  - **Firestore**: `announcements`(공지), `announcements/{id}/comments`(댓글), `tokens`(FCM 토큰), `users`(프로필: nickname·mokjang·photoURL)
-  - **정적 파일** `src/data/`: 일정(`schedule.js`)·방배정(`rooms.js`)·말씀(`verses.js`). 변동 없는 데이터라 읽기비용 절감을 위해 DB에 두지 않는다. `schedule.js`의 각 day는 표시용 `date`("7/29 (수)")와 함께 절대 시각 판정용 `dateISO`("2026-07-29")를 갖는다. 홈의 "지금·다음 일정" 카드는 순수 함수 `src/lib/scheduleNow.js`의 `getScheduleStatus(now)`로 D-Day/진행 중/종료 상태를 계산한다.
+  - **Firestore**: `announcements`(공지), `announcements/{id}/comments`(댓글), `tokens`(FCM 토큰), `users`(프로필: nickname·mokjang·photoURL), `config/live`(라이브 현재 순서: `active`·`dayIndex`·`itemIndex`·`note`·`updatedAt`)
+  - **정적 파일** `src/data/`: 일정(`schedule.js`)·방배정(`rooms.js`)·말씀(`verses.js`). 변동 없는 데이터라 읽기비용 절감을 위해 DB에 두지 않는다. **`schedule.js`는 현재 임시 테스트 일정(단일 "테스트 일정" day)** — 캠프 전 실제 일정으로 교체한다.
 - **푸시 흐름**: Admin이 `announcements` 문서 생성 → Functions `onDocumentCreated` 트리거 → 전체 토큰에 **data-only** 페이로드 발송 → `src/sw.js`가 알림 표시 + 배지 증가.
 - **인증**: 익명 로그인(참가자, 프로필·댓글용) + 이메일 로그인(관리자). `isAdmin = !!user.email`.
 - **공지 데이터 모델**: `{ title, body, blocks[], pinned, createdAt }`. `blocks`는 `text`/`image`/`file`/`link` 타입의 순서 배열. `body`는 첫 텍스트 블록(미리보기·푸시 본문 하위호환). 첨부는 Storage 업로드, 이미지는 클라이언트 리사이즈.
 - **댓글 표시**: `authorUid`로 `users` 문서를 조회(`useUserProfiles`, getDoc+캐시)해 최신 프로필(사진·닉네임·목장)을 반영한다. 조회 실패나 문서 없음(예: 관리자)은 댓글에 저장된 `author*` 필드로 폴백. 쓰기 경로는 하위호환용으로 `author*`를 계속 저장한다.
+- **라이브 현재 순서**: 캠프 진행은 수시로 밀리거나 당겨져 시계 자동 계산이 부정확하다. 그래서 관리자가 `config/live` 포인터(`dayIndex`·`itemIndex`)를 **수동으로** 넘긴다(Admin "라이브 진행" 뷰). 홈은 이를 onSnapshot 구독해 `active`일 때만 "현재 순서" 카드를 표시한다. 순서/다음 순서 해석은 `src/lib/liveSchedule.js`, 현재 순서 제목→관련 자료(말씀/자료실) 판별은 순수 함수 `src/lib/liveResource.js`가 담당한다. 라이브는 FCM 푸시와 무관하다.
 
 주요 파일: `src/App.jsx`(라우팅·스플래시·토스트), `src/sw.js`(캐싱+FCM+알림클릭), `src/pages/Admin.jsx`(공지 작성/발송), `src/hooks/useBackControl.js`(안드로이드 계층 뒤로가기), `src/hooks/useAuth.jsx`, `functions/index.js`(푸시 발송).
 

@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { collection, query, orderBy, limit, where, onSnapshot } from "firebase/firestore";
+import { collection, query, orderBy, limit, where, onSnapshot, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { enablePush } from "../lib/push";
 import { formatRelative } from "../lib/time";
 import { truncateTitle } from "../lib/text";
 import { firstImageUrl, firstFile } from "../lib/blocks";
 import { goToAnnouncement, goChild } from "../lib/nav";
-import { getScheduleStatus } from "../lib/scheduleNow";
+import { getLiveItem, getNextItem } from "../lib/liveSchedule";
+import { getLiveResource } from "../lib/liveResource";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -16,27 +17,19 @@ function initialPermission() {
 }
 
 export default function Home() {
-  const [recent, setRecent] = useState([]); // 최신 2개
+  const [recent, setRecent] = useState([]); // 최신 몇 개 (pinned 필터용)
   const [pinned, setPinned] = useState(null); // 고정 공지 (없으면 null)
+  const [live, setLive] = useState(null); // config/live 라이브 상태
   const [pushMsg, setPushMsg] = useState("");
   const [permission, setPermission] = useState(initialPermission);
-  const [now, setNow] = useState(() => new Date()); // 지금·다음 일정 카드 시간 인식
   const navigate = useNavigate();
   const location = useLocation();
-
-  // 1분마다 now 갱신 → 진행 중/다음 일정 자동 전환
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 60000);
-    return () => clearInterval(id);
-  }, []);
-
-  const scheduleStatus = getScheduleStatus(now);
 
   useEffect(() => {
     const qRecent = query(
       collection(db, "announcements"),
       orderBy("createdAt", "desc"),
-      limit(2)
+      limit(3)
     );
     const unsubRecent = onSnapshot(qRecent, (snap) => {
       setRecent(snap.docs.map((d) => ({ id: d.id, ...d.data() })));
@@ -51,20 +44,34 @@ export default function Home() {
       setPinned(snap.empty ? null : { id: snap.docs[0].id, ...snap.docs[0].data() });
     });
 
+    // 라이브 현재 순서 실시간 구독
+    const unsubLive = onSnapshot(doc(db, "config", "live"), (snap) => {
+      setLive(snap.exists() ? snap.data() : null);
+    });
+
     return () => {
       unsubRecent();
       unsubPinned();
+      unsubLive();
     };
   }, []);
 
-  // 위 카드 = 최신, 아래 카드 = 고정 공지(없으면 두 번째 최신).
-  // 고정이 최신과 같으면 위에 한 번만 표시하고 아래는 그다음 최신으로 중복 방지.
-  const top = recent[0] ?? null;
-  let bottom = null;
-  if (top) {
-    bottom = pinned && pinned.id !== top.id ? pinned : recent[1] ?? null;
+  // 공지 섹션: 최신 중 고정(pinned)이 아닌 것 위주로 최대 2개.
+  const topCards = recent.filter((r) => !r.pinned).slice(0, 2);
+
+  // 라이브: active이고 포인터가 실제 순서를 가리킬 때만 카드 표시.
+  const liveCurrent = live?.active ? getLiveItem(live.dayIndex, live.itemIndex) : null;
+  const liveNext = liveCurrent ? getNextItem(live.dayIndex, live.itemIndex) : null;
+  const liveResource = liveCurrent ? getLiveResource(liveCurrent, pinned?.id ?? null) : null;
+
+  function handleResource(res) {
+    if (!res?.to) return;
+    if (res.kind === "resource" && pinned) {
+      goToAnnouncement(navigate, location.pathname, pinned.id);
+    } else {
+      goChild(navigate, location.pathname, res.to);
+    }
   }
-  const cards = [top, bottom].filter(Boolean);
 
   async function handleEnablePush() {
     setPushMsg("");
@@ -123,9 +130,9 @@ export default function Home() {
         </p>
       </section>
 
-      {/* 공지 — Firestore 실시간 구독 (홈에서 가장 강조되는 영역) */}
+      {/* 공지 — Firestore 실시간 구독 (홈에서 가장 강조되는 영역, 고정 공지는 제외) */}
       <section className="px-6 pt-7">
-        {cards.length > 0 ? (
+        {topCards.length > 0 ? (
           <>
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-semibold text-ink">공지</p>
@@ -139,65 +146,14 @@ export default function Home() {
             </div>
 
             <div className="space-y-3">
-              {cards.map((notice, i) => {
-                const img = firstImageUrl(notice);
-                const file = firstFile(notice);
-                return (
-                  <button
-                    key={notice.id}
-                    type="button"
-                    onClick={() => goToAnnouncement(navigate, location.pathname, notice.id)}
-                    className={`block w-full text-left ${
-                      i === 0
-                        ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-6 shadow-sm"
-                        : "rounded-3xl border border-basil-100 bg-white p-5"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      {i === 0 ? (
-                        <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
-                          <BellIcon />
-                          공지
-                        </span>
-                      ) : (
-                        <span />
-                      )}
-                      <span className="shrink-0 text-[11px] text-basil-400">
-                        {formatRelative(notice.createdAt)}
-                      </span>
-                    </div>
-
-                    {/* A형: 좌측 본문 + 우측 64px 썸네일(밑단 정렬) */}
-                    <div className="mt-3 flex items-end gap-3">
-                      <div className="min-w-0 flex-1">
-                        <h2
-                          className={`truncate font-bold leading-snug text-title ${
-                            i === 0 ? "text-2xl" : "text-lg"
-                          }`}
-                        >
-                          {truncateTitle(notice.title)}
-                        </h2>
-                        {notice.body && (
-                          <p className="mt-2 line-clamp-2 break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
-                            {notice.body}
-                          </p>
-                        )}
-                        {file && (
-                          <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-100 px-2.5 py-1 text-[12px] text-basil-700">
-                            <ClipIcon />
-                            <span className="truncate">{chipName(file.name)}</span>
-                          </span>
-                        )}
-                      </div>
-                      {img && (
-                        <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-basil-100">
-                          <img src={img} alt="" className="h-full w-full object-cover" />
-                        </div>
-                      )}
-                    </div>
-                  </button>
-                );
-              })}
+              {topCards.map((notice, i) => (
+                <NoticeCard
+                  key={notice.id}
+                  notice={notice}
+                  highlight={i === 0}
+                  onClick={() => goToAnnouncement(navigate, location.pathname, notice.id)}
+                />
+              ))}
             </div>
           </>
         ) : (
@@ -235,13 +191,31 @@ export default function Home() {
         )}
       </section>
 
-      {/* 지금·다음 일정 — 시간 인식 카드 (공지보다 약한 톤으로 주인공 자리를 양보) */}
-      <section className="px-6 pt-7">
-        <ScheduleNowCard
-          status={scheduleStatus}
-          onClick={() => goChild(navigate, location.pathname, "/schedule")}
-        />
-      </section>
+      {/* 라이브 현재 순서 — 관리자 포인터(config/live) 기반. active일 때만 표시 */}
+      {liveCurrent && (
+        <section className="px-6 pt-7">
+          <LiveCard
+            current={liveCurrent}
+            next={liveNext}
+            note={live.note}
+            resource={liveResource}
+            onCard={() => goChild(navigate, location.pathname, "/schedule")}
+            onResource={() => handleResource(liveResource)}
+          />
+        </section>
+      )}
+
+      {/* 자료실 — 고정 공지가 있으면 맨 밑에 표시 */}
+      {pinned && (
+        <section className="px-6 pt-7">
+          <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
+          <NoticeCard
+            notice={pinned}
+            highlight={false}
+            onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
+          />
+        </section>
+      )}
 
       <p className="px-6 py-9 text-center text-xs text-ink-faint">
         로뎀나무교회 청년대학부 · 말씀캠프 앱
@@ -250,82 +224,126 @@ export default function Home() {
   );
 }
 
-// 캠프 전(D-Day) / 진행 중(지금·다음) / 종료 후 상태를 한 카드로 표시
-function ScheduleNowCard({ status, onClick }) {
+// 공지 카드 (홈 상단 공지 + 자료실 고정 공지 공용)
+function NoticeCard({ notice, highlight, onClick }) {
+  const img = firstImageUrl(notice);
+  const file = firstFile(notice);
   return (
     <button
       type="button"
       onClick={onClick}
-      className="block w-full rounded-3xl border border-basil-100 bg-basil-50 p-5 text-left"
+      className={`block w-full text-left ${
+        highlight
+          ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-6 shadow-sm"
+          : "rounded-3xl border border-basil-100 bg-white p-5"
+      }`}
     >
-      {status.phase === "before" && (
-        <>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
-            D-DAY
-          </p>
-          <p className="mt-1 text-3xl font-bold text-title">D-{status.dday}</p>
-          <p className="mt-2 text-sm font-semibold text-ink">
-            여름말씀캠프 · 7/29~8/1
-          </p>
-          <p className="mt-0.5 break-keep text-[13px] leading-relaxed text-ink-soft">
-            {status.startLabel}
-          </p>
-        </>
-      )}
+      <div className="flex items-start justify-between gap-3">
+        {highlight ? (
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
+            <BellIcon />
+            공지
+          </span>
+        ) : (
+          <span />
+        )}
+        <span className="shrink-0 text-[11px] text-basil-400">
+          {formatRelative(notice.createdAt)}
+        </span>
+      </div>
 
-      {status.phase === "during" && (
-        <>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
-            지금 · 다음
-          </p>
-          {status.current ? (
-            <>
-              <p className="mt-1.5 text-[11px] font-semibold text-basil-600">
-                지금 진행 중
-              </p>
-              <p className="mt-0.5 break-keep text-lg font-bold text-title">
-                {status.current.time} {status.current.title}
-              </p>
-              <p className="mt-0.5 break-keep text-[13px] text-ink-soft">
-                {status.current.day} · {status.current.place}
-              </p>
-              {status.next && (
-                <p className="mt-2.5 break-keep text-[13px] text-ink-faint">
-                  다음 {status.next.time} {status.next.title} · {status.next.place}
-                </p>
-              )}
-            </>
-          ) : status.next ? (
-            <>
-              <p className="mt-1.5 text-[11px] font-semibold text-basil-600">
-                다음 일정
-              </p>
-              <p className="mt-0.5 break-keep text-lg font-bold text-title">
-                {status.next.time} {status.next.title}
-              </p>
-              <p className="mt-0.5 break-keep text-[13px] text-ink-soft">
-                {status.next.day} · {status.next.place}
-              </p>
-            </>
-          ) : (
-            <p className="mt-1.5 break-keep text-sm leading-relaxed text-ink-soft">
-              오늘 남은 일정이 없습니다.
+      {/* A형: 좌측 본문 + 우측 64px 썸네일(밑단 정렬) */}
+      <div className="mt-3 flex items-end gap-3">
+        <div className="min-w-0 flex-1">
+          <h2
+            className={`truncate font-bold leading-snug text-title ${
+              highlight ? "text-2xl" : "text-lg"
+            }`}
+          >
+            {truncateTitle(notice.title)}
+          </h2>
+          {notice.body && (
+            <p className="mt-2 line-clamp-2 break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
+              {notice.body}
             </p>
           )}
-        </>
+          {file && (
+            <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-100 px-2.5 py-1 text-[12px] text-basil-700">
+              <ClipIcon />
+              <span className="truncate">{chipName(file.name)}</span>
+            </span>
+          )}
+        </div>
+        {img && (
+          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-basil-100">
+            <img src={img} alt="" className="h-full w-full object-cover" />
+          </div>
+        )}
+      </div>
+    </button>
+  );
+}
+
+// 라이브 현재 순서 카드 (공지보다 약한 1px 테두리로 공지 우위 유지)
+function LiveCard({ current, next, note, resource, onCard, onResource }) {
+  return (
+    <div
+      onClick={onCard}
+      className="w-full cursor-pointer rounded-3xl border border-basil-100 bg-basil-50 p-5 text-left"
+    >
+      <div className="flex items-center gap-2">
+        <span className="relative flex h-2 w-2">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-basil-400 opacity-75" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-basil-600" />
+        </span>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
+          지금 진행 중
+        </p>
+        {current.day && (
+          <span className="text-[11px] text-ink-faint">· {current.day}</span>
+        )}
+      </div>
+
+      <p className="mt-2 break-keep text-xl font-bold text-title">
+        {current.time} {current.title}
+      </p>
+      {current.place && (
+        <p className="mt-0.5 break-keep text-[13px] text-ink-soft">{current.place}</p>
       )}
 
-      {status.phase === "after" && (
-        <>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-basil-600">
-            캠프 마침
-          </p>
-          <p className="mt-1.5 break-keep text-sm leading-relaxed text-ink">
-            캠프가 은혜 중에 마쳤습니다.
-          </p>
-        </>
+      {note && (
+        <p className="mt-3 break-keep rounded-xl border border-basil-100 bg-white/70 px-3 py-2 text-[13px] leading-relaxed text-basil-700">
+          {note}
+        </p>
       )}
-    </button>
+
+      {next && (
+        <p className="mt-3 break-keep text-[13px] text-ink-faint">
+          다음 {next.time} {next.title}
+          {next.place ? ` · ${next.place}` : ""}
+        </p>
+      )}
+
+      {resource?.to && (
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onResource();
+          }}
+          className="mt-3 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-600 px-3.5 py-1.5 text-[12px] font-semibold text-white"
+        >
+          {resource.kind === "verse" ? (
+            <span className="truncate">
+              관련 말씀 · {resource.label} {resource.verseTitle}
+              {resource.ref ? ` · ${resource.ref}` : ""}
+            </span>
+          ) : (
+            <span className="truncate">자료실 보기</span>
+          )}
+        </button>
+      )}
+    </div>
   );
 }
 
