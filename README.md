@@ -57,8 +57,8 @@
 - **관리자 전용 페이지** — Firebase Auth 로그인 기반 공지 작성/발송
 - **안드로이드 뒤로가기 계층 제어** — 자식 화면에서 부모 화면으로, 공지 상세에서 목록으로 이동하고, 홈에서는 앱이 종료되지 않도록 트랩하며, 방배정에서는 검색만 해제한다
 - **사진 탭** — 하단 탭에서 Google Photos 공유 앨범 연동
-- **캠프 일정 / 방배정 / 말씀 본문** — 일자별 타임라인, 이름과 방 검색, 강의별 본문 아코디언
-- **말씀 그룹 구조** — 주제 강의, 개회 폐회, GBS, 새벽 메시지로 묶어 강의별 본문 표시
+- **캠프 일정 / 방배정 / 말씀 본문** — 일자별 타임라인, 이름과 방 검색, 강의 목록 → 개별 본문 페이지 이동
+- **말씀 그룹 구조** — 주제 강의, 개회 폐회, GBS, 새벽 메시지로 묶은 목록에서 강의를 골라 본문 상세로 이동(한/EN 토글)
 - **5개 하단 탭** — 홈, 일정, 말씀, 방배정, 사진으로 구성
 
 ---
@@ -183,8 +183,8 @@ skipWaiting, clientsClaim, cleanupOutdatedCaches를 적용해 배포 후 앱 재
 ```
 camp-app/
 ├─ src/
-│  ├─ pages/         # Home, Schedule, Rooms, Verses, Info, Menu, Playlist,
-│  │                 #   Admin, Announcements, AnnouncementDetail
+│  ├─ pages/         # Home, Schedule, Rooms, Verses, VerseDetail, Info,
+│  │                 #   Menu, Playlist, Admin, Announcements, AnnouncementDetail
 │  ├─ components/    # BottomNav, PageHeader, SplashScreen, Toast
 │  ├─ data/          # 일정, 방배정, 말씀, 식단 (정적 데이터)
 │  ├─ lib/push.js    # 알림 권한 요청 + FCM 토큰 등록
