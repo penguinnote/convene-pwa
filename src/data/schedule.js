@@ -9,7 +9,7 @@
 // place는 임시값이니 확정 시 교체한다.
 export const schedule = [
   { day: "1일차", date: "7/29 (수)", items: [
-    { time: "07:00", title: "가자! 연수원으로~~", place: "교회 → 충주", link: { type: "playlist" } },
+    { time: "07:00", title: "연수원으로!", place: "교회 → 충주", link: { type: "playlist" } },
     { time: "10:30", title: "짐 풀기", place: "숙소" },
     { time: "12:00", title: "점심식사 & 휴식", place: "식당", link: { type: "menu" } },
     { time: "13:30", title: "개회 메시지", place: "본관 강당", link: { type: "verse", verseId: "opening" } },
@@ -65,6 +65,6 @@ export const schedule = [
     { time: "10:15", title: "소감 정리", place: "각 방", link: { type: "versesTab" } },
     { time: "10:30", title: "전체 소감 발표", place: "본관 강당" },
     { time: "12:00", title: "점심식사", place: "식당", link: { type: "menu" } },
-    { time: "13:00", title: "다시 사명의 땅으로~~", place: "충주 → 교회", link: { type: "playlist" } },
+    { time: "13:00", title: "다시 사명의 땅으로!", place: "충주 → 교회", link: { type: "playlist" } },
   ]},
 ];
