@@ -250,6 +250,29 @@ export default function Home() {
 function NoticeCard({ notice, highlight, onClick }) {
   const img = firstImageUrl(notice);
   const file = firstFile(notice);
+
+  const bodyEl = notice.body && (
+    <p className="mt-2 line-clamp-2 break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
+      {notice.body}
+    </p>
+  );
+  const fileEl = file && (
+    <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-100 px-2.5 py-1 text-[12px] text-basil-700">
+      <ClipIcon />
+      <span className="truncate">{chipName(file.name)}</span>
+    </span>
+  );
+  const imgEl = img && (
+    <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-basil-100">
+      <img src={img} alt="" className="h-full w-full object-cover" />
+    </div>
+  );
+  const time = (
+    <span className="shrink-0 text-[11px] text-basil-400">
+      {formatRelative(notice.createdAt)}
+    </span>
+  );
+
   return (
     <button
       type="button"
@@ -260,48 +283,47 @@ function NoticeCard({ notice, highlight, onClick }) {
           : "rounded-3xl border border-basil-100 bg-white p-5"
       }`}
     >
-      <div className="flex items-start justify-between gap-3">
-        {highlight ? (
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
-            <BellIcon />
-            공지
-          </span>
-        ) : (
-          <span />
-        )}
-        <span className="shrink-0 text-[11px] text-basil-400">
-          {formatRelative(notice.createdAt)}
-        </span>
-      </div>
-
-      {/* A형: 좌측 본문 + 우측 64px 썸네일(밑단 정렬) */}
-      <div className="mt-3 flex items-end gap-3">
-        <div className="min-w-0 flex-1">
-          <h2
-            className={`truncate font-bold leading-snug text-title ${
-              highlight ? "text-xl" : "text-lg"
-            }`}
-          >
-            {truncateTitle(notice.title)}
-          </h2>
-          {notice.body && (
-            <p className="mt-2 line-clamp-2 break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
-              {notice.body}
-            </p>
-          )}
-          {file && (
-            <span className="mt-2 inline-flex max-w-full items-center gap-1.5 rounded-full bg-basil-100 px-2.5 py-1 text-[12px] text-basil-700">
-              <ClipIcon />
-              <span className="truncate">{chipName(file.name)}</span>
+      {highlight ? (
+        <>
+          {/* 강조(공지) 카드: 배지 행 → 제목·본문·썸네일 */}
+          <div className="flex items-start justify-between gap-3">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
+              <BellIcon />
+              공지
             </span>
-          )}
-        </div>
-        {img && (
-          <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl border border-basil-100">
-            <img src={img} alt="" className="h-full w-full object-cover" />
+            {time}
           </div>
-        )}
-      </div>
+          <div className="mt-3 flex items-end gap-3">
+            <div className="min-w-0 flex-1">
+              <h2 className="truncate text-xl font-bold leading-snug text-title">
+                {truncateTitle(notice.title)}
+              </h2>
+              {bodyEl}
+              {fileEl}
+            </div>
+            {imgEl}
+          </div>
+        </>
+      ) : (
+        <>
+          {/* 자료실 카드: 상단에 제목(좌)·상대시간(우) 한 줄, 아래 본문·썸네일 */}
+          <div className="flex items-baseline justify-between gap-3">
+            <h2 className="min-w-0 truncate text-lg font-bold leading-snug text-title">
+              {truncateTitle(notice.title)}
+            </h2>
+            {time}
+          </div>
+          {(bodyEl || fileEl || imgEl) && (
+            <div className="mt-2 flex items-end gap-3">
+              <div className="min-w-0 flex-1">
+                {bodyEl}
+                {fileEl}
+              </div>
+              {imgEl}
+            </div>
+          )}
+        </>
+      )}
     </button>
   );
 }
@@ -362,9 +384,10 @@ function LiveCard({ current, next, note, linkLabel, onLink, onCard }) {
           )}
 
           {next && (
-            <p className="mt-3 break-keep text-[13px] text-ink-faint">
-              다음 {next.time} {next.title}
-              {next.place ? ` · ${next.place}` : ""}
+            <p className="mt-3 break-keep text-[13px] text-ink-soft">
+              <span className="font-bold text-title">다음 일정</span>
+              : {next.title}
+              {next.place ? ` | ${next.place}` : ""}
             </p>
           )}
 

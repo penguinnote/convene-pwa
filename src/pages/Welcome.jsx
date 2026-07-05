@@ -59,7 +59,7 @@ export default function Welcome() {
       >
         <div className="space-y-5">
           <div>
-            <label className="text-sm font-bold text-ink">닉네임</label>
+            <label className="text-sm font-bold text-ink">이름</label>
             <input
               value={nick}
               onChange={(e) => setNick(e.target.value)}

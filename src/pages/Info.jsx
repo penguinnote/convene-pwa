@@ -224,7 +224,7 @@ export default function Info() {
             {editing ? (
               <div className="mt-4 w-full space-y-3">
                 <div>
-                  <label className="text-xs font-medium text-ink-faint">닉네임</label>
+                  <label className="text-xs font-medium text-ink-faint">이름</label>
                   <input
                     value={nick}
                     onChange={(e) => setNick(e.target.value)}
@@ -265,7 +265,7 @@ export default function Info() {
               </div>
             ) : (
               <>
-                <p className="mt-3 text-lg font-bold text-title">{nickname || "닉네임 없음"}</p>
+                <p className="mt-3 text-lg font-bold text-title">{nickname || "이름 없음"}</p>
                 {mokjang && (
                   <span className="mt-1.5 rounded-full bg-basil-50 px-3 py-1 text-xs font-semibold text-basil-600">
                     {mokjang}
