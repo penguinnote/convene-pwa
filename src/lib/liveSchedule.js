@@ -55,9 +55,22 @@ export function getAutoLive(now = new Date()) {
     nextView = itemView(nextDay, schedule[nextDay].items[0]);
   }
 
+  // 그날 첫 순서(07:00) 이전(=자정~07:00)에는 current가 없으므로 "취침"으로 채운다.
+  // next는 그대로 그날 첫 항목(07:00)을 가리킨다.
+  const currentView = current
+    ? itemView(dayIndex, current)
+    : {
+        day: schedule[dayIndex].day,
+        time: "",
+        title: "취침",
+        place: "",
+        link: { type: "playlist" },
+        rest: true,
+      };
+
   return {
     dayIndex,
-    current: current ? itemView(dayIndex, current) : null,
+    current: currentView,
     next: nextView,
   };
 }
