@@ -17,8 +17,7 @@ import { ref as storageRef, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "../firebase";
 import { resizeImage, uploadToStorage } from "../lib/upload";
 import { formatRelative } from "../lib/time";
-import { schedule } from "../data/schedule";
-import { getNextIndex, getLiveItem } from "../lib/liveSchedule";
+import { getAutoLive } from "../lib/liveSchedule";
 
 let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
@@ -46,13 +45,19 @@ export default function Admin() {
   const [view, setView] = useState("list"); // "list"(공지 관리) | "editor" | "live"(라이브 진행)
   const [editingId, setEditingId] = useState(null); // null=새 공지, id=수정
   const [list, setList] = useState([]);
-  const [live, setLive] = useState(null); // config/live 현재 상태
   const [noteInput, setNoteInput] = useState("");
+  const [now, setNow] = useState(() => new Date()); // 자동 현재/다음 순서 표시용
 
   const imageInputRef = useRef(null);
   const fileInputRef = useRef(null);
 
   useEffect(() => onAuthStateChanged(auth, setUser), []);
+
+  // 라이브 뷰의 자동 현재/다음 순서를 1분마다 갱신
+  useEffect(() => {
+    const id = setInterval(() => setNow(new Date()), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   // 로그인 후 공지 목록 구독 (최신순)
   useEffect(() => {
@@ -63,49 +68,17 @@ export default function Admin() {
     );
   }, [user]);
 
-  // 라이브 진행 상태 구독 (config/live)
+  // 변동 안내 메모 구독 (config/live.note)
   useEffect(() => {
     if (!user) return;
     return onSnapshot(doc(db, "config", "live"), (snap) => {
-      const data = snap.exists() ? snap.data() : null;
-      setLive(data);
-      setNoteInput(data?.note ?? "");
+      setNoteInput(snap.exists() ? snap.data().note ?? "" : "");
     });
   }, [user]);
 
   const liveRef = doc(db, "config", "live");
 
-  // 이 순서를 라이브 시작(active=true)
-  async function startLiveItem(dayIndex, itemIndex) {
-    try {
-      await setDoc(
-        liveRef,
-        { active: true, dayIndex, itemIndex, updatedAt: serverTimestamp() },
-        { merge: true }
-      );
-    } catch (err) {
-      console.error("live start failed", err);
-    }
-  }
-
-  // 다음 순서로 진행(마지막이면 다음 day 첫 항목, 더 없으면 유지)
-  async function liveNext() {
-    if (!live?.active) return;
-    const n = getNextIndex(live.dayIndex, live.itemIndex);
-    if (!n) return;
-    await startLiveItem(n.dayIndex, n.itemIndex);
-  }
-
-  // 라이브 종료(active=false, 순서·메모는 보존)
-  async function endLive() {
-    try {
-      await setDoc(liveRef, { active: false, updatedAt: serverTimestamp() }, { merge: true });
-    } catch (err) {
-      console.error("live end failed", err);
-    }
-  }
-
-  // 순서는 그대로 두고 변동 메모만 갱신
+  // 변동 안내 메모 저장 (현재/다음 순서는 시각 자동 계산이라 저장할 포인터가 없음)
   async function saveNote() {
     try {
       await setDoc(
@@ -113,8 +86,22 @@ export default function Admin() {
         { note: noteInput.trim(), updatedAt: serverTimestamp() },
         { merge: true }
       );
+      setMsg("변동 안내를 저장했습니다.");
     } catch (err) {
       console.error("note save failed", err);
+      setMsg("저장에 실패했습니다.");
+    }
+  }
+
+  // 변동 안내 메모 지우기
+  async function clearNote() {
+    setNoteInput("");
+    try {
+      await setDoc(liveRef, { note: "", updatedAt: serverTimestamp() }, { merge: true });
+      setMsg("변동 안내를 지웠습니다.");
+    } catch (err) {
+      console.error("note clear failed", err);
+      setMsg("지우기에 실패했습니다.");
     }
   }
 
@@ -323,12 +310,9 @@ export default function Admin() {
     );
   }
 
-  // 라이브 진행 제어
+  // 라이브 진행 — 현재/다음 순서는 시각 자동 계산(읽기 전용), 관리자는 변동 안내만 입력
   if (view === "live") {
-    const currentItem =
-      live?.active && live.dayIndex != null
-        ? getLiveItem(live.dayIndex, live.itemIndex)
-        : null;
+    const { current, next } = getAutoLive(now);
 
     return (
       <div className="space-y-4 p-6">
@@ -346,47 +330,40 @@ export default function Admin() {
           </button>
         </div>
 
-        {/* 현재 라이브 상태 */}
+        {/* 자동 계산된 현재/다음 순서 (읽기 전용) */}
         <div className="rounded-2xl border border-basil-100 bg-basil-50 p-4">
-          {currentItem ? (
+          {current ? (
             <>
               <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
-                지금 진행 중 · {currentItem.day}
+                지금 진행 중 · {current.day}
               </p>
               <p className="mt-1 break-keep text-lg font-bold text-title">
-                {currentItem.time} {currentItem.title}
+                {current.time} {current.title}
               </p>
-              {currentItem.place && (
-                <p className="mt-0.5 text-[13px] text-ink-soft">{currentItem.place}</p>
+              {current.place && (
+                <p className="mt-0.5 text-[13px] text-ink-soft">{current.place}</p>
               )}
-              <div className="mt-3 flex gap-2">
-                <button
-                  type="button"
-                  onClick={liveNext}
-                  className="flex-1 rounded-xl bg-basil-600 py-2.5 text-sm font-semibold text-white"
-                >
-                  다음 ▶
-                </button>
-                <button
-                  type="button"
-                  onClick={endLive}
-                  className="flex-1 rounded-xl border border-basil-200 py-2.5 text-sm font-semibold text-ink-soft"
-                >
-                  라이브 종료
-                </button>
-              </div>
             </>
           ) : (
-            <p className="text-sm text-ink-soft">
-              라이브가 꺼져 있습니다. 아래에서 현재 순서를 선택하세요.
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
+              다음 일정 · {next.day}
             </p>
           )}
+          {next && (
+            <p className="mt-2 break-keep text-[13px] text-ink-faint">
+              다음 {next.time} {next.title}
+              {next.place ? ` · ${next.place}` : ""}
+            </p>
+          )}
+          <p className="mt-2 text-[11px] text-ink-faint">
+            현재 순서는 시각에 따라 자동으로 바뀝니다.
+          </p>
         </div>
 
-        {/* 변동 메모 */}
+        {/* 변동 안내 메모 */}
         <div className="rounded-2xl border border-basil-100 bg-white p-4">
           <label className="text-[11px] font-semibold uppercase tracking-wider text-basil-500">
-            변동 메모
+            변동 안내
           </label>
           <textarea
             rows={2}
@@ -395,56 +372,24 @@ export default function Admin() {
             placeholder="예: 점심 30분 지연, 12:40 시작 예정"
             className="mt-2 w-full rounded-xl border border-basil-100 bg-basil-50 px-3 py-2 text-sm"
           />
-          <button
-            type="button"
-            onClick={saveNote}
-            className="mt-2 w-full rounded-xl border border-basil-200 py-2 text-sm font-semibold text-basil-700"
-          >
-            메모 저장
-          </button>
+          <div className="mt-2 flex gap-2">
+            <button
+              type="button"
+              onClick={saveNote}
+              className="flex-1 rounded-xl bg-basil-600 py-2 text-sm font-semibold text-white"
+            >
+              저장
+            </button>
+            <button
+              type="button"
+              onClick={clearNote}
+              className="flex-1 rounded-xl border border-basil-200 py-2 text-sm font-semibold text-ink-soft"
+            >
+              지우기
+            </button>
+          </div>
         </div>
-
-        {/* 순서 목록 — 각 항목에서 바로 시작 */}
-        <div className="space-y-4">
-          {schedule.map((day, di) => (
-            <div key={day.day}>
-              <p className="mb-2 text-sm font-bold text-title">
-                {day.day} <span className="text-xs font-medium text-ink-faint">{day.date}</span>
-              </p>
-              <div className="space-y-2">
-                {day.items.map((item, ii) => {
-                  const isCurrent =
-                    live?.active && live.dayIndex === di && live.itemIndex === ii;
-                  return (
-                    <div
-                      key={ii}
-                      className={`flex items-center gap-3 rounded-xl border p-3 ${
-                        isCurrent
-                          ? "border-basil-500 bg-basil-50"
-                          : "border-basil-100 bg-white"
-                      }`}
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[13px] font-bold text-basil-600">{item.time}</p>
-                        <p className="mt-0.5 break-keep text-sm font-semibold text-ink">
-                          {item.title}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => startLiveItem(di, ii)}
-                        disabled={isCurrent}
-                        className="shrink-0 rounded-lg bg-basil-600 px-3 py-1.5 text-sm font-semibold text-white disabled:bg-basil-200"
-                      >
-                        {isCurrent ? "진행 중" : "이 순서 시작"}
-                      </button>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </div>
+        {msg && <p className="text-sm text-basil-600">{msg}</p>}
       </div>
     );
   }

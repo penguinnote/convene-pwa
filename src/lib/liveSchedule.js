@@ -1,27 +1,63 @@
 import { schedule } from "../data/schedule";
 
-// config/live 포인터(dayIndex·itemIndex)를 schedule 실제 항목으로 해석하는 헬퍼.
-// Home(표시)과 Admin(진행 제어)이 같은 규칙을 공유하도록 한 곳에 둔다.
+// 라이브 "현재 순서" 자동 계산 기준일.
+// 테스트 중에는 오늘 날짜를 두어 1일차부터 매일 순서대로 순환한다.
+// 캠프 때는 "2026-07-29"(1일차)로 바꾼다.
+export const LIVE_ANCHOR = "2026-07-06";
 
-// 해당 위치의 item에 소속 day 라벨을 얹어 반환. 범위를 벗어나면 null.
-export function getLiveItem(dayIndex, itemIndex) {
-  const day = schedule[dayIndex];
-  const item = day?.items?.[itemIndex];
-  if (!item) return null;
-  return { day: day.day, time: item.time, title: item.title, place: item.place };
+// "HH:MM" → 분(minute) 단위 정수
+function timeToMin(t) {
+  const [h, m] = t.split(":").map(Number);
+  return h * 60 + m;
 }
 
-// 다음 순서의 위치: 같은 day의 다음 item, 없으면 다음 day의 첫 item. 마지막이면 null.
-export function getNextIndex(dayIndex, itemIndex) {
-  const day = schedule[dayIndex];
-  if (!day) return null;
-  if (itemIndex + 1 < day.items.length) return { dayIndex, itemIndex: itemIndex + 1 };
-  if (schedule[dayIndex + 1]?.items?.length) return { dayIndex: dayIndex + 1, itemIndex: 0 };
-  return null;
+// schedule item에 소속 day 라벨을 얹은 표시용 뷰(link 포함)
+function itemView(dayIndex, item) {
+  return {
+    day: schedule[dayIndex].day,
+    time: item.time,
+    title: item.title,
+    place: item.place,
+    link: item.link ?? null,
+  };
 }
 
-// 다음 순서 item(표시용). 마지막이면 null.
-export function getNextItem(dayIndex, itemIndex) {
-  const n = getNextIndex(dayIndex, itemIndex);
-  return n ? getLiveItem(n.dayIndex, n.itemIndex) : null;
+// 순수 함수: now 기준 자동 현재/다음 순서를 계산한다.
+// dayIndex는 LIVE_ANCHOR로부터 지난 일수 mod schedule.length(음수 보정)라
+// 오늘=1일차, 내일=2일차 … schedule.length일 뒤 다시 1일차로 순환한다.
+export function getAutoLive(now = new Date()) {
+  const len = schedule.length;
+  const anchorMid = new Date(`${LIVE_ANCHOR}T00:00:00`);
+  const nowMid = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dayDiff = Math.round((nowMid - anchorMid) / 86400000);
+  const dayIndex = ((dayDiff % len) + len) % len;
+
+  const items = schedule[dayIndex].items;
+  const nowMin = now.getHours() * 60 + now.getMinutes();
+
+  // current = 현재 시각 이하의 마지막 항목(첫 항목 시각 이전이면 null)
+  // next = 현재 시각 초과의 첫 항목(없으면 다음 날 순환 첫 항목)
+  let current = null;
+  let next = null;
+  for (const item of items) {
+    if (timeToMin(item.time) <= nowMin) current = item;
+    else {
+      next = item;
+      break;
+    }
+  }
+
+  let nextView;
+  if (next) {
+    nextView = itemView(dayIndex, next);
+  } else {
+    const nextDay = (dayIndex + 1) % len;
+    nextView = itemView(nextDay, schedule[nextDay].items[0]);
+  }
+
+  return {
+    dayIndex,
+    current: current ? itemView(dayIndex, current) : null,
+    next: nextView,
+  };
 }
