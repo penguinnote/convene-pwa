@@ -56,8 +56,8 @@ export default function Home() {
     };
   }, []);
 
-  // 공지 섹션: 최신 중 고정(pinned)이 아닌 것 위주로 최대 2개.
-  const topCards = recent.filter((r) => !r.pinned).slice(0, 2);
+  // 공지 섹션: 최신 중 고정(pinned)이 아닌 것 딱 1개.
+  const topCards = recent.filter((r) => !r.pinned).slice(0, 1);
 
   // 라이브: active이고 포인터가 실제 순서를 가리킬 때만 카드 표시.
   const liveCurrent = live?.active ? getLiveItem(live.dayIndex, live.itemIndex) : null;
@@ -92,7 +92,7 @@ export default function Home() {
     <div>
       {/* 히어로 — 수채화 하늘빛 그라데이션 (안전영역까지 채움) */}
       <section
-        className="relative overflow-hidden px-6 pb-8 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]"
+        className="relative overflow-hidden px-6 pb-6 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]"
         style={{
           background: [
             "radial-gradient(130px 95px at 16% 20%, rgba(255,250,220,.95), transparent 70%)",
@@ -115,7 +115,7 @@ export default function Home() {
         </p>
 
         <h1
-          className="relative mt-4 leading-[1.3] tracking-tight text-title"
+          className="relative mt-3 leading-[1.3] tracking-tight text-title"
           style={{
             whiteSpace: "nowrap",
             fontWeight: 400,
@@ -131,7 +131,7 @@ export default function Home() {
       </section>
 
       {/* 공지 — Firestore 실시간 구독 (홈에서 가장 강조되는 영역, 고정 공지는 제외) */}
-      <section className="px-6 pt-7">
+      <section className="px-6 pt-5">
         {topCards.length > 0 ? (
           <>
             <div className="mb-3 flex items-center justify-between">
@@ -193,7 +193,7 @@ export default function Home() {
 
       {/* 라이브 현재 순서 — 관리자 포인터(config/live) 기반. active일 때만 표시 */}
       {liveCurrent && (
-        <section className="px-6 pt-7">
+        <section className="px-6 pt-5">
           <LiveCard
             current={liveCurrent}
             next={liveNext}
@@ -207,7 +207,7 @@ export default function Home() {
 
       {/* 자료실 — 고정 공지가 있으면 맨 밑에 표시 */}
       {pinned && (
-        <section className="px-6 pt-7">
+        <section className="px-6 pt-5">
           <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
           <NoticeCard
             notice={pinned}
@@ -217,7 +217,7 @@ export default function Home() {
         </section>
       )}
 
-      <p className="px-6 py-9 text-center text-xs text-ink-faint">
+      <p className="px-6 py-6 text-center text-xs text-ink-faint">
         로뎀나무교회 청년대학부 · 말씀캠프 앱
       </p>
     </div>
@@ -234,7 +234,7 @@ function NoticeCard({ notice, highlight, onClick }) {
       onClick={onClick}
       className={`block w-full text-left ${
         highlight
-          ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-6 shadow-sm"
+          ? "rounded-3xl border-2 border-basil-500 bg-basil-50 p-5 shadow-sm"
           : "rounded-3xl border border-basil-100 bg-white p-5"
       }`}
     >
@@ -257,7 +257,7 @@ function NoticeCard({ notice, highlight, onClick }) {
         <div className="min-w-0 flex-1">
           <h2
             className={`truncate font-bold leading-snug text-title ${
-              highlight ? "text-2xl" : "text-lg"
+              highlight ? "text-xl" : "text-lg"
             }`}
           >
             {truncateTitle(notice.title)}
