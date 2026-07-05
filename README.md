@@ -45,7 +45,7 @@
 - **공지 실시간 반영** — Firestore 구독으로 앱을 열면 홈 상단에 최신 공지 1개가 바로 표시(홈 구성: 공지 최신 1 · 라이브 현재 순서 · 자료실을 한 화면에)
 - **라이브 현재 순서 카드** — 관리자가 진행 순서를 수동으로 넘기면(캠프 시각이 수시로 변동하므로 시계 자동 계산 대신 포인터 방식) 홈 중앙에 "지금 진행 중"과 다음 순서·변동 메모·관련 말씀/자료 링크가 실시간 표시
 - **공지 상세 및 목록** — 홈에서 최신 공지를 보여주고, 상세 페이지와 전체 목록 페이지로 모든 공지를 확인
-- **댓글 프로필 실시간 반영** — 댓글 작성자의 현재 프로필(사진·닉네임·목장)을 authorUid로 조회해 항상 최신 상태로 표시
+- **식단표 · 플레이리스트** — 정보 탭에서 일자별 식단표와 캠프 찬양 유튜브 플레이리스트로 이동
 - **이미지 / 파일 첨부** — 블록 에디터로 텍스트, 이미지, PDF 파일을 글 중간에 원하는 순서로 배치
 - **상세 첨부 표시** — 공지 상세에서 이미지를 원본 비율로 보여주고, 파일은 보기 및 다운로드로 연결
 - **제목 길이 제한 표시** — 홈과 목록에서 공지 제목을 20자로 자르고 말줄임으로 표시
@@ -183,10 +183,10 @@ skipWaiting, clientsClaim, cleanupOutdatedCaches를 적용해 배포 후 앱 재
 ```
 camp-app/
 ├─ src/
-│  ├─ pages/         # Home, Schedule, Rooms, Verses, Admin,
-│  │                 #   Announcements, AnnouncementDetail
+│  ├─ pages/         # Home, Schedule, Rooms, Verses, Info, Menu, Playlist,
+│  │                 #   Admin, Announcements, AnnouncementDetail
 │  ├─ components/    # BottomNav, PageHeader, SplashScreen, Toast
-│  ├─ data/          # 일정, 방배정, 말씀 (정적 데이터)
+│  ├─ data/          # 일정, 방배정, 말씀, 식단 (정적 데이터)
 │  ├─ lib/push.js    # 알림 권한 요청 + FCM 토큰 등록
 │  ├─ lib/time.js    # 상대시간 포맷 (just now, N분 전)
 │  ├─ lib/badge.js   # 읽지 않은 공지 배지 카운트 (IndexedDB)

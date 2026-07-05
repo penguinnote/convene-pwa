@@ -294,13 +294,28 @@ export default function Info() {
             <span className="flex-1 font-bold text-title">방배정</span>
             <span className="text-basil-300">›</span>
           </button>
-          <div className="flex items-center gap-3 px-4 py-4 opacity-40">
+          <button
+            type="button"
+            onClick={() => navigate("/menu")}
+            className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
+          >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
               <MealIcon />
             </span>
-            <span className="flex-1 font-bold text-ink-faint">식단표</span>
-            <span className="text-xs text-ink-faint">준비 중</span>
-          </div>
+            <span className="flex-1 font-bold text-title">식단표</span>
+            <span className="text-basil-300">›</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/playlist")}
+            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
+              <MusicIcon />
+            </span>
+            <span className="flex-1 font-bold text-title">플레이리스트</span>
+            <span className="text-basil-300">›</span>
+          </button>
         </div>
       </section>
     </div>
@@ -369,6 +384,16 @@ function MealIcon() {
       <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
       <path d="M7 2v20" />
       <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
+    </svg>
+  );
+}
+
+function MusicIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
+      <path d="M9 18V5l12-2v13" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="18" cy="16" r="3" />
     </svg>
   );
 }
