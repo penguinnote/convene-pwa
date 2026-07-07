@@ -1,16 +1,9 @@
-# 로뎀 청년대학부 여름말씀캠프 PWA
+# Convene
 
-> QR 코드로 설치하고, 관리자 공지를 전 참가자 폰에 **실시간 푸시 알림**으로 전달하는 캠프 전용 프로그레시브 웹앱(PWA).
+> 워크숍·수련회·캠프 같은 여러 날짜의 오프라인 행사를 위한 **설치형 컴패니언 PWA**.
+> QR 코드로 설치하고, 운영진 공지를 전 참가자 폰에 **실시간 푸시 알림**으로 전달한다.
 
-<p>
-  <img alt="React" src="https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white">
-  <img alt="Vite" src="https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white">
-  <img alt="Tailwind CSS" src="https://img.shields.io/badge/TailwindCSS-3-06B6D4?logo=tailwindcss&logoColor=white">
-  <img alt="Firebase" src="https://img.shields.io/badge/Firebase-FCM%20%7C%20Firestore%20%7C%20Functions-FFCA28?logo=firebase&logoColor=black">
-  <img alt="PWA" src="https://img.shields.io/badge/PWA-installable-5A0FC8?logo=pwa&logoColor=white">
-</p>
-
-🔗 **Live demo:** https://rodemcamp.web.app
+🔗 **Live demo (첫 배포 인스턴스 · 로뎀 캠프):** https://rodemcamp.web.app
 
 📐 **디자인 기록:** [DESIGN.md](DESIGN.md)
 
@@ -18,13 +11,15 @@
 
 ## 프로젝트 소개
 
-교회 청년대학부 여름 캠프(80~100명, 3박 4일)를 위해 직접 만든 모바일 웹앱이다.
-앱스토어 심사 없이 **QR 코드 스캔만으로 설치**할 수 있고, 캠프 일정, 방배정, 말씀 본문을
-오프라인에서도 확인할 수 있으며, 운영진이 입력한 공지가 **모든 참가자의 폰에 푸시 알림**으로
-즉시 전달된다.
+Convene은 다중일 오프라인 행사(수련회·워크숍·캠프)에서 참가자에게 필요한 정보를
+한 곳에 모아 주는 모바일 웹앱이다. 앱스토어 심사 없이 **QR 스캔만으로 설치**되고,
+일정·배정·자료를 오프라인에서도 확인할 수 있으며, 운영진 공지가 **모든 참가자 폰에
+푸시 알림**으로 즉시 전달된다.
 
-처음 기획부터 배포까지 직접 진행했으며, iOS의 까다로운 PWA 푸시 제약과
-서비스워커 충돌 등 실제 프로덕션에서 마주치는 문제들을 해결한 것이 핵심이다.
+기획부터 배포까지 직접 진행했으며, 제품은 범용으로 설계하되 각 행사의 브랜딩·일정·
+콘텐츠는 인스턴스 설정으로 분리했다. **첫 배포처는 로뎀나무교회 청년부 여름캠프
+(80~100명, 3박 4일)** 이며, iOS PWA 푸시 제약·서비스워커 충돌 등 실제 프로덕션
+문제를 해결한 것이 핵심이다.
 
 ---
 
