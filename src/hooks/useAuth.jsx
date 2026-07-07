@@ -1,8 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject } from "firebase/storage";
 import { auth, db, storage } from "../firebase";
+import { logEvent, isStandalone } from "../lib/track";
 
 const AuthContext = createContext(null);
 
@@ -23,6 +24,11 @@ export function AuthProvider({ children }) {
           setNickname(d.nickname ?? "");
           setMokjang(d.mokjang ?? "");
           setPhotoURL(d.photoURL ?? "");
+        }
+        // 설치(홈화면 추가) 실행 최초 1회만 기록
+        if (isStandalone() && !snap.data()?.installedAt) {
+          await setDoc(doc(db, "users", u.uid), { installedAt: serverTimestamp() }, { merge: true });
+          logEvent("install_detected");
         }
       } else {
         try {

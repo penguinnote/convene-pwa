@@ -1,6 +1,7 @@
 import { getToken } from "firebase/messaging";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db, getMessagingIfSupported } from "../firebase";
+import { logEvent } from "./track";
 
 // 앱 진입 후 사용자가 "알림 받기"를 누르면 호출.
 // iOS는 반드시 홈화면 추가 → 앱으로 실행한 상태에서만 권한 요청이 동작한다.
@@ -9,6 +10,7 @@ export async function enablePush() {
   if (!messaging) return { ok: false, reason: "unsupported" };
 
   const permission = await Notification.requestPermission();
+  logEvent("push_permission", { result: permission });
   if (permission !== "granted") return { ok: false, reason: permission };
 
   // vite-plugin-pwa가 등록한 SW를 사용

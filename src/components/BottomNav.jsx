@@ -1,5 +1,6 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { goChild, goHome } from "../lib/nav";
+import { logEvent } from "../lib/track";
 
 // Google Photos 공유 앨범 URL
 const PHOTO_ALBUM_URL = "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A";
@@ -60,7 +61,10 @@ export default function BottomNav() {
         {/* 사진 — 외부 Google Photos 공유 앨범을 새 탭으로 */}
         <button
           type="button"
-          onClick={() => window.open(PHOTO_ALBUM_URL, "_blank")}
+          onClick={() => {
+            logEvent("external_open", { target: "photos" });
+            window.open(PHOTO_ALBUM_URL, "_blank");
+          }}
           className="flex flex-col items-center gap-1 py-2.5 text-[11px] text-[#9BB3BD] transition-colors"
         >
           <PhotoIcon active={false} />

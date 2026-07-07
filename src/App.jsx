@@ -9,6 +9,7 @@ import { setBadgeCount } from "./lib/badge";
 import { goToAnnouncement } from "./lib/nav";
 import { useBackControl } from "./hooks/useBackControl";
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
+import { logEvent } from "./lib/track";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
 import Rooms from "./pages/Rooms.jsx";
@@ -33,7 +34,7 @@ export default function App() {
 function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { ready, hasProfile, isAdmin } = useAuth();
+  const { ready, hasProfile, isAdmin, user } = useAuth();
 
   // 콜드 스타트마다 스플래시 노출 (마운트 시 1회)
   const [splashVisible, setSplashVisible] = useState(true);
@@ -55,6 +56,20 @@ function AppShell() {
     },
   });
   useEffect(() => () => clearTimeout(exitHintTimerRef.current), []);
+
+  // app_open — uid 준비된 뒤 세션당 1회
+  const openedRef = useRef(false);
+  useEffect(() => {
+    if (ready && user && !openedRef.current) {
+      openedRef.current = true;
+      logEvent("app_open");
+    }
+  }, [ready, user]);
+
+  // page_view — 라우트 변경마다
+  useEffect(() => {
+    logEvent("page_view", { path: location.pathname });
+  }, [location.pathname]);
 
   useEffect(() => {
     const toStage2 = setTimeout(() => setSplashStage(2), SPLASH_TIMING.stage2At);
