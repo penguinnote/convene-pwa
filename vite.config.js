@@ -1,11 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import { VitePWA } from "vite-plugin-pwa";
+import { INSTANCE } from "./src/config/instance.js";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    // index.html의 %APP_NAME%/%APP_SHORT_NAME% 토큰을 인스턴스 값으로 치환
+    {
+      name: "html-instance",
+      transformIndexHtml(html) {
+        return html
+          .replace(/%APP_NAME%/g, INSTANCE.appName)
+          .replace(/%APP_SHORT_NAME%/g, INSTANCE.shortName);
+      },
+    },
     VitePWA({
       strategies: "injectManifest",
       srcDir: "src",
@@ -16,12 +26,12 @@ export default defineConfig({
       devOptions: { enabled: false, type: "module" },
       includeAssets: ["favicon.svg", "icons/*.png"],
       manifest: {
-        name: "2026 여름말씀캠프",
-        short_name: "말씀캠프",
-        description: "2026 청년대학부 여름말씀캠프 · 일정 · 방배정 · 말씀구절 · 공지",
+        name: INSTANCE.appName,
+        short_name: INSTANCE.shortName,
+        description: INSTANCE.description,
         lang: "ko",
-        theme_color: "#D3F0F3",
-        background_color: "#ffffff",
+        theme_color: INSTANCE.theme.manifestThemeColor,
+        background_color: INSTANCE.theme.manifestBackgroundColor,
         display: "standalone",
         orientation: "portrait",
         start_url: "/",

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { logEvent } from "../lib/track";
+import { INSTANCE } from "../config/instance.js";
 
 const MOKJANG_LIST = [
   "기쁨", "다소니", "마음", "밸리", "빛길", "사랑",
@@ -41,7 +42,7 @@ export default function Welcome() {
         }}
       >
         <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-basil-600">
-          2026 로뎀나무교회 청년대학부 여름말씀캠프
+          {INSTANCE.org}
         </p>
         <h1
           className="mt-4 tracking-tight text-title"
