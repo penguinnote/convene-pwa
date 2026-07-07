@@ -22,7 +22,6 @@ export default function Home() {
   const [pinned, setPinned] = useState(null); // 고정 공지 (없으면 null)
   const [note, setNote] = useState(""); // config/live.note (변동 안내 메모)
   const [now, setNow] = useState(() => new Date()); // 라이브 자동 계산용 시각
-  const [pushMsg, setPushMsg] = useState("");
   const [permission, setPermission] = useState(initialPermission);
   const navigate = useNavigate();
   const location = useLocation();
@@ -99,18 +98,8 @@ export default function Home() {
   }
 
   async function handleEnablePush() {
-    setPushMsg("");
-    const result = await enablePush();
+    await enablePush();
     setPermission(initialPermission());
-    if (result.ok) {
-      setPushMsg("알림이 설정되었어요.");
-    } else if (result.reason === "unsupported") {
-      setPushMsg("이 기기/브라우저에서는 알림을 지원하지 않아요.");
-    } else if (result.reason === "denied") {
-      setPushMsg("알림 권한이 거부되었어요. 브라우저 설정에서 허용해주세요.");
-    } else {
-      setPushMsg("알림 설정에 실패했어요. 다시 시도해주세요.");
-    }
   }
 
   return (
@@ -197,22 +186,13 @@ export default function Home() {
         )}
 
         {permission === "default" && (
-          <>
-            <button
-              type="button"
-              onClick={handleEnablePush}
-              className="mt-3 w-full rounded-xl border border-basil-100 bg-basil-50 py-2.5 text-sm font-semibold text-basil-700"
-            >
-              알림 받기
-            </button>
-            <p className="mt-1.5 break-keep text-center text-[11px] text-ink-faint">
-              아이폰은 홈 화면에 추가 후 그 아이콘으로 실행해야 알림을 받을 수
-              있어요.
-            </p>
-          </>
-        )}
-        {pushMsg && (
-          <p className="mt-2 text-center text-xs text-ink-faint">{pushMsg}</p>
+          <button
+            type="button"
+            onClick={handleEnablePush}
+            className="mt-3 w-full rounded-xl border border-basil-100 bg-basil-50 py-2.5 text-sm font-semibold text-basil-700"
+          >
+            알림 받기
+          </button>
         )}
       </section>
 
