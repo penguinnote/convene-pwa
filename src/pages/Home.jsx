@@ -8,6 +8,7 @@ import { truncateTitle } from "../lib/text";
 import { firstImageUrl, firstFile } from "../lib/blocks";
 import { goToAnnouncement, goToVerse, goChild } from "../lib/nav";
 import { getAutoLive } from "../lib/liveSchedule";
+import { logEvent } from "../lib/track";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -73,6 +74,7 @@ export default function Home() {
   // 현재 순서 link 타입별 이동
   function handleLink(link) {
     if (!link) return;
+    logEvent("live_link_click", { type: link.type });
     const path = location.pathname;
     switch (link.type) {
       case "verse":

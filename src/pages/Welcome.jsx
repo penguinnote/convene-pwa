@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../hooks/useAuth.jsx";
+import { logEvent } from "../lib/track";
 
 const MOKJANG_LIST = [
   "기쁨", "다소니", "마음", "밸리", "빛길", "사랑",
@@ -19,6 +20,7 @@ export default function Welcome() {
     if (!valid || !user || saving) return;
     setSaving(true);
     await saveProfile({ nickname: nick, mokjang: mok });
+    logEvent("onboarding_complete", { mokjang: mok });
     setSaving(false);
   }
 

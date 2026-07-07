@@ -1,6 +1,6 @@
 const { onDocumentCreated } = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
-const { getFirestore } = require("firebase-admin/firestore");
+const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
 
 initializeApp();
@@ -30,5 +30,14 @@ exports.sendAnnouncement = onDocumentCreated(
     await Promise.all(
       dead.map((t) => getFirestore().collection("tokens").doc(t).delete())
     );
+
+    // 푸시 도달 로그 (분석은 Admin SDK로만 조회)
+    await getFirestore().collection("pushLogs").doc(event.params.id).set({
+      announcementId: event.params.id,
+      sent: tokens.length,
+      success: res.successCount,
+      failure: res.failureCount,
+      at: FieldValue.serverTimestamp(),
+    });
   }
 );

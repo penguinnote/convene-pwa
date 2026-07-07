@@ -1,4 +1,5 @@
 import PageHeader from "../components/PageHeader.jsx";
+import { logEvent } from "../lib/track";
 
 // 캠프 찬양 유튜브 플레이리스트
 const PLAYLIST_URL =
@@ -12,7 +13,10 @@ export default function Playlist() {
       <div className="px-5 py-6">
         <button
           type="button"
-          onClick={() => window.open(PLAYLIST_URL, "_blank")}
+          onClick={() => {
+            logEvent("external_open", { target: "playlist" });
+            window.open(PLAYLIST_URL, "_blank");
+          }}
           className="flex w-full items-center gap-4 rounded-2xl border border-basil-100 bg-basil-50 p-5 text-left"
         >
           <span
