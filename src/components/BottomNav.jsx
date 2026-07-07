@@ -1,9 +1,10 @@
 import { NavLink, useNavigate, useLocation } from "react-router-dom";
 import { goChild, goHome } from "../lib/nav";
 import { logEvent } from "../lib/track";
+import { INSTANCE } from "../config/instance.js";
 
-// Google Photos 공유 앨범 URL
-const PHOTO_ALBUM_URL = "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A";
+// Google Photos 공유 앨범 URL (인스턴스 설정)
+const PHOTO_ALBUM_URL = INSTANCE.photosAlbumUrl;
 
 const tabsBefore = [
   { to: "/", label: "홈", icon: HomeIcon },

@@ -1,9 +1,8 @@
 import { schedule } from "../data/schedule";
+import { INSTANCE } from "../config/instance.js";
 
-// 라이브 "현재 순서" 자동 계산 기준일.
-// 테스트 중에는 오늘 날짜를 두어 1일차부터 매일 순서대로 순환한다.
-// 캠프 때는 "2026-07-29"(1일차)로 바꾼다.
-export const LIVE_ANCHOR = "2026-07-06";
+// 라이브 "현재 순서" 자동 계산 기준일. 인스턴스 설정(liveAnchor)에서 가져온다.
+export const LIVE_ANCHOR = INSTANCE.liveAnchor;
 
 // "HH:MM" → 분(minute) 단위 정수
 function timeToMin(t) {

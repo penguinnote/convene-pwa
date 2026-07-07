@@ -9,6 +9,7 @@ import { firstImageUrl, firstFile } from "../lib/blocks";
 import { goToAnnouncement, goToVerse, goChild } from "../lib/nav";
 import { getAutoLive } from "../lib/liveSchedule";
 import { logEvent } from "../lib/track";
+import { INSTANCE } from "../config/instance.js";
 
 // 알림 권한이 아직 결정되지 않았을 때만(default) "알림 받기" 버튼을 노출.
 // 미지원 환경에서는 Notification 자체가 없으므로 숨김 처리됨.
@@ -135,7 +136,7 @@ export default function Home() {
         <Sparkle className="bottom-[18%] left-[24%]" size={11} color="#FFFFFF" />
 
         <p className="relative text-[11px] font-semibold uppercase tracking-[0.22em] text-basil-600">
-          2026 로뎀나무교회 청년대학부 여름말씀캠프
+          {INSTANCE.org}
         </p>
 
         <h1
@@ -146,11 +147,11 @@ export default function Home() {
             fontSize: "clamp(1.4rem, 6.5vw, 1.65rem)",
           }}
         >
-          아담아, 네가 어디 있느냐?
+          {INSTANCE.slogan}
         </h1>
 
         <p className="relative mt-2 text-[22px] font-bold italic text-title">
-          Where are you?
+          {INSTANCE.sloganEn}
         </p>
       </section>
 
@@ -242,7 +243,7 @@ export default function Home() {
       )}
 
       <p className="px-6 py-6 text-center text-xs text-ink-faint">
-        로뎀나무교회 청년대학부 · 말씀캠프 앱
+        {INSTANCE.org}
       </p>
     </div>
   );
