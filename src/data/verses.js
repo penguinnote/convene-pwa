@@ -34,8 +34,6 @@ export const verseGroups = [
         label: "2강",
         title: "이 내 아들은 잃었다가 다시 얻었노라",
         titleEn: "This Son of Mine Was Lost and Is Found",
-        note: "언약",
-        noteEn: "Covenant",
         passages: [{ ref: "누가복음 15:1-32", refEn: "Luke 15:1-32", text: `1 모든 세리와 죄인들이 말씀을 들으러 가까이 나아오니
 2 바리새인과 서기관들이 수군거려 이르되 이 사람이 죄인을 영접하고 음식을 같이 먹는다 하더라
 3 예수께서 그들에게 이 비유로 이르시되
@@ -215,7 +213,7 @@ export const verseGroups = [
     items: [
       {
         id: "gbs-1",
-        label: "GBS 1강",
+        label: "1강",
         title: "네 죄 사함을 받았느니라",
         titleEn: "Your Sins Are Forgiven",
         passages: [{ ref: "마가복음 2:1-12", refEn: "Mark 2:1-12", text: `1 수 일 후에 예수께서 다시 가버나움에 들어가시니 집에 계시다는 소문이 들린지라
@@ -233,7 +231,7 @@ export const verseGroups = [
       },
       {
         id: "gbs-2",
-        label: "GBS 2강",
+        label: "2강",
         title: "삭개오야 속히 내려오라",
         titleEn: "Zacchaeus, Come Down",
         passages: [{ ref: "누가복음 19:1-10", refEn: "Luke 19:1-10", text: `1 예수께서 여리고로 들어가 지나가시더라
@@ -249,7 +247,7 @@ export const verseGroups = [
       },
       {
         id: "gbs-3",
-        label: "GBS 3강",
+        label: "3강",
         title: "청년아 일어나라",
         titleEn: "Young Man, Get Up",
         passages: [{ ref: "누가복음 7:11-17", refEn: "Luke 7:11-17", text: `11 그 후에 예수께서 나인이란 성으로 가실새 제자와 많은 무리가 동행하더니
@@ -263,8 +261,8 @@ export const verseGroups = [
     ],
   },
   {
-    group: "새벽 메시지",
-    groupEn: "Dawn Devotions",
+    group: "아침 묵상",
+    groupEn: "Morning Meditation",
     items: [
       {
         id: "dawn-1",
