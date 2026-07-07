@@ -15,7 +15,7 @@ export const INSTANCE = {
   photosAlbumUrl: "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A",
 
   // 캠프 1일차 날짜 (라이브 '현재 순서' 계산 기준). 실제 캠프 날짜로 둔다.
-  liveAnchor: "2026-07-29",
+  liveAnchor: "2026-07-01",
 
   // 브랜드 색 (tailwind와 매니페스트가 참조)
   theme: {
