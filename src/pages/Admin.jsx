@@ -27,9 +27,7 @@ const emptyText = () => ({ _id: newId(), type: "text", value: "" });
 function withTimeout(promise, ms = 15000) {
   return Promise.race([
     promise,
-    new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("timeout")), ms)
-    ),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms)),
   ]);
 }
 
@@ -73,7 +71,7 @@ export default function Admin() {
   useEffect(() => {
     if (!user) return;
     return onSnapshot(doc(db, "config", "live"), (snap) => {
-      setNoteInput(snap.exists() ? snap.data().note ?? "" : "");
+      setNoteInput(snap.exists() ? (snap.data().note ?? "") : "");
     });
   }, [user]);
 
@@ -157,9 +155,7 @@ export default function Admin() {
   }
 
   function updateBlock(id, patch) {
-    setBlocks((prev) =>
-      prev.map((b) => (b._id === id ? { ...b, ...patch } : b))
-    );
+    setBlocks((prev) => prev.map((b) => (b._id === id ? { ...b, ...patch } : b)));
   }
 
   function removeBlock(id) {
@@ -196,7 +192,15 @@ export default function Admin() {
     const base =
       kind === "image"
         ? { _id: id, type: "image", url: "", path: "", uploading: true, progress: 0 }
-        : { _id: id, type: "file", url: "", path: "", name: file.name, uploading: true, progress: 0 };
+        : {
+            _id: id,
+            type: "file",
+            url: "",
+            path: "",
+            name: file.name,
+            uploading: true,
+            progress: 0,
+          };
     setBlocks((prev) => [...prev, base]);
 
     try {
@@ -332,7 +336,11 @@ export default function Admin() {
             ‹ 공지 관리
           </button>
           <h1 className="text-base font-bold text-ink">라이브 진행</h1>
-          <button type="button" onClick={() => signOut(auth)} className="text-sm text-ink-faint">
+          <button
+            type="button"
+            onClick={() => signOut(auth)}
+            className="text-sm text-ink-faint"
+          >
             로그아웃
           </button>
         </div>
@@ -399,7 +407,11 @@ export default function Admin() {
       <div className="space-y-4 p-6">
         <div className="flex items-center justify-between">
           <h1 className="text-xl font-bold text-ink">공지 관리</h1>
-          <button type="button" onClick={() => signOut(auth)} className="text-sm text-ink-faint">
+          <button
+            type="button"
+            onClick={() => signOut(auth)}
+            className="text-sm text-ink-faint"
+          >
             로그아웃
           </button>
         </div>
@@ -429,14 +441,19 @@ export default function Admin() {
             </p>
           ) : (
             list.map((item) => (
-              <div key={item.id} className="rounded-2xl border border-basil-100 bg-white p-4">
+              <div
+                key={item.id}
+                className="rounded-2xl border border-basil-100 bg-white p-4"
+              >
                 <div className="flex items-center gap-2">
                   {item.pinned && (
                     <span className="shrink-0 rounded-full bg-basil-600 px-2 py-0.5 text-[11px] font-semibold text-white">
                       고정
                     </span>
                   )}
-                  <p className="min-w-0 flex-1 truncate font-bold text-title">{item.title}</p>
+                  <p className="min-w-0 flex-1 truncate font-bold text-title">
+                    {item.title}
+                  </p>
                 </div>
                 <p className="mt-0.5 text-xs text-ink-faint">
                   {formatRelative(item.createdAt)}
@@ -478,7 +495,11 @@ export default function Admin() {
         <h1 className="text-base font-bold text-ink">
           {editingId ? "공지 수정" : "새 공지 작성"}
         </h1>
-        <button type="button" onClick={() => signOut(auth)} className="text-sm text-ink-faint">
+        <button
+          type="button"
+          onClick={() => signOut(auth)}
+          className="text-sm text-ink-faint"
+        >
           로그아웃
         </button>
       </div>
@@ -584,11 +605,11 @@ export default function Admin() {
           ? sending
             ? "저장 중…"
             : resendPush
-            ? "수정 저장 + 푸시 발송"
-            : "수정 저장"
+              ? "수정 저장 + 푸시 발송"
+              : "수정 저장"
           : sending
-          ? "발송 중…"
-          : "공지 발송 (푸시)"}
+            ? "발송 중…"
+            : "공지 발송 (푸시)"}
       </button>
       {editingId && (
         <p className="text-center text-xs text-ink-faint">
@@ -604,7 +625,15 @@ export default function Admin() {
 
 const BLOCK_LABEL = { text: "텍스트", image: "이미지", file: "파일", link: "링크" };
 
-function BlockEditor({ block, isFirst, isLast, onPatch, onRemove, onMoveUp, onMoveDown }) {
+function BlockEditor({
+  block,
+  isFirst,
+  isLast,
+  onPatch,
+  onRemove,
+  onMoveUp,
+  onMoveDown,
+}) {
   return (
     <div className="rounded-2xl border border-basil-100 bg-white p-3">
       <div className="mb-2 flex items-center justify-between">

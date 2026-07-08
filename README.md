@@ -25,8 +25,8 @@ Convene은 다중일 오프라인 행사에서 참가자에게 필요한 정보(
 
 ## 첨부 사진
 
-| 홈 | 일정 | 공지 푸시 |
-|---|---|---|
+| 홈                     | 일정                           | 공지 푸시              |
+| ---------------------- | ------------------------------ | ---------------------- |
 | ![home](docs/home.png) | ![schedule](docs/schedule.png) | ![push](docs/push.png) |
 
 ---
@@ -66,13 +66,13 @@ Convene은 다중일 오프라인 행사에서 참가자에게 필요한 정보(
 
 ## 기술 스택
 
-| 구분 | 기술 |
-|---|---|
-| Frontend | React 18, React Router, Vite 5 |
-| Styling | Tailwind CSS |
-| Font | Gowun Batang |
-| PWA | vite-plugin-pwa (Workbox, injectManifest) |
-| Backend | Firebase Firestore, Cloud Functions, Auth |
+| 구분                     | 기술                                            |
+| ------------------------ | ----------------------------------------------- |
+| Frontend                 | React 18, React Router, Vite 5                  |
+| Styling                  | Tailwind CSS                                    |
+| Font                     | Gowun Batang                                    |
+| PWA                      | vite-plugin-pwa (Workbox, injectManifest)       |
+| Backend                  | Firebase Firestore, Cloud Functions, Auth       |
 | Storage / Push / Hosting | Firebase Storage, Cloud Messaging(FCM), Hosting |
 
 ---
@@ -130,6 +130,7 @@ FCM 백그라운드용 서비스워커와 루트 스코프에서 충돌해, **`i
 npm install
 cp .env.local.example .env.local   # Firebase 설정값 입력
 npm run dev
+npm run lint                        # ESLint 검사 (선택)
 ```
 
 ### 배포

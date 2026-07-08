@@ -5,8 +5,13 @@
 @tailwind utilities;
 
 :root {
-  font-family: "Gowun Batang", "Apple SD Gothic Neo", -apple-system,
-    BlinkMacSystemFont, system-ui, serif;
+  font-family:
+    "Gowun Batang",
+    "Apple SD Gothic Neo",
+    -apple-system,
+    BlinkMacSystemFont,
+    system-ui,
+    serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
   word-break: keep-all; /* 한글 단어 단위 줄바꿈 */

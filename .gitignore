@@ -9,3 +9,6 @@ dev-dist
 .claude
 .firebase
 firebase-debug.log
+
+# 인스턴스 작업 지침(로컬 유지, 공개 레포에서 감춤)
+CLAUDE.md

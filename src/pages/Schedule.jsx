@@ -18,9 +18,7 @@ export default function Schedule() {
               key={d.day}
               onClick={() => setActiveDay(i)}
               className={`flex flex-col items-center whitespace-nowrap rounded-xl px-4 py-2 text-sm transition ${
-                i === activeDay
-                  ? "bg-basil-600 text-white"
-                  : "bg-basil-50 text-ink-soft"
+                i === activeDay ? "bg-basil-600 text-white" : "bg-basil-50 text-ink-soft"
               }`}
             >
               <span className="font-semibold">{d.day}</span>

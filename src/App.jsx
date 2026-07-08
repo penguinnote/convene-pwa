@@ -143,9 +143,7 @@ function AppShell() {
   if (!hasProfile && !isAdmin) {
     return (
       <>
-        {splashVisible && (
-          <SplashScreen stage={splashStage} leaving={splashLeaving} />
-        )}
+        {splashVisible && <SplashScreen stage={splashStage} leaving={splashLeaving} />}
         <div className="mx-auto max-w-md">
           <Welcome />
         </div>
@@ -155,9 +153,7 @@ function AppShell() {
 
   return (
     <>
-      {splashVisible && (
-        <SplashScreen stage={splashStage} leaving={splashLeaving} />
-      )}
+      {splashVisible && <SplashScreen stage={splashStage} leaving={splashLeaving} />}
 
       {toast && (
         <Toast

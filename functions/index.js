@@ -1,4 +1,7 @@
-const { onDocumentCreated, onDocumentUpdated } = require("firebase-functions/v2/firestore");
+const {
+  onDocumentCreated,
+  onDocumentUpdated,
+} = require("firebase-functions/v2/firestore");
 const { initializeApp } = require("firebase-admin/app");
 const { getFirestore, FieldValue } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
@@ -26,9 +29,7 @@ async function sendToAllTokens({ title, body, id }) {
   res.responses.forEach((r, i) => {
     if (!r.success) dead.push(tokens[i]);
   });
-  await Promise.all(
-    dead.map((t) => getFirestore().collection("tokens").doc(t).delete())
-  );
+  await Promise.all(dead.map((t) => getFirestore().collection("tokens").doc(t).delete()));
 
   // 푸시 도달 로그 (분석은 Admin SDK로만 조회)
   await getFirestore().collection("pushLogs").doc(id).set({

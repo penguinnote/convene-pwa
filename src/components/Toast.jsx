@@ -115,10 +115,7 @@ export default function Toast({ title, onClick, onClose }) {
           <p className="text-[11px] font-semibold" style={{ color: "#3f7d99" }}>
             새 공지
           </p>
-          <p
-            className="truncate font-bold leading-snug"
-            style={{ color: "#2f5e72" }}
-          >
+          <p className="truncate font-bold leading-snug" style={{ color: "#2f5e72" }}>
             {title}
           </p>
         </div>
