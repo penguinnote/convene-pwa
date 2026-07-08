@@ -5,12 +5,23 @@ import PageHeader from "../components/PageHeader.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
 
 const MOKJANG_LIST = [
-  "기쁨", "다소니", "마음", "밸리", "빛길", "사랑",
-  "새벽", "새싹", "에끌", "토브", "프레쉬", "하품",
+  "기쁨",
+  "다소니",
+  "마음",
+  "밸리",
+  "빛길",
+  "사랑",
+  "새벽",
+  "새싹",
+  "에끌",
+  "토브",
+  "프레쉬",
+  "하품",
 ];
 
 export default function Info() {
-  const { user, nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto } = useAuth();
+  const { nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto } =
+    useAuth();
   const navigate = useNavigate();
   const fileRef = useRef(null);
 
@@ -27,8 +38,12 @@ export default function Info() {
   const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState(null);
 
-  useEffect(() => { setNick(nickname); }, [nickname]);
-  useEffect(() => { setMok(mokjang); }, [mokjang]);
+  useEffect(() => {
+    setNick(nickname);
+  }, [nickname]);
+  useEffect(() => {
+    setMok(mokjang);
+  }, [mokjang]);
 
   async function handleSave() {
     if (saving) return;
@@ -164,7 +179,12 @@ export default function Info() {
                   <img
                     src={photoURL}
                     alt=""
-                    style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "center" }}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                      objectPosition: "center",
+                    }}
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center text-basil-300">
@@ -202,7 +222,10 @@ export default function Info() {
                   <div className="absolute -bottom-2 left-1/2 z-50 w-44 -translate-x-1/2 translate-y-full overflow-hidden rounded-xl border border-basil-200 bg-white shadow-lg">
                     <button
                       type="button"
-                      onClick={() => { setShowPhotoMenu(false); fileRef.current?.click(); }}
+                      onClick={() => {
+                        setShowPhotoMenu(false);
+                        fileRef.current?.click();
+                      }}
                       className="w-full px-4 py-3 text-left text-sm font-medium text-ink"
                     >
                       사진 변경
@@ -239,9 +262,13 @@ export default function Info() {
                     onChange={(e) => setMok(e.target.value)}
                     className="mt-1 w-full appearance-none rounded-xl border border-basil-200 bg-basil-50/50 px-3 py-2.5 text-sm text-ink outline-none focus:border-basil-500"
                   >
-                    <option value="" disabled>선택</option>
+                    <option value="" disabled>
+                      선택
+                    </option>
                     {MOKJANG_LIST.map((m) => (
-                      <option key={m} value={m}>{m}</option>
+                      <option key={m} value={m}>
+                        {m}
+                      </option>
                     ))}
                   </select>
                 </div>
@@ -265,7 +292,9 @@ export default function Info() {
               </div>
             ) : (
               <>
-                <p className="mt-3 text-lg font-bold text-title">{nickname || "이름 없음"}</p>
+                <p className="mt-3 text-lg font-bold text-title">
+                  {nickname || "이름 없음"}
+                </p>
                 {mokjang && (
                   <span className="mt-1.5 rounded-full bg-basil-50 px-3 py-1 text-xs font-semibold text-basil-600">
                     {mokjang}
@@ -336,8 +365,14 @@ async function getCroppedBlob(src, cropArea) {
   const ctx = canvas.getContext("2d");
   ctx.drawImage(
     img,
-    cropArea.x, cropArea.y, cropArea.width, cropArea.height,
-    0, 0, 512, 512
+    cropArea.x,
+    cropArea.y,
+    cropArea.width,
+    cropArea.height,
+    0,
+    0,
+    512,
+    512
   );
   return new Promise((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.85));
 }

@@ -1,5 +1,9 @@
-// Firestore Timestamp(또는 Date)를 받아 영어 상대시간 문자열로 변환.
-// serverTimestamp 대기 중이라 createdAt이 null이면 "just now".
+/**
+ * Firestore Timestamp(또는 Date)를 받아 영어 상대시간 문자열로 변환.
+ * serverTimestamp 대기 중이라 createdAt이 null이면 "just now".
+ * @param {{toDate?: () => Date}|Date|null|undefined} createdAt Firestore Timestamp 또는 Date
+ * @returns {string} "just now" | "N min ago" | "N hours ago" | "N days ago"
+ */
 export function formatRelative(createdAt) {
   if (!createdAt) return "just now";
 

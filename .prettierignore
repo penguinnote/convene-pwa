@@ -1,0 +1,9 @@
+dist
+dev-dist
+node_modules
+functions/node_modules
+package-lock.json
+functions/package-lock.json
+*.png
+# 손으로 관리하는 콘텐츠 데이터(일정·말씀 등)는 포맷 대상에서 제외 — 원문 구조 유지
+src/data

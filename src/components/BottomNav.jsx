@@ -43,9 +43,7 @@ export default function BottomNav() {
         {({ isActive }) => (
           <>
             <Icon active={isActive} />
-            <span className={isActive ? "font-semibold" : "font-medium"}>
-              {label}
-            </span>
+            <span className={isActive ? "font-semibold" : "font-medium"}>{label}</span>
           </>
         )}
       </NavLink>
@@ -81,9 +79,7 @@ export default function BottomNav() {
           }`}
         >
           <PersonIcon active={infoActive} />
-          <span className={infoActive ? "font-semibold" : "font-medium"}>
-            정보
-          </span>
+          <span className={infoActive ? "font-semibold" : "font-medium"}>정보</span>
         </NavLink>
       </div>
     </nav>

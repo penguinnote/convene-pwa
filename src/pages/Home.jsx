@@ -1,6 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { collection, query, orderBy, limit, where, onSnapshot, doc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  orderBy,
+  limit,
+  where,
+  onSnapshot,
+  doc,
+} from "firebase/firestore";
 import { db } from "../firebase";
 import { enablePush } from "../lib/push";
 import { formatRelative } from "../lib/time";
@@ -53,7 +61,7 @@ export default function Home() {
 
     // 변동 안내 메모 실시간 구독 (config/live.note)
     const unsubLive = onSnapshot(doc(db, "config", "live"), (snap) => {
-      setNote(snap.exists() ? snap.data().note ?? "" : "");
+      setNote(snap.exists() ? (snap.data().note ?? "") : "");
     });
 
     return () => {
@@ -178,8 +186,7 @@ export default function Home() {
             <div>
               <p className="text-sm font-semibold text-ink">공지사항</p>
               <p className="mt-0.5 break-keep text-sm leading-relaxed text-ink-soft">
-                등록된 공지가 없습니다. 캠프 기간 중 새 공지가 올라오면 여기에
-                표시됩니다.
+                등록된 공지가 없습니다. 캠프 기간 중 새 공지가 올라오면 여기에 표시됩니다.
               </p>
             </div>
           </div>
@@ -222,9 +229,7 @@ export default function Home() {
         </section>
       )}
 
-      <p className="px-6 py-6 text-center text-xs text-ink-faint">
-        {INSTANCE.org}
-      </p>
+      <p className="px-6 py-6 text-center text-xs text-ink-faint">{INSTANCE.org}</p>
     </div>
   );
 }
@@ -368,8 +373,7 @@ function LiveCard({ current, next, note, linkLabel, onLink, onCard }) {
 
           {next && (
             <p className="mt-3 break-keep text-[13px] text-ink-soft">
-              <span className="font-bold text-title">다음 일정</span>
-              : {next.title}
+              <span className="font-bold text-title">다음 일정</span>: {next.title}
               {next.place ? ` | ${next.place}` : ""}
             </p>
           )}

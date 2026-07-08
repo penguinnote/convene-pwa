@@ -1,7 +1,13 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
-import { ref, uploadBytesResumable, getDownloadURL, listAll, deleteObject } from "firebase/storage";
+import {
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+  listAll,
+  deleteObject,
+} from "firebase/storage";
 import { auth, db, storage } from "../firebase";
 import { logEvent, isStandalone } from "../lib/track";
 
@@ -27,7 +33,11 @@ export function AuthProvider({ children }) {
         }
         // 설치(홈화면 추가) 실행 최초 1회만 기록
         if (isStandalone() && !snap.data()?.installedAt) {
-          await setDoc(doc(db, "users", u.uid), { installedAt: serverTimestamp() }, { merge: true });
+          await setDoc(
+            doc(db, "users", u.uid),
+            { installedAt: serverTimestamp() },
+            { merge: true }
+          );
           logEvent("install_detected");
         }
       } else {
@@ -81,10 +91,20 @@ export function AuthProvider({ children }) {
   const hasProfile = !!nickname;
 
   return (
-    <AuthContext.Provider value={{
-      user, nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto,
-      ready, hasProfile, isAdmin: !!user?.email,
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        nickname,
+        mokjang,
+        photoURL,
+        saveProfile,
+        uploadPhoto,
+        removePhoto,
+        ready,
+        hasProfile,
+        isAdmin: !!user?.email,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -93,4 +113,3 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
-

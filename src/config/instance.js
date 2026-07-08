@@ -8,8 +8,8 @@ export const INSTANCE = {
 
   // 홈 히어로
   org: "2026 로뎀나무교회 청년대학부 여름말씀캠프", // eyebrow(상단 작은 글씨)
-  slogan: "아담아, 네가 어디 있느냐?",             // 대표 표어(h1)
-  sloganEn: "Where are you?",                     // 이탤릭 영문 표어
+  slogan: "아담아, 네가 어디 있느냐?", // 대표 표어(h1)
+  sloganEn: "Where are you?", // 이탤릭 영문 표어
 
   // 외부 링크
   photosAlbumUrl: "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A",
@@ -21,9 +21,16 @@ export const INSTANCE = {
   theme: {
     palette: {
       basil: {
-        50: "#F2F8FA", 100: "#E3EEF0", 200: "#CFE6EE", 300: "#A9C4CF",
-        400: "#7BB0C4", 500: "#5A93AC", 600: "#3F7D99", 700: "#356A83",
-        800: "#2A5468", 900: "#21343C",
+        50: "#F2F8FA",
+        100: "#E3EEF0",
+        200: "#CFE6EE",
+        300: "#A9C4CF",
+        400: "#7BB0C4",
+        500: "#5A93AC",
+        600: "#3F7D99",
+        700: "#356A83",
+        800: "#2A5468",
+        900: "#21343C",
       },
       ink: { DEFAULT: "#21343C", soft: "#52707D", faint: "#8AA6B3" },
       title: "#2F5E72",

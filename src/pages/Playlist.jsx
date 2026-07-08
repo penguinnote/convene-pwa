@@ -42,13 +42,7 @@ export default function Playlist() {
 
 function PlayIcon() {
   return (
-    <svg
-      width="26"
-      height="26"
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      stroke="none"
-    >
+    <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" stroke="none">
       <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14z" />
     </svg>
   );

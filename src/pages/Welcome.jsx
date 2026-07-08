@@ -4,8 +4,18 @@ import { logEvent } from "../lib/track";
 import { INSTANCE } from "../config/instance.js";
 
 const MOKJANG_LIST = [
-  "기쁨", "다소니", "마음", "밸리", "빛길", "사랑",
-  "새벽", "새싹", "에끌", "토브", "프레쉬", "하품",
+  "기쁨",
+  "다소니",
+  "마음",
+  "밸리",
+  "빛길",
+  "사랑",
+  "새벽",
+  "새싹",
+  "에끌",
+  "토브",
+  "프레쉬",
+  "하품",
 ];
 
 export default function Welcome() {
@@ -50,9 +60,7 @@ export default function Welcome() {
         >
           환영합니다
         </h1>
-        <p className="mt-1.5 text-[22px] font-bold italic text-title">
-          Welcome
-        </p>
+        <p className="mt-1.5 text-[22px] font-bold italic text-title">Welcome</p>
       </header>
 
       {/* 입력 폼 */}
@@ -81,9 +89,13 @@ export default function Welcome() {
                 mok ? "text-ink" : "text-ink-faint"
               }`}
             >
-              <option value="" disabled>목장을 선택하세요</option>
+              <option value="" disabled>
+                목장을 선택하세요
+              </option>
               {MOKJANG_LIST.map((m) => (
-                <option key={m} value={m}>{m}</option>
+                <option key={m} value={m}>
+                  {m}
+                </option>
               ))}
             </select>
           </div>
