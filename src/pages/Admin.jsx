@@ -40,6 +40,7 @@ export default function Admin() {
   const [title, setTitle] = useState("");
   const [blocks, setBlocks] = useState([emptyText()]);
   const [isPinned, setIsPinned] = useState(false);
+  const [resendPush, setResendPush] = useState(false); // 수정 시 푸시 재발송 여부
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
   const [view, setView] = useState("list"); // "list"(공지 관리) | "editor" | "live"(라이브 진행)
@@ -110,6 +111,7 @@ export default function Admin() {
     setTitle("");
     setBlocks([emptyText()]);
     setIsPinned(false);
+    setResendPush(false);
     setMsg("");
     setView("editor");
   }
@@ -124,6 +126,7 @@ export default function Admin() {
         : [{ _id: newId(), type: "text", value: item.body ?? "" }];
     setBlocks(loaded);
     setIsPinned(!!item.pinned);
+    setResendPush(false); // 수정 시 기본 해제(체크해야 재발송)
     setMsg("");
     setView("editor");
   }
@@ -255,8 +258,11 @@ export default function Admin() {
         : doc(collection(db, "announcements"));
       const data = { title: title.trim(), body, blocks: cleaned, pinned: isPinned };
       if (editingId) {
-        // 수정: createdAt 유지(목록 순서 보존), 푸시는 발생하지 않음
-        batch.update(ref, { ...data, updatedAt: serverTimestamp() });
+        // 수정: createdAt 유지(목록 순서 보존). resendPush 체크 시에만 resendAt를
+        // 갱신 → onDocumentUpdated가 이를 감지해 1회 재발송, 아니면 푸시 없음.
+        const updateData = { ...data, updatedAt: serverTimestamp() };
+        if (resendPush) updateData.resendAt = serverTimestamp();
+        batch.update(ref, updateData);
       } else {
         batch.set(ref, { ...data, createdAt: serverTimestamp() });
       }
@@ -276,6 +282,7 @@ export default function Admin() {
       setTitle("");
       setBlocks([emptyText()]);
       setIsPinned(false);
+      setResendPush(false);
       setView("list");
     } catch (err) {
       console.error("send failed", err);
@@ -555,6 +562,20 @@ export default function Admin() {
         <span className="text-sm font-medium text-ink">이 공지를 홈에 고정</span>
       </label>
 
+      {editingId && (
+        <label className="flex items-center gap-2.5 rounded-xl border border-basil-100 bg-basil-50 px-4 py-3">
+          <input
+            type="checkbox"
+            checked={resendPush}
+            onChange={(e) => setResendPush(e.target.checked)}
+            className="h-4 w-4 accent-basil-600"
+          />
+          <span className="text-sm font-medium text-ink">
+            수정 내용을 푸시 알림으로 다시 보내기
+          </span>
+        </label>
+      )}
+
       <button
         disabled={sending}
         className="w-full rounded-xl bg-basil-600 py-2.5 font-semibold text-white disabled:opacity-60"
@@ -562,6 +583,8 @@ export default function Admin() {
         {editingId
           ? sending
             ? "저장 중…"
+            : resendPush
+            ? "수정 저장 + 푸시 발송"
             : "수정 저장"
           : sending
           ? "발송 중…"
@@ -569,7 +592,9 @@ export default function Admin() {
       </button>
       {editingId && (
         <p className="text-center text-xs text-ink-faint">
-          수정은 새 푸시 알림을 보내지 않습니다.
+          {resendPush
+            ? "수정 후 푸시 알림을 다시 보냅니다."
+            : "체크하지 않으면 푸시 없이 수정만 됩니다."}
         </p>
       )}
       {msg && <p className="text-sm text-basil-600">{msg}</p>}
