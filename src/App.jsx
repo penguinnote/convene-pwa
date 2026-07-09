@@ -45,17 +45,8 @@ function AppShell() {
   const [toast, setToast] = useState(null); // { id, title }
   const lastCreatedRef = useRef(0); // 마지막으로 본 최신 공지의 createdAt(ms)
 
-  // 홈에서 뒤로가기 종료 안내
-  const [exitHint, setExitHint] = useState(false);
-  const exitHintTimerRef = useRef(null);
-  useBackControl({
-    onExitHint: () => {
-      setExitHint(true);
-      clearTimeout(exitHintTimerRef.current);
-      exitHintTimerRef.current = setTimeout(() => setExitHint(false), 2000);
-    },
-  });
-  useEffect(() => () => clearTimeout(exitHintTimerRef.current), []);
+  // 홈 위에 센티넬을 상시 유지 → 홈에서 뒤로가기해도 앱이 종료·재시작되지 않는다.
+  useBackControl();
 
   // app_open — uid 준비된 뒤 세션당 1회
   const openedRef = useRef(false);
@@ -166,15 +157,6 @@ function AppShell() {
           }}
           onClose={() => setToast(null)}
         />
-      )}
-
-      {/* 홈 뒤로가기 종료 안내 (하단 중앙) */}
-      {exitHint && (
-        <div className="pointer-events-none fixed inset-x-0 bottom-24 z-[95] flex justify-center px-6">
-          <div className="rounded-full bg-ink/90 px-4 py-2 text-sm font-medium text-white shadow-lg">
-            뒤로가기를 한 번 더 누르면 종료됩니다
-          </div>
-        </div>
       )}
 
       {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정 */}

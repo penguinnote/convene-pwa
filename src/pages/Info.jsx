@@ -306,10 +306,10 @@ export default function Info() {
         </div>
       </section>
 
-      {/* 메뉴 */}
+      {/* info */}
       <section className="px-5 pb-6">
         <h2 className="mb-3 px-1 text-[13px] font-bold uppercase tracking-wider text-basil-600">
-          메뉴
+          info
         </h2>
         <div className="overflow-hidden rounded-2xl border border-basil-100 bg-white">
           <button
