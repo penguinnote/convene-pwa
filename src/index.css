@@ -24,10 +24,17 @@ body,
 }
 
 html,
-body,
-#root {
+body {
   /* 상태바 자리에 단색이 깔리지 않도록 투명 — 헤더 수채화 그라데이션이 그 위를 덮음 */
   background-color: transparent;
+}
+
+/* 넓은 화면에서 중앙 앱 컬럼(max-w-md) 양옆으로 드러나는 은은한 브랜드 배경.
+   모바일에선 앱 컬럼이 폭을 꽉 채워 이 배경이 가려지므로 시각적 변화가 없다.
+   상태바 영역도 앱 컬럼의 헤더 수채화가 덮으므로 투명 처리와 충돌하지 않는다. */
+#root {
+  background-color: #e3eef0; /* basil-100 (fallback) */
+  background-image: linear-gradient(165deg, #e3eef0 0%, #e9f1ee 55%, #f1ece2 100%);
 }
 
 body {

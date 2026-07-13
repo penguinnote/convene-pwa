@@ -135,7 +135,8 @@ function AppShell() {
     return (
       <>
         {splashVisible && <SplashScreen stage={splashStage} leaving={splashLeaving} />}
-        <div className="mx-auto max-w-md">
+        {/* 온보딩도 동일한 중앙 컬럼 프레임(넓은 화면에서 md:shadow-xl) */}
+        <div className="mx-auto max-w-md md:shadow-xl">
           <Welcome />
         </div>
       </>
@@ -159,8 +160,9 @@ function AppShell() {
         />
       )}
 
-      {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정 */}
-      <div className="mx-auto flex h-screen max-w-md flex-col bg-white">
+      {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정.
+          넓은 화면에선 md:shadow-xl로 배경 위에 뜬 중앙 프레임처럼 보인다. */}
+      <div className="mx-auto flex h-screen max-w-md flex-col bg-white md:shadow-xl">
         <main className="flex-1 overflow-x-hidden overflow-y-auto">
           <Routes>
             <Route path="/" element={<Home />} />
