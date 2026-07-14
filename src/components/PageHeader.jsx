@@ -8,10 +8,11 @@ const headerBg = [
   "linear-gradient(165deg,#d3f0f3,#e0f2ec 52%,#f6f1e3)",
 ].join(", ");
 
-export default function PageHeader({ eyebrow, title, subtitle }) {
+// sticky=false로 두면 상위에서 헤더+부가 바를 하나의 sticky 덩어리로 묶을 수 있다.
+export default function PageHeader({ eyebrow, title, subtitle, sticky = true }) {
   return (
     <header
-      className="sticky top-0 z-10 border-b border-basil-100 px-5 pb-4 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]"
+      className={`${sticky ? "sticky top-0 z-10 " : ""}border-b border-basil-100 px-5 pb-4 pt-[max(2.5rem,calc(env(safe-area-inset-top)+1.25rem))]`}
       style={{ background: headerBg }}
     >
       {eyebrow && (

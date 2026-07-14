@@ -8,29 +8,40 @@ export default function Schedule() {
 
   return (
     <div>
-      <PageHeader eyebrow="Schedule" title="캠프 일정" subtitle="3박 4일 전체 스케줄" />
+      {/* 헤더 + 일자 탭을 하나의 sticky 덩어리로 묶어 함께 고정
+          (하드코딩 오프셋 없이 노치/비노치 모두 안전) */}
+      <div className="sticky top-0 z-10">
+        <PageHeader
+          eyebrow="Schedule"
+          title="캠프 일정"
+          subtitle="3박 4일 전체 스케줄"
+          sticky={false}
+        />
 
-      {/* 일자 탭 */}
-      <div className="sticky top-[92px] z-10 border-b border-basil-100 bg-white/90 backdrop-blur-md">
-        <div className="no-scrollbar flex gap-2 overflow-x-auto px-5 py-3">
-          {schedule.map((d, i) => (
-            <button
-              key={d.day}
-              onClick={() => setActiveDay(i)}
-              className={`flex flex-col items-center whitespace-nowrap rounded-xl px-4 py-2 text-sm transition ${
-                i === activeDay ? "bg-basil-600 text-white" : "bg-basil-50 text-ink-soft"
-              }`}
-            >
-              <span className="font-semibold">{d.day}</span>
-              <span
-                className={`text-[11px] ${
-                  i === activeDay ? "text-white/80" : "text-ink-faint"
+        {/* 일자 탭 */}
+        <div className="border-b border-basil-100 bg-white/90 backdrop-blur-md">
+          <div className="no-scrollbar flex gap-2 overflow-x-auto px-5 py-3">
+            {schedule.map((d, i) => (
+              <button
+                key={d.day}
+                onClick={() => setActiveDay(i)}
+                className={`flex flex-col items-center whitespace-nowrap rounded-xl px-4 py-2 text-sm transition ${
+                  i === activeDay
+                    ? "bg-basil-600 text-white"
+                    : "bg-basil-50 text-ink-soft"
                 }`}
               >
-                {d.date.replace(/\s/g, "")}
-              </span>
-            </button>
-          ))}
+                <span className="font-semibold">{d.day}</span>
+                <span
+                  className={`text-[11px] ${
+                    i === activeDay ? "text-white/80" : "text-ink-faint"
+                  }`}
+                >
+                  {d.date.replace(/\s/g, "")}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
