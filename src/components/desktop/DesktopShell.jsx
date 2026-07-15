@@ -5,11 +5,11 @@ import DesktopHome from "./DesktopHome.jsx";
 import DesktopSchedule from "./DesktopSchedule.jsx";
 import DesktopVerses from "./DesktopVerses.jsx";
 import DesktopRooms from "./DesktopRooms.jsx";
+import DesktopAnnouncements from "./DesktopAnnouncements.jsx";
+import DesktopMenu from "./DesktopMenu.jsx";
+import DesktopPlaylist from "./DesktopPlaylist.jsx";
 import Info from "../../pages/Info.jsx";
-import Menu from "../../pages/Menu.jsx";
-import Playlist from "../../pages/Playlist.jsx";
 import Admin from "../../pages/Admin.jsx";
-import Announcements from "../../pages/Announcements.jsx";
 import AnnouncementDetail from "../../pages/AnnouncementDetail.jsx";
 
 // 홈 히어로와 동일한 수채화 그라데이션 값 재사용.
@@ -37,15 +37,12 @@ export default function DesktopShell() {
           <Route path="/verses" element={<DesktopVerses />} />
           <Route path="/verses/:id" element={<DesktopVerses />} />
           <Route path="/info" element={<PageFrame element={<Info />} />} />
-          <Route path="/menu" element={<PageFrame element={<Menu />} />} />
-          <Route path="/playlist" element={<PageFrame element={<Playlist />} />} />
-          <Route
-            path="/announcements"
-            element={<PageFrame element={<Announcements />} />}
-          />
+          <Route path="/menu" element={<DesktopMenu />} />
+          <Route path="/playlist" element={<DesktopPlaylist />} />
+          <Route path="/announcements" element={<DesktopAnnouncements />} />
           <Route
             path="/announcements/:id"
-            element={<PageFrame element={<AnnouncementDetail />} />}
+            element={<PageFrame element={<AnnouncementDetail />} width="max-w-[720px]" />}
           />
           <Route path="/admin" element={<PageFrame element={<Admin />} />} />
           <Route path="*" element={<Navigate to="/" replace />} />
@@ -56,9 +53,11 @@ export default function DesktopShell() {
 }
 
 // 홈 외 기존 페이지를 데스크톱 본문 가운데 흰 컬럼으로 감싼다(모바일 페이지 컴포넌트 재사용).
-function PageFrame({ element }) {
+function PageFrame({ element, width = "max-w-2xl" }) {
   return (
-    <div className="mx-auto max-w-2xl overflow-hidden rounded-3xl border border-basil-100 bg-white shadow-sm">
+    <div
+      className={`mx-auto ${width} overflow-hidden rounded-3xl border border-basil-100 bg-white shadow-sm`}
+    >
       {element}
     </div>
   );
