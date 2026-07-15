@@ -65,7 +65,7 @@ export default function DesktopRooms() {
             </h2>
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {sections[key].map((room) => (
-                <RoomCard key={room.name} room={room} />
+                <RoomCard key={room.id} room={room} />
               ))}
             </div>
           </section>
