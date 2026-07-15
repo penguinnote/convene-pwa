@@ -22,11 +22,11 @@ const HERO_BG = [
   "linear-gradient(165deg,#d3f0f3,#e0f2ec 52%,#f6f1e3)",
 ].join(", ");
 
-// 데스크톱 공통 셸: 전체 폭 수채화 히어로 + 가로 탭 내비 + 본문 영역(옅은 아쿠아).
+// 데스크톱 공통 셸: 전체 폭 수채화 히어로 + 가로 탭 내비 + 본문 영역(흰 배경, 카드 테두리로 구분).
 // md(≥768px) 이상에서만 렌더된다(모바일은 App.jsx에서 기존 셸 유지).
 export default function DesktopShell() {
   return (
-    <div className="min-h-screen bg-[#EEF6F7]">
+    <div className="min-h-screen bg-white">
       <DesktopHero />
       <DesktopNav />
       <main className="mx-auto max-w-6xl px-6 py-8 lg:px-8">

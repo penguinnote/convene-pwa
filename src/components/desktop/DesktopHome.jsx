@@ -59,22 +59,37 @@ export default function DesktopHome() {
         />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* 공지 최신 1건 */}
-          <section>
-            <p className="mb-3 text-sm font-semibold text-ink">공지</p>
-            {topCard ? (
-              <AnnouncementCard
-                notice={topCard}
-                onClick={() => goToAnnouncement(navigate, location.pathname, topCard.id)}
-              />
-            ) : (
-              <div className="rounded-3xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
-                등록된 공지가 없습니다. 새 공지가 올라오면 여기에 표시됩니다.
-              </div>
-            )}
-          </section>
+          {/* 왼쪽 열: 공지 + 자료실(세로로 쌓임) */}
+          <div className="space-y-4">
+            <section>
+              <p className="mb-3 text-sm font-semibold text-ink">공지</p>
+              {topCard ? (
+                <AnnouncementCard
+                  notice={topCard}
+                  onClick={() =>
+                    goToAnnouncement(navigate, location.pathname, topCard.id)
+                  }
+                />
+              ) : (
+                <div className="rounded-3xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
+                  등록된 공지가 없습니다. 새 공지가 올라오면 여기에 표시됩니다.
+                </div>
+              )}
+            </section>
 
-          {/* 오늘 일정 미리보기 */}
+            {/* 자료실(고정 공지) — 공지 카드 바로 밑, 같은 열 폭 */}
+            {pinned && (
+              <section>
+                <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
+                <AnnouncementCard
+                  notice={pinned}
+                  onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
+                />
+              </section>
+            )}
+          </div>
+
+          {/* 오른쪽 열: 오늘 일정 미리보기 */}
           <section>
             <p className="mb-3 text-sm font-semibold text-ink">오늘 일정</p>
             <TodaySchedule
@@ -83,17 +98,6 @@ export default function DesktopHome() {
             />
           </section>
         </div>
-
-        {/* 자료실(고정 공지) */}
-        {pinned && (
-          <section>
-            <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
-            <AnnouncementCard
-              notice={pinned}
-              onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
-            />
-          </section>
-        )}
       </div>
 
       {/* 정보 레일 (lg+; 좁은 폭에선 메인 아래로 접힘) */}
