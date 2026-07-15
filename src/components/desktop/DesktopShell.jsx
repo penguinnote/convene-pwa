@@ -2,10 +2,9 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-
 import { INSTANCE } from "../../config/instance.js";
 import { logEvent } from "../../lib/track";
 import DesktopHome from "./DesktopHome.jsx";
-import Schedule from "../../pages/Schedule.jsx";
-import Rooms from "../../pages/Rooms.jsx";
-import Verses from "../../pages/Verses.jsx";
-import VerseDetail from "../../pages/VerseDetail.jsx";
+import DesktopSchedule from "./DesktopSchedule.jsx";
+import DesktopVerses from "./DesktopVerses.jsx";
+import DesktopRooms from "./DesktopRooms.jsx";
 import Info from "../../pages/Info.jsx";
 import Menu from "../../pages/Menu.jsx";
 import Playlist from "../../pages/Playlist.jsx";
@@ -33,10 +32,10 @@ export default function DesktopShell() {
       <main className="mx-auto max-w-6xl px-6 py-8 lg:px-8">
         <Routes>
           <Route path="/" element={<DesktopHome />} />
-          <Route path="/schedule" element={<PageFrame element={<Schedule />} />} />
-          <Route path="/rooms" element={<PageFrame element={<Rooms />} />} />
-          <Route path="/verses" element={<PageFrame element={<Verses />} />} />
-          <Route path="/verses/:id" element={<PageFrame element={<VerseDetail />} />} />
+          <Route path="/schedule" element={<DesktopSchedule />} />
+          <Route path="/rooms" element={<DesktopRooms />} />
+          <Route path="/verses" element={<DesktopVerses />} />
+          <Route path="/verses/:id" element={<DesktopVerses />} />
           <Route path="/info" element={<PageFrame element={<Info />} />} />
           <Route path="/menu" element={<PageFrame element={<Menu />} />} />
           <Route path="/playlist" element={<PageFrame element={<Playlist />} />} />
