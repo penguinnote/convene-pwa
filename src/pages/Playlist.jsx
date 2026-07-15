@@ -1,8 +1,8 @@
 import PageHeader from "../components/PageHeader.jsx";
 import { logEvent } from "../lib/track";
 
-// 캠프 찬양 유튜브 플레이리스트
-const PLAYLIST_URL =
+// 캠프 찬양 유튜브 플레이리스트 (데스크톱 플레이리스트에서도 재사용)
+export const PLAYLIST_URL =
   "https://youtube.com/playlist?list=PLZslkUTkp7CA&si=4cCL549DCTsvzQuL";
 
 export default function Playlist() {

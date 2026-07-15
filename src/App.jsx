@@ -138,9 +138,11 @@ function AppShell() {
     return (
       <>
         {splashVisible && <SplashScreen stage={splashStage} leaving={splashLeaving} />}
-        {/* 온보딩도 동일한 중앙 컬럼 프레임(넓은 화면에서 md:shadow-xl) */}
-        <div className="mx-auto max-w-md md:shadow-xl">
-          <Welcome />
+        {/* 온보딩: 모바일은 전체 화면 컬럼, lg+에선 가운데 카드. (base/md 그대로 → 모바일 불변) */}
+        <div className="mx-auto max-w-md md:shadow-xl lg:flex lg:min-h-screen lg:max-w-none lg:items-center lg:justify-center lg:p-8 lg:shadow-none">
+          <div className="lg:w-full lg:max-w-md lg:overflow-hidden lg:rounded-3xl lg:shadow-xl">
+            <Welcome />
+          </div>
         </div>
       </>
     );

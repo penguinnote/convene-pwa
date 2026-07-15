@@ -36,7 +36,7 @@ export default function Welcome() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-white">
+    <div className="flex h-screen flex-col bg-white lg:h-auto">
       {/* 수채화 헤더 */}
       <header
         className="relative overflow-hidden px-6 pb-10 pt-[max(3.5rem,calc(env(safe-area-inset-top)+2rem))]"
