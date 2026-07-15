@@ -1,16 +1,65 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { schedule } from "../../data/schedule.js";
 import { getAutoLive } from "../../lib/liveSchedule";
 
-// 데스크톱 일정: 일자 탭(가운데) + 가운데 정렬 넓은 타임라인. 왼쪽 선/점 유지, 블록 텍스트 가운데.
+// 가장 가까운 스크롤 가능한 조상(없으면 null → window).
+function getScrollParent(node) {
+  let el = node?.parentElement;
+  while (el) {
+    const oy = getComputedStyle(el).overflowY;
+    if ((oy === "auto" || oy === "scroll") && el.scrollHeight > el.clientHeight)
+      return el;
+    el = el.parentElement;
+  }
+  return null;
+}
+
+// 데스크톱 일정: 일자 탭(가운데) + 가운데 정렬 넓은 타임라인. 진입 시 현재 순서로 자동 스크롤.
 export default function DesktopSchedule() {
   const live = getAutoLive(new Date());
   const [activeDay, setActiveDay] = useState(live.dayIndex);
+  const userSwitched = useRef(false);
+  const rootRef = useRef(null);
+  const currentItemRef = useRef(null);
   const day = schedule[activeDay];
   const isToday = activeDay === live.dayIndex;
 
+  const currentIdx =
+    isToday && live.current && !live.current.rest
+      ? day.items.findIndex(
+          (it) => it.time === live.current.time && it.title === live.current.title
+        )
+      : -1;
+
+  useEffect(() => {
+    const scroller = getScrollParent(rootRef.current);
+    const toTop = () =>
+      scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
+
+    if (userSwitched.current) {
+      toTop(); // 수동 전환: 위에서부터
+      return;
+    }
+    if (currentIdx < 0 || !currentItemRef.current) return; // 현재 항목 없음: 위에서부터
+
+    // 상단 고정 내비(DesktopNav)에 가려지지 않게 오프셋.
+    const nav = document.querySelector("nav");
+    const offset = (nav?.offsetHeight ?? 0) + 16;
+    currentItemRef.current.style.scrollMarginTop = `${offset}px`;
+    requestAnimationFrame(() => {
+      currentItemRef.current?.scrollIntoView({ block: "start" });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDay]);
+
+  function selectDay(i) {
+    if (i === activeDay) return;
+    userSwitched.current = true;
+    setActiveDay(i);
+  }
+
   return (
-    <div className="mx-auto max-w-[640px]">
+    <div ref={rootRef} className="mx-auto max-w-[640px]">
       <div className="mb-2 text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-basil-600">
           Schedule
@@ -24,7 +73,7 @@ export default function DesktopSchedule() {
           <button
             key={d.day}
             type="button"
-            onClick={() => setActiveDay(i)}
+            onClick={() => selectDay(i)}
             className={`flex flex-col items-center whitespace-nowrap rounded-xl px-5 py-2 text-sm transition ${
               i === activeDay ? "bg-basil-600 text-white" : "bg-basil-50 text-ink-soft"
             }`}
@@ -44,13 +93,13 @@ export default function DesktopSchedule() {
       {/* 타임라인 */}
       <ol className="relative ml-3 border-l-2 border-basil-200 pl-8">
         {day.items.map((item, i) => {
-          const now =
-            isToday &&
-            !live.current?.rest &&
-            live.current?.time === item.time &&
-            live.current?.title === item.title;
+          const now = i === currentIdx;
           return (
-            <li key={i} className="relative mb-4 last:mb-0">
+            <li
+              key={i}
+              ref={now ? currentItemRef : undefined}
+              className="relative mb-4 last:mb-0"
+            >
               <span
                 className={`absolute -left-[39px] top-5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 bg-white ${
                   now ? "border-basil-600" : "border-basil-400"
