@@ -26,28 +26,38 @@ const HERO_BG = [
 // md(≥768px) 이상에서만 렌더된다(모바일은 App.jsx에서 기존 셸 유지).
 export default function DesktopShell() {
   return (
-    <div className="min-h-screen bg-white">
-      <DesktopHero />
-      <DesktopNav />
-      <main className="mx-auto max-w-6xl px-6 py-8 lg:px-8">
-        <Routes>
-          <Route path="/" element={<DesktopHome />} />
-          <Route path="/schedule" element={<DesktopSchedule />} />
-          <Route path="/rooms" element={<DesktopRooms />} />
-          <Route path="/verses" element={<DesktopVerses />} />
-          <Route path="/verses/:id" element={<DesktopVerses />} />
-          <Route path="/info" element={<PageFrame element={<Info />} />} />
-          <Route path="/menu" element={<DesktopMenu />} />
-          <Route path="/playlist" element={<DesktopPlaylist />} />
-          <Route path="/announcements" element={<DesktopAnnouncements />} />
-          <Route
-            path="/announcements/:id"
-            element={<PageFrame element={<AnnouncementDetail />} width="max-w-[720px]" />}
-          />
-          <Route path="/admin" element={<PageFrame element={<Admin />} />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </main>
+    // lg+: 화면 높이 세로 flex → 상단(히어로+탭) 고정, 본문만 내부 스크롤. md/모바일은 기존대로.
+    <div className="min-h-screen bg-white lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
+      {/* 상단 고정부 (lg에서 스크롤되지 않음) */}
+      <div className="lg:shrink-0">
+        <DesktopHero />
+        <DesktopNav />
+      </div>
+
+      {/* 본문 스크롤 영역 (lg에서 이 영역만 내부 스크롤) */}
+      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+        <main className="mx-auto max-w-6xl px-6 py-8 lg:px-8">
+          <Routes>
+            <Route path="/" element={<DesktopHome />} />
+            <Route path="/schedule" element={<DesktopSchedule />} />
+            <Route path="/rooms" element={<DesktopRooms />} />
+            <Route path="/verses" element={<DesktopVerses />} />
+            <Route path="/verses/:id" element={<DesktopVerses />} />
+            <Route path="/info" element={<PageFrame element={<Info />} />} />
+            <Route path="/menu" element={<DesktopMenu />} />
+            <Route path="/playlist" element={<DesktopPlaylist />} />
+            <Route path="/announcements" element={<DesktopAnnouncements />} />
+            <Route
+              path="/announcements/:id"
+              element={
+                <PageFrame element={<AnnouncementDetail />} width="max-w-[720px]" />
+              }
+            />
+            <Route path="/admin" element={<PageFrame element={<Admin />} />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </main>
+      </div>
     </div>
   );
 }

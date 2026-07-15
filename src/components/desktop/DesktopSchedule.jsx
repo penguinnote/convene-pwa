@@ -36,18 +36,27 @@ export default function DesktopSchedule() {
     const toTop = () =>
       scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
 
-    if (userSwitched.current) {
-      toTop(); // 수동 전환: 위에서부터
+    // 수동 전환·현재 항목 없음·현재가 첫 항목(위에 항목 없음) → 위에서부터.
+    if (userSwitched.current || currentIdx < 1 || !currentItemRef.current) {
+      toTop();
       return;
     }
-    if (currentIdx < 0 || !currentItemRef.current) return; // 현재 항목 없음: 위에서부터
 
-    // 상단 고정 내비(DesktopNav)에 가려지지 않게 오프셋.
-    const nav = document.querySelector("nav");
-    const offset = (nav?.offsetHeight ?? 0) + 16;
-    currentItemRef.current.style.scrollMarginTop = `${offset}px`;
+    // 현재 순서를 "위에서 두 번째"로: 바로 앞(이전) 항목을 스크롤 영역 상단에 건다.
+    const prev = currentItemRef.current.previousElementSibling ?? currentItemRef.current;
+    const PAD = 12;
     requestAnimationFrame(() => {
-      currentItemRef.current?.scrollIntoView({ block: "start" });
+      if (scroller) {
+        // lg 내부 스크롤 컨테이너: 컨테이너 상단이 곧 보이는 상단(내비 겹침 없음).
+        const delta =
+          prev.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+        scroller.scrollTo({ top: scroller.scrollTop + delta - PAD });
+      } else {
+        // md: 페이지 스크롤 + sticky 내비가 겹치므로 내비 높이만큼 보정.
+        const navH = document.querySelector("nav")?.offsetHeight ?? 0;
+        const y = prev.getBoundingClientRect().top + window.scrollY - navH - PAD;
+        window.scrollTo({ top: Math.max(0, y) });
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDay]);
