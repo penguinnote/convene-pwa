@@ -5,7 +5,7 @@ import { getVerseById } from "../data/verses.js";
 export default function VerseDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [lang, setLang] = useState("ko");
+  const [lang, setLang] = useState("gae"); // "gae"(개역개정) | "sae"(새번역) | "en"(NIV)
   const en = lang === "en";
 
   const item = getVerseById(id);
@@ -22,7 +22,7 @@ export default function VerseDetail() {
           <BackIcon />
           뒤로
         </button>
-        {item && <LangToggle lang={lang} onChange={setLang} />}
+        {item && <LangSegment lang={lang} onChange={setLang} />}
       </header>
 
       <div className="px-6 py-6">
@@ -51,7 +51,8 @@ export default function VerseDetail() {
             <div className="mt-6 space-y-5">
               {item.passages.map((p, j) => {
                 const ref = en ? p.refEn : p.ref;
-                const text = en ? p.textEn : p.text;
+                const text =
+                  lang === "gae" ? p.text : lang === "sae" ? p.textSae : p.textEn;
                 return (
                   <div key={j} className="border-l-2 border-basil-300 pl-4">
                     <p className="text-sm font-bold text-basil-600">{ref}</p>
@@ -75,35 +76,34 @@ export default function VerseDetail() {
   );
 }
 
-function LangToggle({ lang, onChange }) {
-  const isEn = lang === "en";
+// 3단 언어 세그먼트 컨트롤 (개역개정/새번역/NIV).
+// 각 칸이 독립 버튼이라 선택 칸이 항상 꽉 채워진다(슬라이딩 노브의 채움 틈 없음).
+const LANG_OPTIONS = [
+  { value: "gae", label: "개역개정" },
+  { value: "en", label: "NIV" },
+  { value: "sae", label: "새번역" },
+];
+
+function LangSegment({ lang, onChange }) {
   return (
-    <button
-      type="button"
-      onClick={() => onChange(isEn ? "ko" : "en")}
-      className="relative flex h-7 w-[4.5rem] items-center rounded-full border border-basil-200 bg-basil-50 transition-colors"
-      aria-label={isEn ? "Switch to Korean" : "Switch to English"}
-    >
-      <span
-        className={`absolute left-0.5 h-6 w-8 rounded-full bg-basil-600 shadow-sm transition-transform ${
-          isEn ? "translate-x-[calc(100%-2px)]" : ""
-        }`}
-      />
-      <span
-        className={`relative z-10 flex-1 text-center text-[11px] font-bold ${
-          isEn ? "text-basil-400" : "text-white"
-        }`}
-      >
-        한글
-      </span>
-      <span
-        className={`relative z-10 flex-1 text-center text-[11px] font-bold ${
-          isEn ? "text-white" : "text-basil-400"
-        }`}
-      >
-        EN
-      </span>
-    </button>
+    <div className="inline-flex items-center gap-0.5 rounded-full border border-basil-200 bg-basil-50 p-0.5">
+      {LANG_OPTIONS.map((opt) => {
+        const active = lang === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            aria-pressed={active}
+            className={`rounded-full px-2.5 py-1 text-[11px] font-bold transition-colors ${
+              active ? "bg-basil-600 text-white" : "text-basil-500"
+            }`}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
   );
 }
 
