@@ -20,11 +20,19 @@ export default function Rooms() {
     }
   }
 
+  const q = query.trim();
   const filtered = rooms.filter((room) => {
-    const q = query.trim();
     if (!q) return true;
     return room.name.includes(q) || room.members.some((m) => m.includes(q));
   });
+
+  // group("4인실"/"6인실")별로 묶는다. 방 번호(name)가 섹션 간 겹치므로 반드시 id를 키로.
+  const sections = {};
+  filtered.forEach((room) => {
+    const key = room.group ?? room.floor ?? "기타";
+    (sections[key] ??= []).push(room);
+  });
+  const sectionKeys = Object.keys(sections).sort((a, b) => a.localeCompare(b, "ko"));
 
   return (
     <div>
@@ -44,40 +52,45 @@ export default function Rooms() {
         </div>
       </div>
 
-      <div className="space-y-3 px-5 pb-6">
-        {filtered.length === 0 && (
+      <div className="space-y-6 px-5 pb-6">
+        {filtered.length === 0 ? (
           <p className="py-12 text-center text-sm text-ink-faint">
             검색 결과가 없습니다.
           </p>
+        ) : (
+          sectionKeys.map((key) => (
+            <section key={key}>
+              <h2 className="mb-2.5 px-1 text-[13px] font-bold uppercase tracking-wider text-basil-600">
+                {key}
+              </h2>
+              <div className="space-y-3">
+                {sections[key].map((room) => (
+                  <div
+                    key={room.id}
+                    className="rounded-2xl border border-basil-100 bg-white p-4"
+                  >
+                    <p className="text-lg font-bold text-ink">{room.name}</p>
+                    <div className="mt-3 flex flex-wrap gap-1.5">
+                      {room.members.map((m) => (
+                        <span
+                          key={m}
+                          className={`rounded-lg px-2.5 py-1 text-sm ${
+                            m === room.leader
+                              ? "bg-basil-600 font-medium text-white"
+                              : "bg-basil-50 text-ink-soft"
+                          }`}
+                        >
+                          {m}
+                          {m === room.leader && " · 리더"}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))
         )}
-        {filtered.map((room) => (
-          <div
-            key={room.name}
-            className="rounded-2xl border border-basil-100 bg-white p-4"
-          >
-            <div className="flex items-center justify-between">
-              <p className="text-lg font-bold text-ink">{room.name}</p>
-              <span className="rounded-full bg-basil-50 px-2.5 py-1 text-xs font-medium text-basil-600">
-                {room.floor}
-              </span>
-            </div>
-            <div className="mt-3 flex flex-wrap gap-1.5">
-              {room.members.map((m) => (
-                <span
-                  key={m}
-                  className={`rounded-lg px-2.5 py-1 text-sm ${
-                    m === room.leader
-                      ? "bg-basil-600 font-medium text-white"
-                      : "bg-basil-50 text-ink-soft"
-                  }`}
-                >
-                  {m}
-                  {m === room.leader && " · 리더"}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
       </div>
     </div>
   );
