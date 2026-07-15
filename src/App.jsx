@@ -8,8 +8,10 @@ import Toast from "./components/Toast.jsx";
 import { setBadgeCount } from "./lib/badge";
 import { goToAnnouncement } from "./lib/nav";
 import { useBackControl } from "./hooks/useBackControl";
+import { useIsDesktop } from "./hooks/useIsDesktop";
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
 import { logEvent } from "./lib/track";
+import DesktopShell from "./components/desktop/DesktopShell.jsx";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
 import Rooms from "./pages/Rooms.jsx";
@@ -35,6 +37,7 @@ function AppShell() {
   const navigate = useNavigate();
   const location = useLocation();
   const { ready, hasProfile, isAdmin, user } = useAuth();
+  const isDesktop = useIsDesktop(); // ≥768px → 데스크톱 셸, 미만은 모바일 셸
 
   // 콜드 스타트마다 스플래시 노출 (마운트 시 1회)
   const [splashVisible, setSplashVisible] = useState(true);
@@ -160,28 +163,32 @@ function AppShell() {
         />
       )}
 
-      {/* 전체 높이 flex 컬럼: 본문만 내부 스크롤, 하단 탭은 항상 맨 아래 고정.
-          넓은 화면에선 md:shadow-xl로 배경 위에 뜬 중앙 프레임처럼 보인다. */}
-      <div className="mx-auto flex h-screen max-w-md flex-col bg-white md:shadow-xl">
-        <main className="flex-1 overflow-x-hidden overflow-y-auto">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/schedule" element={<Schedule />} />
-            <Route path="/rooms" element={<Rooms />} />
-            <Route path="/verses" element={<Verses />} />
-            <Route path="/verses/:id" element={<VerseDetail />} />
-            <Route path="/info" element={<Info />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/playlist" element={<Playlist />} />
-            <Route path="/announcements" element={<Announcements />} />
-            <Route path="/announcements/:id" element={<AnnouncementDetail />} />
-            <Route path="/admin" element={<Admin />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </main>
+      {isDesktop ? (
+        /* 넓은 화면(≥768px): 데스크톱 셸(전체 폭 히어로 + 가로 탭). 하단 탭은 숨김. */
+        <DesktopShell />
+      ) : (
+        /* 모바일(<768px): 전체 높이 flex 컬럼, 본문만 내부 스크롤, 하단 탭 고정. */
+        <div className="mx-auto flex h-screen max-w-md flex-col bg-white md:shadow-xl">
+          <main className="flex-1 overflow-x-hidden overflow-y-auto">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/schedule" element={<Schedule />} />
+              <Route path="/rooms" element={<Rooms />} />
+              <Route path="/verses" element={<Verses />} />
+              <Route path="/verses/:id" element={<VerseDetail />} />
+              <Route path="/info" element={<Info />} />
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/playlist" element={<Playlist />} />
+              <Route path="/announcements" element={<Announcements />} />
+              <Route path="/announcements/:id" element={<AnnouncementDetail />} />
+              <Route path="/admin" element={<Admin />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </main>
 
-        <BottomNav />
-      </div>
+          <BottomNav />
+        </div>
+      )}
     </>
   );
 }
