@@ -25,6 +25,10 @@ const HERO_BG = [
 // 데스크톱 공통 셸: 전체 폭 수채화 히어로 + 가로 탭 내비 + 본문 영역(흰 배경, 카드 테두리로 구분).
 // md(≥768px) 이상에서만 렌더된다(모바일은 App.jsx에서 기존 셸 유지).
 export default function DesktopShell() {
+  const { pathname } = useLocation();
+  // 말씀 2단만 본문 높이를 정확히 채워(안 넘침) 좌·우 패널이 각자 스크롤하게 한다.
+  // 다른 페이지는 기존대로 본문이 늘어나며 바깥이 스크롤(패딩 유지).
+  const versesRoute = pathname === "/verses" || pathname.startsWith("/verses/");
   return (
     // lg+: 화면 높이 세로 flex → 상단(히어로+탭) 고정, 본문만 내부 스크롤. md/모바일은 기존대로.
     <div className="min-h-screen bg-white lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
@@ -36,9 +40,13 @@ export default function DesktopShell() {
 
       {/* 본문 스크롤 영역 (lg에서 이 영역만 내부 스크롤) */}
       <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-        {/* main은 lg에서 본문 높이를 채우는 flex 컬럼(min-h-full). 콘텐츠가 길면 늘어나
-            바깥이 스크롤되고(패딩 유지), 말씀처럼 flex-1로 꽉 채우면 안에서만 스크롤된다. */}
-        <main className="mx-auto max-w-6xl px-6 py-8 lg:flex lg:min-h-full lg:flex-col lg:px-8">
+        {/* 말씀 라우트: main을 본문 높이에 정확히 맞춘 flex 컬럼(lg:h-full, 안 넘침)으로 두어
+            안의 좌·우 패널만 스크롤. 그 외 라우트: 기존처럼 콘텐츠대로 늘어나 바깥이 스크롤. */}
+        <main
+          className={`mx-auto max-w-6xl px-6 py-8 lg:px-8${
+            versesRoute ? " lg:flex lg:h-full lg:flex-col lg:overflow-hidden" : ""
+          }`}
+        >
           <Routes>
             <Route path="/" element={<DesktopHome />} />
             <Route path="/schedule" element={<DesktopSchedule />} />
