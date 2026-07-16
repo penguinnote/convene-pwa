@@ -99,7 +99,7 @@ export default function Schedule() {
       </div>
 
       <div className="px-5 py-5">
-        <ol className="relative ml-2 border-l border-basil-200 pl-6">
+        <ol className="relative ml-2 border-l border-[#D9D9D9] pl-6">
           {day.items.map((item, i) => {
             const now = i === currentIdx;
             return (
@@ -108,19 +108,23 @@ export default function Schedule() {
                 ref={now ? currentItemRef : undefined}
                 className="relative mb-6 last:mb-0"
               >
+                {/* 점 중심을 타임라인 선(x축)에 정확히 정렬(-translate-x-1/2).
+                    펄스 scale은 안쪽 ◎에만 걸어 중심 정렬을 깨지 않게 합성. */}
                 {now ? (
-                  // 라이브 코랄 펄스: 확산 링(animate-ping) + 코어(animate-livebeat)
-                  <span className="absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center">
+                  // 빨강 라이브 ◎: 확산 링(animate-ping) + 빨강 ◎(animate-livebeat)
+                  <span className="absolute left-[-24.5px] top-1 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center">
                     <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live-ring opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 animate-livebeat rounded-full bg-live" />
+                    <span className="relative flex h-3.5 w-3.5 animate-livebeat items-center justify-center rounded-full border-2 border-live bg-white">
+                      <span className="h-1.5 w-1.5 rounded-full bg-live" />
+                    </span>
                   </span>
                 ) : (
-                  <span className="absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-basil-500 bg-white">
-                    <span className="h-1.5 w-1.5 rounded-full bg-basil-500" />
+                  <span className="absolute left-[-24.5px] top-1 flex h-3.5 w-3.5 -translate-x-1/2 items-center justify-center rounded-full border-2 border-[#1A1A1A] bg-white">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#1A1A1A]" />
                   </span>
                 )}
                 {now && (
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-live">
                     지금 진행 중
                   </p>
                 )}
