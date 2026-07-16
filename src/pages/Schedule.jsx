@@ -108,17 +108,17 @@ export default function Schedule() {
                 ref={now ? currentItemRef : undefined}
                 className="relative mb-6 last:mb-0"
               >
-                <span
-                  className={`absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 bg-white ${
-                    now ? "border-basil-600" : "border-basil-500"
-                  }`}
-                >
-                  <span
-                    className={`h-1.5 w-1.5 rounded-full ${
-                      now ? "bg-basil-600" : "bg-basil-500"
-                    }`}
-                  />
-                </span>
+                {now ? (
+                  // 라이브 코랄 펄스: 확산 링(animate-ping) + 코어(animate-livebeat)
+                  <span className="absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live-ring opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 animate-livebeat rounded-full bg-live" />
+                  </span>
+                ) : (
+                  <span className="absolute -left-[31px] top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-basil-500 bg-white">
+                    <span className="h-1.5 w-1.5 rounded-full bg-basil-500" />
+                  </span>
+                )}
                 {now && (
                   <p className="text-[11px] font-semibold uppercase tracking-wider text-basil-600">
                     지금 진행 중
