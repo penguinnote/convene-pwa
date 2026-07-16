@@ -177,7 +177,7 @@ function AppShell() {
         <DesktopShell />
       ) : (
         /* 모바일(<768px): 전체 높이 flex 컬럼, 본문만 내부 스크롤, 하단 탭 고정. */
-        <div className="mx-auto flex h-svh max-w-md flex-col bg-white md:shadow-xl">
+        <div className="mx-auto flex h-dvh max-w-md flex-col bg-white md:shadow-xl">
           <main
             ref={mainRef}
             className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
