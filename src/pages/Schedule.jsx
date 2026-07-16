@@ -18,10 +18,10 @@ function getScrollParent(node) {
 export default function Schedule() {
   const live = getAutoLive(new Date());
   const [activeDay, setActiveDay] = useState(live.dayIndex); // 진입 시 현재 일차 자동 선택
-  const userSwitched = useRef(false);
   const rootRef = useRef(null);
   const stickyRef = useRef(null);
   const currentItemRef = useRef(null);
+  const scrollToCurrentRef = useRef(false);
   const day = schedule[activeDay];
   const isToday = activeDay === live.dayIndex;
 
@@ -33,30 +33,57 @@ export default function Schedule() {
         )
       : -1;
 
-  // 진입 시: 현재 항목을 맨 위로. 사용자가 날짜를 바꾸면 위에서부터.
+  // 현재 캠프 일차의 "지금 진행 중" 순서 인덱스(활성 일차와 무관). 없으면 -1 → 버튼 숨김.
+  const liveCurrentIdx =
+    live.current && !live.current.rest
+      ? schedule[live.dayIndex].items.findIndex(
+          (it) => it.time === live.current.time && it.title === live.current.title
+        )
+      : -1;
+
+  // 진입/일차 전환 시 맨 위(자동 스크롤 없음). "현재 순서로" 버튼으로 온 경우만 현재 순서로.
   useEffect(() => {
     const scroller = getScrollParent(rootRef.current);
-    const toTop = () =>
+    if (scrollToCurrentRef.current) {
+      scrollToCurrentRef.current = false;
+      scrollToCurrent();
+    } else {
       scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
-
-    if (userSwitched.current) {
-      toTop(); // 수동 전환: 위에서부터, 자동 스크롤 안 함
-      return;
     }
-    if (currentIdx < 0 || !currentItemRef.current) return; // 현재 항목 없음: 그대로 위에서부터
-
-    // 상단 고정(헤더+일자 탭)에 가려지지 않게 오프셋을 준 뒤 현재 항목을 맨 위로.
-    const offset = (stickyRef.current?.offsetHeight ?? 0) + 12;
-    currentItemRef.current.style.scrollMarginTop = `${offset}px`;
-    requestAnimationFrame(() => {
-      currentItemRef.current?.scrollIntoView({ block: "start" });
-    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeDay]);
 
+  // 현재 순서 직전 항목을 스크롤 영역 맨 위(헤더 아래)에 → 현재 순서는 위에서 두 번째.
+  function scrollToCurrent() {
+    const el = currentItemRef.current;
+    if (!el) return;
+    const scroller = getScrollParent(rootRef.current);
+    const prev = el.previousElementSibling;
+    requestAnimationFrame(() => {
+      if (!prev) {
+        // 현재가 그날 첫 항목: 그냥 맨 위로
+        scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
+        return;
+      }
+      const offset = (stickyRef.current?.offsetHeight ?? 0) + 12;
+      prev.style.scrollMarginTop = `${offset}px`;
+      prev.scrollIntoView({ block: "start" });
+    });
+  }
+
+  // "현재 순서로" 버튼: 현재 일차가 아니면 전환 후, 현재 순서로 스크롤.
+  function goToCurrent() {
+    if (liveCurrentIdx < 0) return;
+    if (activeDay !== live.dayIndex) {
+      scrollToCurrentRef.current = true;
+      setActiveDay(live.dayIndex);
+    } else {
+      scrollToCurrent();
+    }
+  }
+
   function selectDay(i) {
     if (i === activeDay) return;
-    userSwitched.current = true;
     setActiveDay(i);
   }
 
@@ -95,10 +122,25 @@ export default function Schedule() {
               </button>
             ))}
           </div>
+
+          {/* 현재 순서로 바로가기 (현재 진행 중 순서가 있을 때만) */}
+          {liveCurrentIdx >= 0 && (
+            <div className="flex justify-center px-5 pb-3">
+              <button
+                type="button"
+                onClick={goToCurrent}
+                className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-4 py-1.5 text-sm font-semibold text-white"
+              >
+                <TargetIcon />
+                현재 순서로
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      <div className="px-5 py-5">
+      {/* 하단에 큰 여백 → 마지막·마지막 직전 순서도 "위 1개 + 아래 여백" 위치로 스크롤 가능 */}
+      <div className="px-5 pt-5 pb-[70vh]">
         <ol className="relative ml-2 border-l border-[#D9D9D9] pl-6">
           {day.items.map((item, i) => {
             const now = i === currentIdx;
@@ -161,6 +203,16 @@ function PinIcon() {
     >
       <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z" />
       <circle cx="12" cy="10" r="3" />
+    </svg>
+  );
+}
+
+// ◎ 타깃 아이콘 ("현재 순서로" 버튼)
+function TargetIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="12" r="8" strokeWidth="2" />
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
     </svg>
   );
 }

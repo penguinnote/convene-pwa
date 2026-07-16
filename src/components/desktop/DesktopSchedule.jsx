@@ -14,13 +14,14 @@ function getScrollParent(node) {
   return null;
 }
 
-// 데스크톱 일정: 일자 탭(가운데) + 가운데 정렬 넓은 타임라인. 진입 시 현재 순서로 자동 스크롤.
+// 데스크톱 일정: 일자 탭(가운데) + 가운데 정렬 넓은 타임라인.
+// 진입 시 맨 위(일차만 현재로 자동 선택). "현재 순서로" 버튼으로 현재 순서로 이동.
 export default function DesktopSchedule() {
   const live = getAutoLive(new Date());
   const [activeDay, setActiveDay] = useState(live.dayIndex);
-  const userSwitched = useRef(false);
   const rootRef = useRef(null);
   const currentItemRef = useRef(null);
+  const scrollToCurrentRef = useRef(false);
   const day = schedule[activeDay];
   const isToday = activeDay === live.dayIndex;
 
@@ -31,21 +32,39 @@ export default function DesktopSchedule() {
         )
       : -1;
 
+  // 현재 캠프 일차의 "지금 진행 중" 순서 인덱스(활성 일차와 무관). 없으면 -1 → 버튼 숨김.
+  const liveCurrentIdx =
+    live.current && !live.current.rest
+      ? schedule[live.dayIndex].items.findIndex(
+          (it) => it.time === live.current.time && it.title === live.current.title
+        )
+      : -1;
+
+  // 진입/일차 전환 시 맨 위(자동 스크롤 없음). "현재 순서로" 버튼으로 온 경우만 현재 순서로.
   useEffect(() => {
     const scroller = getScrollParent(rootRef.current);
-    const toTop = () =>
+    if (scrollToCurrentRef.current) {
+      scrollToCurrentRef.current = false;
+      scrollToCurrent();
+    } else {
       scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
-
-    // 수동 전환·현재 항목 없음·현재가 첫 항목(위에 항목 없음) → 위에서부터.
-    if (userSwitched.current || currentIdx < 1 || !currentItemRef.current) {
-      toTop();
-      return;
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeDay]);
 
-    // 현재 순서를 "위에서 두 번째"로: 바로 앞(이전) 항목을 스크롤 영역 상단에 건다.
-    const prev = currentItemRef.current.previousElementSibling ?? currentItemRef.current;
+  // 현재 순서 직전(이전) 항목을 스크롤 영역 상단에 → 현재 순서는 위에서 두 번째.
+  function scrollToCurrent() {
+    const el = currentItemRef.current;
+    if (!el) return;
+    const scroller = getScrollParent(rootRef.current);
+    const prev = el.previousElementSibling;
     const PAD = 12;
     requestAnimationFrame(() => {
+      if (!prev) {
+        // 현재가 그날 첫 항목: 그냥 맨 위로
+        scroller ? scroller.scrollTo({ top: 0 }) : window.scrollTo({ top: 0 });
+        return;
+      }
       if (scroller) {
         // lg 내부 스크롤 컨테이너: 컨테이너 상단이 곧 보이는 상단(내비 겹침 없음).
         const delta =
@@ -58,12 +77,21 @@ export default function DesktopSchedule() {
         window.scrollTo({ top: Math.max(0, y) });
       }
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeDay]);
+  }
+
+  // "현재 순서로" 버튼: 현재 일차가 아니면 전환 후, 현재 순서로 스크롤.
+  function goToCurrent() {
+    if (liveCurrentIdx < 0) return;
+    if (activeDay !== live.dayIndex) {
+      scrollToCurrentRef.current = true;
+      setActiveDay(live.dayIndex);
+    } else {
+      scrollToCurrent();
+    }
+  }
 
   function selectDay(i) {
     if (i === activeDay) return;
-    userSwitched.current = true;
     setActiveDay(i);
   }
 
@@ -77,7 +105,7 @@ export default function DesktopSchedule() {
       </div>
 
       {/* 일자 탭 (가운데 정렬) */}
-      <div className="mb-6 mt-4 flex justify-center gap-2">
+      <div className="mb-4 mt-4 flex justify-center gap-2">
         {schedule.map((d, i) => (
           <button
             key={d.day}
@@ -98,6 +126,20 @@ export default function DesktopSchedule() {
           </button>
         ))}
       </div>
+
+      {/* 현재 순서로 바로가기 (현재 진행 중 순서가 있을 때만) */}
+      {liveCurrentIdx >= 0 && (
+        <div className="mb-6 flex justify-center">
+          <button
+            type="button"
+            onClick={goToCurrent}
+            className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-4 py-2 text-sm font-semibold text-white"
+          >
+            <TargetIcon />
+            현재 순서로
+          </button>
+        </div>
+      )}
 
       {/* 타임라인 */}
       <ol className="relative ml-3 border-l-2 border-[#D9D9D9] pl-8">
@@ -150,6 +192,19 @@ export default function DesktopSchedule() {
           );
         })}
       </ol>
+
+      {/* 하단 여백 → 마지막·마지막 직전 순서도 "위 1개 + 아래 여백" 위치로 스크롤 가능 */}
+      <div aria-hidden className="h-[70vh]" />
     </div>
+  );
+}
+
+// ◎ 타깃 아이콘 ("현재 순서로" 버튼)
+function TargetIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+      <circle cx="12" cy="12" r="8" strokeWidth="2" />
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none" />
+    </svg>
   );
 }
