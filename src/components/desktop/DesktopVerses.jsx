@@ -25,9 +25,11 @@ export default function DesktopVerses() {
   const en = lang === "en";
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[300px_minmax(0,1fr)]">
+    // lg+: 본문 높이를 꽉 채우는 flex 행. 좌/우 패널이 각자 내부 스크롤(바깥 공통 스크롤 없음).
+    // lg 미만(태블릿): 세로로 쌓이고 페이지가 함께 스크롤.
+    <div className="space-y-6 lg:flex lg:min-h-0 lg:flex-1 lg:gap-6 lg:space-y-0">
       {/* 목록 패널 */}
-      <aside className="rounded-3xl border border-basil-100 bg-white p-4 lg:sticky lg:top-20 lg:max-h-[calc(100vh-7rem)] lg:self-start lg:overflow-y-auto">
+      <aside className="rounded-3xl border border-basil-100 bg-white p-4 lg:w-[300px] lg:shrink-0 lg:min-h-0 lg:overflow-y-auto">
         {verseGroups.map((g) => (
           <div key={g.group} className="mb-4 last:mb-0">
             <p className="mb-2 px-1 text-[12px] font-bold uppercase tracking-wider text-basil-600">
@@ -64,7 +66,7 @@ export default function DesktopVerses() {
       </aside>
 
       {/* 본문 패널 */}
-      <section className="rounded-3xl border border-basil-100 bg-white p-6 lg:p-8">
+      <section className="rounded-3xl border border-basil-100 bg-white p-6 lg:min-h-0 lg:flex-1 lg:overflow-y-auto lg:p-8">
         {!item ? (
           <p className="text-sm text-ink-soft">강의를 선택하세요.</p>
         ) : (
