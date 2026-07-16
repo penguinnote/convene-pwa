@@ -224,6 +224,7 @@ export default function Home() {
           <NoticeCard
             notice={pinned}
             highlight={false}
+            hideTime
             onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
           />
         </section>
@@ -235,7 +236,7 @@ export default function Home() {
 }
 
 // 공지 카드 (홈 상단 공지 + 자료실 고정 공지 공용)
-function NoticeCard({ notice, highlight, onClick }) {
+function NoticeCard({ notice, highlight, onClick, hideTime = false }) {
   const img = firstImageUrl(notice);
   const file = firstFile(notice);
 
@@ -255,7 +256,7 @@ function NoticeCard({ notice, highlight, onClick }) {
       <img src={img} alt="" className="h-full w-full object-cover" />
     </div>
   );
-  const time = (
+  const time = hideTime ? null : (
     <span className="shrink-0 text-[11px] text-basil-400">
       {formatRelative(notice.createdAt)}
     </span>
