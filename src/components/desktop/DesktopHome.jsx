@@ -83,6 +83,7 @@ export default function DesktopHome() {
                 <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
                 <AnnouncementCard
                   notice={pinned}
+                  hideTime
                   onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
                 />
               </section>
@@ -255,7 +256,7 @@ function TodaySchedule({ items, onOpen }) {
 }
 
 // 공지 카드(데스크톱): 항상 강조 톤(2px) — 최신 공지가 주인공.
-function AnnouncementCard({ notice, onClick }) {
+function AnnouncementCard({ notice, onClick, hideTime = false }) {
   const img = firstImageUrl(notice);
   const file = firstFile(notice);
   return (
@@ -268,9 +269,11 @@ function AnnouncementCard({ notice, onClick }) {
         <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
           공지
         </span>
-        <span className="shrink-0 text-[11px] text-basil-400">
-          {formatRelative(notice.createdAt)}
-        </span>
+        {!hideTime && (
+          <span className="shrink-0 text-[11px] text-basil-400">
+            {formatRelative(notice.createdAt)}
+          </span>
+        )}
       </div>
       <div className="mt-3 flex items-end gap-3">
         <div className="min-w-0 flex-1">
