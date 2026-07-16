@@ -29,9 +29,6 @@ export default function Playlist() {
             <span className="block break-keep text-lg font-bold text-title">
               유튜브에서 듣기
             </span>
-            <span className="mt-0.5 block break-keep text-sm text-ink-soft">
-              캠프 찬양 플레이리스트를 새 탭에서 엽니다
-            </span>
           </span>
           <span className="shrink-0 text-basil-600">›</span>
         </button>
