@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { INSTANCE } from "../../config/instance.js";
 import { logEvent } from "../../lib/track";
@@ -29,6 +30,14 @@ export default function DesktopShell() {
   // 말씀 2단만 본문 높이를 정확히 채워(안 넘침) 좌·우 패널이 각자 스크롤하게 한다.
   // 다른 페이지는 기존대로 본문이 늘어나며 바깥이 스크롤(패딩 유지).
   const versesRoute = pathname === "/verses" || pathname.startsWith("/verses/");
+
+  // 탭 전환 시 본문 스크롤을 맨 위로 리셋(이전 위치 남지 않게). 일정 페이지의
+  // 현재-순서 스크롤은 rAF로 이 리셋 다음에 실행되므로 그대로 유지된다.
+  const bodyRef = useRef(null);
+  useEffect(() => {
+    if (bodyRef.current) bodyRef.current.scrollTop = 0; // lg: 내부 스크롤 컨테이너
+    window.scrollTo(0, 0); // md: 페이지(window) 스크롤
+  }, [pathname]);
   return (
     // lg+: 화면 높이 세로 flex → 상단(히어로+탭) 고정, 본문만 내부 스크롤. md/모바일은 기존대로.
     <div className="min-h-screen bg-white lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
@@ -39,7 +48,7 @@ export default function DesktopShell() {
       </div>
 
       {/* 본문 스크롤 영역 (lg에서 이 영역만 내부 스크롤) */}
-      <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
+      <div ref={bodyRef} className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
         {/* 말씀 라우트: main을 본문 높이에 정확히 맞춘 flex 컬럼(lg:h-full, 안 넘침)으로 두어
             안의 좌·우 패널만 스크롤. 그 외 라우트: 기존처럼 콘텐츠대로 늘어나 바깥이 스크롤. */}
         <main

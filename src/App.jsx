@@ -65,6 +65,13 @@ function AppShell() {
     logEvent("page_view", { path: location.pathname });
   }, [location.pathname]);
 
+  // 탭 전환 시 모바일 본문 스크롤을 맨 위로 리셋(이전 위치 남지 않게).
+  // 데스크톱은 DesktopShell이 자체 처리.
+  const mainRef = useRef(null);
+  useEffect(() => {
+    if (mainRef.current) mainRef.current.scrollTop = 0;
+  }, [location.pathname]);
+
   useEffect(() => {
     const toStage2 = setTimeout(() => setSplashStage(2), SPLASH_TIMING.stage2At);
     const toLeave = setTimeout(() => setSplashLeaving(true), SPLASH_TIMING.finishAt);
@@ -170,8 +177,11 @@ function AppShell() {
         <DesktopShell />
       ) : (
         /* 모바일(<768px): 전체 높이 flex 컬럼, 본문만 내부 스크롤, 하단 탭 고정. */
-        <div className="mx-auto flex h-dvh max-w-md flex-col bg-white md:shadow-xl">
-          <main className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto">
+        <div className="mx-auto flex h-svh max-w-md flex-col bg-white md:shadow-xl">
+          <main
+            ref={mainRef}
+            className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto"
+          >
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/schedule" element={<Schedule />} />
