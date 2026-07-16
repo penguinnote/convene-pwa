@@ -109,17 +109,17 @@ export default function DesktopSchedule() {
               ref={now ? currentItemRef : undefined}
               className="relative mb-4 last:mb-0"
             >
-              <span
-                className={`absolute -left-[39px] top-5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 bg-white ${
-                  now ? "border-basil-600" : "border-basil-400"
-                }`}
-              >
-                <span
-                  className={`h-1.5 w-1.5 rounded-full ${
-                    now ? "bg-basil-600" : "bg-basil-400"
-                  }`}
-                />
-              </span>
+              {now ? (
+                // 라이브 코랄 펄스: 확산 링(animate-ping) + 코어(animate-livebeat)
+                <span className="absolute -left-[39px] top-5 flex h-3.5 w-3.5 items-center justify-center">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live-ring opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 animate-livebeat rounded-full bg-live" />
+                </span>
+              ) : (
+                <span className="absolute -left-[39px] top-5 flex h-3.5 w-3.5 items-center justify-center rounded-full border-2 border-basil-400 bg-white">
+                  <span className="h-1.5 w-1.5 rounded-full bg-basil-400" />
+                </span>
+              )}
               <div
                 className={`rounded-2xl px-6 py-4 text-center ${
                   now
