@@ -36,7 +36,9 @@ export default function DesktopShell() {
 
       {/* 본문 스크롤 영역 (lg에서 이 영역만 내부 스크롤) */}
       <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
-        <main className="mx-auto max-w-6xl px-6 py-8 lg:px-8">
+        {/* main은 lg에서 본문 높이를 채우는 flex 컬럼(min-h-full). 콘텐츠가 길면 늘어나
+            바깥이 스크롤되고(패딩 유지), 말씀처럼 flex-1로 꽉 채우면 안에서만 스크롤된다. */}
+        <main className="mx-auto max-w-6xl px-6 py-8 lg:flex lg:min-h-full lg:flex-col lg:px-8">
           <Routes>
             <Route path="/" element={<DesktopHome />} />
             <Route path="/schedule" element={<DesktopSchedule />} />
