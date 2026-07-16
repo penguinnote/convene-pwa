@@ -19,9 +19,6 @@ export default function DesktopPlaylist() {
           <PlayIcon />
         </span>
         <p className="mt-4 text-lg font-bold text-title">유튜브에서 듣기</p>
-        <p className="mt-1 break-keep text-sm text-ink-soft">
-          캠프 찬양 플레이리스트를 새 탭에서 엽니다
-        </p>
         <button
           type="button"
           onClick={() => {
