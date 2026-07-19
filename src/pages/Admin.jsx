@@ -298,7 +298,8 @@ export default function Admin() {
     }
   }
 
-  if (!user) {
+  // 익명 로그인 사용자(user 있음, email 없음)도 관리자 화면 대신 로그인 폼을 본다.
+  if (!user || !user.email) {
     return (
       <form onSubmit={login} className="space-y-3 p-6">
         <h1 className="text-xl font-bold text-ink">관리자 로그인</h1>
