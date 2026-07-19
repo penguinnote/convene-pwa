@@ -66,8 +66,9 @@ export default function DesktopHome() {
         />
 
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          {/* 왼쪽 열: 공지 + 자료실(세로로 쌓임) */}
-          <div className="space-y-4">
+          {/* 왼쪽 열: 공지 + 자료실(세로로 쌓임). 자료실 카드가 남은 높이를
+              채워(flex-1) 왼쪽 열 밑단이 오른쪽 오늘 일정 카드 밑단과 맞는다. */}
+          <div className="flex flex-col gap-4">
             <section>
               <p className="mb-3 text-sm font-semibold text-ink">공지</p>
               {topCard ? (
@@ -86,11 +87,12 @@ export default function DesktopHome() {
 
             {/* 자료실(고정 공지) — 공지 카드 바로 밑, 같은 열 폭 */}
             {pinned && (
-              <section>
+              <section className="flex flex-1 flex-col">
                 <p className="mb-3 text-sm font-semibold text-ink">자료실</p>
                 <AnnouncementCard
                   notice={pinned}
                   hideTime
+                  className="flex-1"
                   onClick={() => goToAnnouncement(navigate, location.pathname, pinned.id)}
                 />
               </section>
@@ -272,14 +274,15 @@ function TodaySchedule({ items, onOpen }) {
 }
 
 // 공지 카드(데스크톱): 항상 강조 톤(2px) — 최신 공지가 주인공.
-function AnnouncementCard({ notice, onClick, hideTime = false }) {
+// className으로 flex-1 등을 얹어 열 높이를 채우는 용도로도 쓴다(자료실).
+function AnnouncementCard({ notice, onClick, hideTime = false, className = "" }) {
   const img = firstImageUrl(notice);
   const file = firstFile(notice);
   return (
     <button
       type="button"
       onClick={onClick}
-      className="block w-full rounded-3xl border-2 border-basil-500 bg-basil-50 p-5 text-left shadow-sm"
+      className={`block w-full rounded-3xl border-2 border-basil-500 bg-basil-50 p-5 text-left shadow-sm ${className}`}
     >
       <div className="flex items-start justify-between gap-3">
         <span className="inline-flex items-center gap-1.5 rounded-full bg-basil-600 px-3 py-1 text-[11px] font-semibold text-white">
