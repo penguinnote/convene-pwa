@@ -342,13 +342,13 @@ function ProfileCard({ onEdit }) {
   );
 }
 
-// INFO 바로가기(방배정·식단표·플레이리스트)
+// INFO 바로가기 (모바일 정보 탭과 같은 순서 유지)
 const INFO_LINKS = [
-  { to: "/rooms", label: "방배정" },
-  { to: "/menu", label: "식단표" },
-  { to: "/playlist", label: "플레이리스트" },
-  { to: "/team", label: "레크레이션" },
   { to: "/participants", label: "참여자" },
+  { to: "/rooms", label: "방배정" },
+  { to: "/playlist", label: "플레이리스트" },
+  { to: "/menu", label: "식단표" },
+  { to: "/team", label: "레크레이션" },
 ];
 
 function InfoShortcuts({ navigate, path }) {
