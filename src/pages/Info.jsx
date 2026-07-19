@@ -348,12 +348,23 @@ export default function Info() {
           <button
             type="button"
             onClick={() => navigate("/team")}
-            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+            className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
               <FlagIcon />
             </span>
             <span className="flex-1 font-bold text-title">레크레이션</span>
+            <span className="text-basil-300">›</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/participants")}
+            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
+              <PeopleIcon />
+            </span>
+            <span className="flex-1 font-bold text-title">참여자</span>
             <span className="text-basil-300">›</span>
           </button>
         </div>
@@ -449,6 +460,17 @@ function FlagIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
       <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z" />
       <path d="M4 22V15" />
+    </svg>
+  );
+}
+
+function PeopleIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
+      <circle cx="9" cy="8" r="3.2" />
+      <path d="M3 20v-1a5 5 0 0 1 5-5h2a5 5 0 0 1 5 5v1" />
+      <path d="M16 3.5a3.2 3.2 0 0 1 0 6" />
+      <path d="M18 14a5 5 0 0 1 3 4.5V20" />
     </svg>
   );
 }

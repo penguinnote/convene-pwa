@@ -16,10 +16,12 @@ service cloud.firestore {
       allow create: if true;
       allow read, update, delete: if false;
     }
-    // 사용자 닉네임: 누구나 읽기, 본인만 쓰기
+    // 사용자 닉네임/팀: 누구나 읽기, 본인 또는 이메일 관리자만 쓰기
+    // (관리자 팀 편성이 남의 users 문서를 수정하므로 email 관리자 허용)
     match /users/{uid} {
       allow read: if true;
-      allow write: if request.auth != null && request.auth.uid == uid;
+      allow write: if request.auth != null
+                   && (request.auth.uid == uid || request.auth.token.email != null);
     }
     // 이벤트 로그: 로그인 사용자가 자기 uid로만 생성, 읽기/수정/삭제 불가(분석은 Admin SDK)
     match /events/{id} {

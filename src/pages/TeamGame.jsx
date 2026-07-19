@@ -1,52 +1,67 @@
 import { useEffect, useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
 import PageHeader from "../components/PageHeader.jsx";
+import TeamTable from "../components/TeamTable.jsx";
+import { db } from "../firebase";
+import { useAuth } from "../hooks/useAuth.jsx";
+import { useUsers } from "../hooks/useUsers";
 import { TEAM_ROUNDS, getZone } from "../data/teamGame.js";
 
-const storageKey = (round) => `convene.teamgame.round${round}`;
-
 export default function TeamGame() {
+  const { user } = useAuth();
+  const users = useUsers();
   const [round, setRound] = useState(1);
   const [answers, setAnswers] = useState([]); // 진행 중 선택
-  const [saved, setSaved] = useState(null); // 완료된 선택(구역 고정)
+  const [saving, setSaving] = useState(false);
 
+  const roundKey = `round${round}`;
   const roundData = TEAM_ROUNDS.find((r) => r.id === round) ?? TEAM_ROUNDS[0];
+  const me = user ? users.find((u) => u.id === user.uid) : null;
+  const myCode = me?.teams?.[roundKey] ?? null; // 저장된 내 팀(있으면 결과 화면)
 
-  // 라운드 전환/진입 시 저장된 결과 로드 + 진행 초기화 (라운드별 독립)
+  // 라운드 전환 시 진행 초기화
   useEffect(() => {
-    let stored = null;
-    try {
-      const raw = localStorage.getItem(storageKey(round));
-      if (raw) stored = JSON.parse(raw);
-    } catch {
-      stored = null;
-    }
-    setSaved(Array.isArray(stored) && stored.length === 4 ? stored : null);
     setAnswers([]);
   }, [round]);
 
-  function pick(optionIdx) {
+  async function pick(optionIdx) {
+    if (saving) return;
     const next = [...answers, optionIdx];
     if (next.length === roundData.questions.length) {
+      const code = getZone(next).code;
+      setSaving(true);
       try {
-        localStorage.setItem(storageKey(round), JSON.stringify(next));
+        if (user) {
+          await setDoc(
+            doc(db, "users", user.uid),
+            { teams: { [roundKey]: code } },
+            { merge: true }
+          );
+        }
+        setAnswers([]); // 스냅샷이 myCode를 채우면 결과 화면으로
       } catch {
-        /* localStorage 불가 시 메모리에만 유지 */
+        /* 저장 실패 시 마지막 문제 유지 */
+      } finally {
+        setSaving(false);
       }
-      setSaved(next);
-      setAnswers([]);
     } else {
       setAnswers(next);
     }
   }
 
-  function reset() {
-    try {
-      localStorage.removeItem(storageKey(round));
-    } catch {
-      /* noop */
-    }
-    setSaved(null);
+  async function reset() {
     setAnswers([]);
+    if (user) {
+      try {
+        await setDoc(
+          doc(db, "users", user.uid),
+          { teams: { [roundKey]: null } },
+          { merge: true }
+        );
+      } catch {
+        /* noop */
+      }
+    }
   }
 
   return (
@@ -78,8 +93,14 @@ export default function TeamGame() {
         </div>
 
         <div className="mt-5">
-          {saved ? (
-            <Result roundData={roundData} answers={saved} onReset={reset} />
+          {myCode ? (
+            <Result
+              users={users}
+              roundKey={roundKey}
+              myCode={myCode}
+              cols="grid-cols-2"
+              onReset={reset}
+            />
           ) : (
             <Question roundData={roundData} step={answers.length} onPick={pick} />
           )}
@@ -117,41 +138,31 @@ function Question({ roundData, step, onPick }) {
   );
 }
 
-// 결과(배정 구역 + 선택 기록)
-function Result({ roundData, answers, onReset }) {
-  const zone = getZone(answers);
+// 결과: 내 팀 + 전체 16칸 팀표(실시간)
+export function Result({ users, roundKey, myCode, cols, onReset }) {
+  const col = myCode[0];
+  const row = myCode.slice(1);
   return (
     <div>
       <div className="rounded-3xl border border-basil-100 bg-basil-50 p-6 text-center">
         <p className="text-[13px] font-semibold uppercase tracking-wider text-basil-600">
-          당신의 구역
+          나의 팀
         </p>
-        <p className="mt-1 text-5xl font-bold tracking-tight text-title">{zone.code}</p>
+        <p className="mt-1 text-5xl font-bold tracking-tight text-title">{myCode}</p>
         <p className="mt-3 break-keep text-[15px] leading-relaxed text-ink">
-          {zone.col}구역으로 이동한 뒤 {zone.row}번 표지를 찾아주세요
+          {col}구역으로 이동해 {row}번 표지를 찾으세요
         </p>
       </div>
 
-      <div className="mt-5">
-        <p className="mb-2 text-sm font-semibold text-ink">내 선택</p>
-        <ol className="space-y-2">
-          {roundData.questions.map((q, i) => (
-            <li key={i} className="rounded-2xl border border-basil-100 bg-white p-3">
-              <p className="break-keep text-[13px] text-ink-faint">{q.prompt}</p>
-              <p className="mt-1 break-keep text-sm font-semibold text-ink">
-                {q.options[answers[i]]}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </div>
+      <p className="mb-3 mt-6 text-sm font-semibold text-ink">전체 팀</p>
+      <TeamTable users={users} roundKey={roundKey} myCode={myCode} cols={cols} />
 
       <button
         type="button"
         onClick={onReset}
         className="mt-5 w-full rounded-2xl border border-basil-200 py-3 text-sm font-semibold text-basil-700"
       >
-        다시 선택하기 (초기화)
+        다시 선택하기
       </button>
     </div>
   );

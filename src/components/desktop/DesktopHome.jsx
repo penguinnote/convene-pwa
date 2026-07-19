@@ -342,6 +342,7 @@ const INFO_LINKS = [
   { to: "/menu", label: "식단표" },
   { to: "/playlist", label: "플레이리스트" },
   { to: "/team", label: "레크레이션" },
+  { to: "/participants", label: "참여자" },
 ];
 
 function InfoShortcuts({ navigate, path }) {

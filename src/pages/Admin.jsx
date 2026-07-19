@@ -18,6 +18,7 @@ import { auth, db, storage } from "../firebase";
 import { resizeImage, uploadToStorage } from "../lib/upload";
 import { formatRelative } from "../lib/time";
 import { getAutoLive } from "../lib/liveSchedule";
+import AdminTeams from "./AdminTeams.jsx";
 
 let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
@@ -41,7 +42,7 @@ export default function Admin() {
   const [resendPush, setResendPush] = useState(false); // 수정 시 푸시 재발송 여부
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
-  const [view, setView] = useState("list"); // "list"(공지 관리) | "editor" | "live"(라이브 진행)
+  const [view, setView] = useState("list"); // "list" | "editor" | "live" | "teams"(팀 편성)
   const [editingId, setEditingId] = useState(null); // null=새 공지, id=수정
   const [list, setList] = useState([]);
   const [noteInput, setNoteInput] = useState("");
@@ -401,6 +402,11 @@ export default function Admin() {
     );
   }
 
+  // 팀 편성 (관리자 레크레이션 조 관리)
+  if (view === "teams") {
+    return <AdminTeams onBack={() => setView("list")} onLogout={() => signOut(auth)} />;
+  }
+
   // 공지 관리 목록
   if (view === "list") {
     return (
@@ -416,20 +422,27 @@ export default function Admin() {
           </button>
         </div>
 
-        <div className="flex gap-2">
+        <div className="grid grid-cols-2 gap-2">
           <button
             type="button"
             onClick={openNew}
-            className="flex-1 rounded-xl bg-basil-600 py-2.5 font-semibold text-white"
+            className="col-span-2 rounded-xl bg-basil-600 py-2.5 font-semibold text-white"
           >
             + 새 공지 작성
           </button>
           <button
             type="button"
             onClick={() => setView("live")}
-            className="flex-1 rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
+            className="rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
           >
             라이브 진행 ▶
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("teams")}
+            className="rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
+          >
+            팀 편성
           </button>
         </div>
         {msg && <p className="text-sm text-basil-600">{msg}</p>}

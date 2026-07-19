@@ -31,6 +31,13 @@ export const TEAM_ROUNDS = [
   },
 ];
 
+export const ZONE_CODES = [
+  "A1", "A2", "A3", "A4",
+  "B1", "B2", "B3", "B4",
+  "C1", "C2", "C3", "C4",
+  "D1", "D2", "D3", "D4",
+];
+
 export function getZone(answers) {
   const col = "ABCD"[answers[0] * 2 + answers[1]];
   const row = answers[2] * 2 + answers[3] + 1;
