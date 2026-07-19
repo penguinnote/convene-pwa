@@ -2,6 +2,7 @@ import { useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useUsers } from "../hooks/useUsers";
+import { useActiveRound } from "../hooks/useActiveRound";
 import TeamTable from "../components/TeamTable.jsx";
 import { TEAM_ROUNDS, ZONE_CODES } from "../data/teamGame.js";
 
@@ -9,12 +10,21 @@ import { TEAM_ROUNDS, ZONE_CODES } from "../data/teamGame.js";
 // 남의 users 문서를 수정하므로 firestore.rules의 users write 확장(이메일 관리자 허용)이 전제.
 export default function AdminTeams({ onBack, onLogout }) {
   const users = useUsers();
+  const activeRound = useActiveRound(); // 참여자에게 열린 라운드(0=닫힘)
   const [round, setRound] = useState(1);
   const [selected, setSelected] = useState(null); // 메뉴 대상 유저
   const [moving, setMoving] = useState(false); // 이동 대상 코드 선택 모드
   const roundKey = `round${round}`;
 
   const assigned = users.filter((u) => u.nickname && u.teams?.[roundKey]).length;
+
+  async function setOpen(n) {
+    try {
+      await setDoc(doc(db, "config", "game"), { activeRound: n }, { merge: true });
+    } catch {
+      /* 저장 실패 무시 */
+    }
+  }
 
   async function setTeam(uid, code) {
     try {
@@ -51,7 +61,45 @@ export default function AdminTeams({ onBack, onLogout }) {
         </button>
       </div>
 
-      {/* 라운드 선택 */}
+      {/* 참여자에게 라운드 열기/닫기 (config/game.activeRound) */}
+      <div className="rounded-2xl border border-basil-100 bg-basil-50 p-3">
+        <p className="mb-2 text-xs font-semibold text-ink">
+          참여자에게 열기{" "}
+          <span className="font-normal text-ink-faint">
+            (현재:{" "}
+            {activeRound >= 1 && activeRound <= 3 ? `${activeRound}라운드 열림` : "닫힘"})
+          </span>
+        </p>
+        <div className="grid grid-cols-4 gap-2">
+          {[1, 2, 3].map((n) => (
+            <button
+              key={n}
+              type="button"
+              onClick={() => setOpen(n)}
+              className={`rounded-lg py-2 text-sm font-semibold transition ${
+                activeRound === n
+                  ? "bg-basil-600 text-white"
+                  : "border border-basil-200 bg-white text-basil-700"
+              }`}
+            >
+              {n}라운드
+            </button>
+          ))}
+          <button
+            type="button"
+            onClick={() => setOpen(0)}
+            className={`rounded-lg py-2 text-sm font-semibold transition ${
+              !activeRound
+                ? "bg-ink text-white"
+                : "border border-basil-200 bg-white text-ink-soft"
+            }`}
+          >
+            닫기
+          </button>
+        </div>
+      </div>
+
+      {/* 표를 볼 라운드 선택 */}
       <div className="flex gap-2">
         {TEAM_ROUNDS.map((r) => (
           <button

@@ -37,7 +37,7 @@ export default function TeamTable({
             </span>
 
             {cell.members.length === 0 ? (
-              <p className="py-1 text-center text-[12px] text-ink-faint">-</p>
+              <p className="py-1 text-center text-[12px] text-basil-200">·</p>
             ) : (
               <ul className="space-y-1">
                 {cell.members.map((m) =>
