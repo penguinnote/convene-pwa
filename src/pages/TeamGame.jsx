@@ -6,7 +6,7 @@ import { db } from "../firebase";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { useUsers } from "../hooks/useUsers";
 import { useActiveRound } from "../hooks/useActiveRound";
-import { TEAM_ROUNDS, getZone } from "../data/teamGame.js";
+import { TEAM_ROUNDS, getZone, getChoices } from "../data/teamGame.js";
 
 export default function TeamGame() {
   const { user } = useAuth();
@@ -99,6 +99,7 @@ export default function TeamGame() {
           {myCode ? (
             <Result
               users={users}
+              round={round}
               roundKey={roundKey}
               myCode={myCode}
               cols="grid-cols-2"
@@ -183,9 +184,8 @@ function Question({ roundData, step, onPick }) {
 }
 
 // 결과: 내 팀 + 전체 16칸 팀표(실시간). 배정은 확정(재선택 없음).
-export function Result({ users, roundKey, myCode, cols }) {
-  const col = myCode[0];
-  const row = myCode.slice(1);
+export function Result({ users, round, roundKey, myCode, cols }) {
+  const choices = getChoices(round, myCode);
   return (
     <div>
       <div className="rounded-3xl border border-basil-100 bg-basil-50 p-6 text-center">
@@ -193,9 +193,11 @@ export function Result({ users, roundKey, myCode, cols }) {
           나의 팀
         </p>
         <p className="mt-1 text-5xl font-bold tracking-tight text-title">{myCode}</p>
-        <p className="mt-3 break-keep text-[15px] leading-relaxed text-ink">
-          {col}구역으로 이동해 {row}번 표지를 찾으세요
-        </p>
+        {choices.length > 0 && (
+          <p className="mt-3 break-keep text-[15px] leading-relaxed text-ink">
+            {choices.join(" | ")}
+          </p>
+        )}
       </div>
 
       <p className="mb-3 mt-6 text-sm font-semibold text-ink">전체 팀</p>
