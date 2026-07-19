@@ -1,0 +1,17 @@
+[debug] [2026-07-16T05:38:43.335Z] ----------------------------------------------------------------------
+[debug] [2026-07-16T05:38:43.338Z] Command:       /usr/local/bin/node /Users/yunjong/.npm/_npx/7750544ccf494d8b/node_modules/.bin/firebase deploy --only hosting
+[debug] [2026-07-16T05:38:43.338Z] CLI Version:   15.24.0
+[debug] [2026-07-16T05:38:43.338Z] Platform:      darwin
+[debug] [2026-07-16T05:38:43.338Z] Node Version:  v24.14.0
+[debug] [2026-07-16T05:38:43.338Z] Detected Agent: unknown
+[debug] [2026-07-16T05:38:43.338Z] Time:          Thu Jul 16 2026 14:38:43 GMT+0900 (한국 표준시)
+[debug] [2026-07-16T05:38:43.338Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-16T05:38:44.368Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-16T05:38:44.368Z] > authorizing via signed-in user (johnlee3080@gmail.com)
+[debug] [2026-07-16T05:38:44.368Z] [iam] checking project rodemcamp for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-07-16T05:38:44.376Z] Checked if tokens are valid: true, expires at: 1784181368674
+[debug] [2026-07-16T05:38:44.376Z] Checked if tokens are valid: true, expires at: 1784181368674
+[debug] [2026-07-16T05:38:44.377Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/rodemcamp:testIamPermissions [none]
+[debug] [2026-07-16T05:38:44.377Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/rodemcamp:testIamPermissions  x-goog-user-project=rodemcamp
+[debug] [2026-07-16T05:38:44.377Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/rodemcamp:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}

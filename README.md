@@ -77,6 +77,17 @@ Convene은 다중일 오프라인 행사에서 참가자에게 필요한 정보(
 
 ---
 
+## 프로젝트 구조
+
+처음 보는 사람은 여기부터 보면 된다.
+
+- `src/` — React 앱. 진입점 `src/App.jsx`, 행사 설정 `src/config/instance.js`, 화면은 `src/pages/`, 정적 데이터(일정·방배정·말씀 등)는 `src/data/`
+- `functions/` — 공지 푸시 발송 Cloud Functions
+- `docs/` — README용 스크린샷·다이어그램
+- 루트의 나머지 파일은 빌드·배포 설정(Vite·Tailwind·Firebase·ESLint 등)
+
+---
+
 ## 제품 = 인스턴스 분리 (재사용 설계)
 
 행사마다 다른 값을 코드 전체에 흩뿌리는 대신 `src/config/instance.js` 한 파일에 모았다. 앱 이름, 히어로 표어, 브랜드 팔레트, 라이브 기준일, 사진 앨범 링크 등 "행사의 정체성"이 여기 담긴다. 새 행사에 배포하려면 이 파일만 교체하면 되고, 앱 전체 색은 이 팔레트를 Tailwind와 매니페스트가 함께 참조한다.
