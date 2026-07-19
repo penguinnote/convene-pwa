@@ -1,56 +1,71 @@
 import { useEffect, useState } from "react";
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../../firebase";
+import { useAuth } from "../../hooks/useAuth.jsx";
+import { useUsers } from "../../hooks/useUsers";
 import { TEAM_ROUNDS, getZone } from "../../data/teamGame.js";
+import { Result } from "../../pages/TeamGame.jsx";
 
-const storageKey = (round) => `convene.teamgame.round${round}`;
-
-// 데스크톱 레크레이션 조 편성. 모바일 TeamGame과 동일 로직/데이터(teamGame.js) 공유,
-// 데스크톱 폭 레이아웃(PageFrame 흰 프레임 안에서 렌더).
+// 데스크톱 레크레이션 조 편성. 모바일 TeamGame과 동일 로직/데이터·Firestore 저장 공유,
+// 데스크톱 폭(PageFrame 안) + 4열 팀표.
 export default function DesktopTeamGame() {
+  const { user } = useAuth();
+  const users = useUsers();
   const [round, setRound] = useState(1);
   const [answers, setAnswers] = useState([]);
-  const [saved, setSaved] = useState(null);
+  const [saving, setSaving] = useState(false);
 
+  const roundKey = `round${round}`;
   const roundData = TEAM_ROUNDS.find((r) => r.id === round) ?? TEAM_ROUNDS[0];
+  const me = user ? users.find((u) => u.id === user.uid) : null;
+  const myCode = me?.teams?.[roundKey] ?? null;
 
   useEffect(() => {
-    let stored = null;
-    try {
-      const raw = localStorage.getItem(storageKey(round));
-      if (raw) stored = JSON.parse(raw);
-    } catch {
-      stored = null;
-    }
-    setSaved(Array.isArray(stored) && stored.length === 4 ? stored : null);
     setAnswers([]);
   }, [round]);
 
-  function pick(optionIdx) {
+  async function pick(optionIdx) {
+    if (saving) return;
     const next = [...answers, optionIdx];
     if (next.length === roundData.questions.length) {
+      const code = getZone(next).code;
+      setSaving(true);
       try {
-        localStorage.setItem(storageKey(round), JSON.stringify(next));
+        if (user) {
+          await setDoc(
+            doc(db, "users", user.uid),
+            { teams: { [roundKey]: code } },
+            { merge: true }
+          );
+        }
+        setAnswers([]);
       } catch {
-        /* localStorage 불가 시 메모리에만 유지 */
+        /* 저장 실패 시 유지 */
+      } finally {
+        setSaving(false);
       }
-      setSaved(next);
-      setAnswers([]);
     } else {
       setAnswers(next);
     }
   }
 
-  function reset() {
-    try {
-      localStorage.removeItem(storageKey(round));
-    } catch {
-      /* noop */
-    }
-    setSaved(null);
+  async function reset() {
     setAnswers([]);
+    if (user) {
+      try {
+        await setDoc(
+          doc(db, "users", user.uid),
+          { teams: { [roundKey]: null } },
+          { merge: true }
+        );
+      } catch {
+        /* noop */
+      }
+    }
   }
 
   return (
-    <div className="mx-auto max-w-xl px-6 py-8">
+    <div className="mx-auto max-w-3xl px-6 py-8">
       <div className="text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-basil-600">
           Recreation
@@ -59,8 +74,7 @@ export default function DesktopTeamGame() {
         <p className="mt-1 text-sm text-ink-soft">라운드별 조 편성</p>
       </div>
 
-      {/* 라운드 세그먼트 */}
-      <div className="mt-6 flex gap-2">
+      <div className="mx-auto mt-6 flex max-w-md gap-2">
         {TEAM_ROUNDS.map((r) => (
           <button
             key={r.id}
@@ -83,8 +97,14 @@ export default function DesktopTeamGame() {
       </div>
 
       <div className="mt-6">
-        {saved ? (
-          <Result roundData={roundData} answers={saved} onReset={reset} />
+        {myCode ? (
+          <Result
+            users={users}
+            roundKey={roundKey}
+            myCode={myCode}
+            cols="grid-cols-4"
+            onReset={reset}
+          />
         ) : (
           <Question roundData={roundData} step={answers.length} onPick={pick} />
         )}
@@ -97,7 +117,7 @@ function Question({ roundData, step, onPick }) {
   const total = roundData.questions.length;
   const q = roundData.questions[step];
   return (
-    <div>
+    <div className="mx-auto max-w-md">
       <p className="text-center text-[13px] font-bold tracking-wide text-basil-600">
         Q {step + 1}/{total}
       </p>
@@ -116,45 +136,6 @@ function Question({ roundData, step, onPick }) {
           </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function Result({ roundData, answers, onReset }) {
-  const zone = getZone(answers);
-  return (
-    <div>
-      <div className="rounded-3xl border border-basil-100 bg-basil-50 p-8 text-center">
-        <p className="text-[13px] font-semibold uppercase tracking-wider text-basil-600">
-          당신의 구역
-        </p>
-        <p className="mt-1 text-6xl font-bold tracking-tight text-title">{zone.code}</p>
-        <p className="mt-3 break-keep text-base leading-relaxed text-ink">
-          {zone.col}구역으로 이동한 뒤 {zone.row}번 표지를 찾아주세요
-        </p>
-      </div>
-
-      <div className="mt-6">
-        <p className="mb-2 text-sm font-semibold text-ink">내 선택</p>
-        <ol className="space-y-2">
-          {roundData.questions.map((q, i) => (
-            <li key={i} className="rounded-2xl border border-basil-100 bg-white p-3">
-              <p className="break-keep text-[13px] text-ink-faint">{q.prompt}</p>
-              <p className="mt-1 break-keep text-sm font-semibold text-ink">
-                {q.options[answers[i]]}
-              </p>
-            </li>
-          ))}
-        </ol>
-      </div>
-
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-6 w-full rounded-2xl border border-basil-200 py-3 text-sm font-semibold text-basil-700"
-      >
-        다시 선택하기 (초기화)
-      </button>
     </div>
   );
 }

@@ -14,7 +14,7 @@ export function goChild(navigate, currentPath, to) {
 
 // 자식 → 홈: 홈으로 pop 해서 [홈]으로 접는다.
 // 직계 자식은 -1, 2단계(공지 상세·말씀 상세·/info 하위)는 -2.
-const INFO_CHILDREN = ["/rooms", "/menu", "/playlist", "/team"];
+const INFO_CHILDREN = ["/rooms", "/menu", "/playlist", "/team", "/participants"];
 export function goHome(navigate, currentPath) {
   if (currentPath === "/") return;
   if (/^\/announcements\/[^/]+$/.test(currentPath)) navigate(-2);
