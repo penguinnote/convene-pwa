@@ -14,16 +14,22 @@ function timeToMin(t) {
   return h * 60 + m;
 }
 
-// 오늘(dayIndex) 남은 순서: 현재 순서부터 끝까지. 첫 항목이 "지금".
-function todayRemaining(dayIndex, now) {
+// 오늘(dayIndex) 일정 미리보기: 현재 순서부터 최대 6개.
+// 남은 순서(현재~끝)가 6개 미만이면 지난 순서로 앞을 채워 항상 6개를 유지한다.
+function todayPreview(dayIndex, now) {
   const items = schedule[dayIndex]?.items ?? [];
   const nowMin = now.getHours() * 60 + now.getMinutes();
   let curIdx = -1;
   items.forEach((it, i) => {
     if (timeToMin(it.time) <= nowMin) curIdx = i;
   });
-  const startIdx = curIdx === -1 ? 0 : curIdx;
-  return items.slice(startIdx).map((it, k) => ({ ...it, now: curIdx !== -1 && k === 0 }));
+  const remainStart = curIdx === -1 ? 0 : curIdx;
+  const startIdx =
+    items.length - remainStart >= 6 ? remainStart : Math.max(0, items.length - 6);
+  return items.slice(startIdx, startIdx + 6).map((it, k) => {
+    const idx = startIdx + k;
+    return { ...it, now: idx === curIdx, past: curIdx !== -1 && idx < curIdx };
+  });
 }
 
 // 데스크톱 홈 대시보드. 데이터·로직은 useHomeData(모바일 홈과 동일)에서 가져오고 배치만 재구성.
@@ -44,7 +50,7 @@ export default function DesktopHome() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const remaining = todayRemaining(dayIndex, now);
+  const todayItems = todayPreview(dayIndex, now);
 
   return (
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
@@ -91,11 +97,11 @@ export default function DesktopHome() {
             )}
           </div>
 
-          {/* 오른쪽 열: 오늘 일정 미리보기 */}
-          <section>
+          {/* 오른쪽 열: 오늘 일정 미리보기 — 카드가 열 높이를 채워 밑단을 자료실과 맞춘다 */}
+          <section className="flex flex-col">
             <p className="mb-3 text-sm font-semibold text-ink">오늘 일정</p>
             <TodaySchedule
-              items={remaining}
+              items={todayItems}
               onOpen={() => goChild(navigate, location.pathname, "/schedule")}
             />
           </section>
@@ -209,23 +215,28 @@ function LiveWideCard({ current, next, note, linkLabel, onLink, onOpenSchedule }
   );
 }
 
-// 오늘 남은 순서 타임라인
+// 오늘 일정 타임라인: 지난 순서는 흐리게, 현재는 "지금" 강조.
+// flex 세로 + 버튼 mt-auto로 카드 밑단(버튼 줄)을 왼쪽 열(자료실) 밑단에 맞춘다.
 function TodaySchedule({ items, onOpen }) {
   return (
-    <div className="rounded-3xl border border-basil-100 bg-white p-5">
+    <div className="flex flex-1 flex-col rounded-3xl border border-basil-100 bg-white p-5">
       {items.length === 0 ? (
         <p className="text-sm text-ink-soft">오늘 남은 순서가 없습니다.</p>
       ) : (
         <ol className="space-y-3">
-          {items.slice(0, 6).map((it, i) => (
+          {items.map((it, i) => (
             <li key={i} className="flex items-start gap-3">
               <span
                 className={`mt-1 h-2 w-2 shrink-0 rounded-full ${
-                  it.now ? "bg-basil-600" : "bg-basil-200"
+                  it.now ? "bg-basil-600" : it.past ? "bg-basil-100" : "bg-basil-200"
                 }`}
               />
               <div className="min-w-0">
-                <p className="flex items-center gap-2 text-[13px] font-bold text-basil-600">
+                <p
+                  className={`flex items-center gap-2 text-[13px] font-bold ${
+                    it.past ? "text-ink-faint" : "text-basil-600"
+                  }`}
+                >
                   {it.time}
                   {it.now && (
                     <span className="rounded-full bg-basil-600 px-1.5 py-0.5 text-[10px] font-semibold text-white">
@@ -235,7 +246,11 @@ function TodaySchedule({ items, onOpen }) {
                 </p>
                 <p
                   className={`break-keep text-sm ${
-                    it.now ? "font-semibold text-title" : "text-ink"
+                    it.now
+                      ? "font-semibold text-title"
+                      : it.past
+                        ? "text-ink-faint"
+                        : "text-ink"
                   }`}
                 >
                   {it.title}
@@ -248,7 +263,7 @@ function TodaySchedule({ items, onOpen }) {
       <button
         type="button"
         onClick={onOpen}
-        className="mt-4 text-sm font-medium text-basil-600"
+        className="mt-auto self-start pt-4 text-sm font-medium text-basil-600"
       >
         전체 일정 보기 ›
       </button>
