@@ -337,12 +337,23 @@ export default function Info() {
           <button
             type="button"
             onClick={() => navigate("/playlist")}
-            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+            className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
               <MusicIcon />
             </span>
             <span className="flex-1 font-bold text-title">플레이리스트</span>
+            <span className="text-basil-300">›</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => navigate("/team")}
+            className="flex w-full items-center gap-3 px-4 py-4 text-left"
+          >
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
+              <FlagIcon />
+            </span>
+            <span className="flex-1 font-bold text-title">레크레이션</span>
             <span className="text-basil-300">›</span>
           </button>
         </div>
@@ -429,6 +440,15 @@ function MusicIcon() {
       <path d="M9 18V5l12-2v13" />
       <circle cx="6" cy="18" r="3" />
       <circle cx="18" cy="16" r="3" />
+    </svg>
+  );
+}
+
+function FlagIcon() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
+      <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V4s-1 1-4 1-5-2-8-2-4 1-4 1z" />
+      <path d="M4 22V15" />
     </svg>
   );
 }

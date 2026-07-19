@@ -4,7 +4,7 @@ import { INSTANCE } from "../config/instance.js";
 /**
  * 라이브 카드가 순서를 눌렀을 때 이동할 대상 서술자.
  * @typedef {Object} ScheduleLink
- * @property {"verse"|"versesTab"|"menu"|"playlist"|"resource"} type 링크 종류
+ * @property {"verse"|"versesTab"|"menu"|"playlist"|"team"|"resource"} type 링크 종류
  * @property {string} [verseId] type==="verse"일 때 이동할 말씀 id
  */
 

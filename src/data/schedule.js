@@ -4,6 +4,7 @@
 //   - { type: "versesTab" }       : 말씀 탭 전체
 //   - { type: "menu" }            : 식단표
 //   - { type: "playlist" }        : 캠프 플레이리스트
+//   - { type: "team" }            : 레크레이션 조 편성(/team)
 //   - { type: "resource" }        : 자료실(고정 공지)
 // verseId 규칙: 주제강의 topic-1~5, 개회 opening, 폐회 closing, GBS gbs-1~3, 새벽(아침묵상) dawn-1~3.
 // place는 임시값이니 확정 시 교체한다.
@@ -14,7 +15,7 @@ export const schedule = [
     { time: "12:00", title: "점심식사 & 휴식", place: "식당", link: { type: "menu" } },
     { time: "13:30", title: "개회 메시지", place: "본관 강당", link: { type: "verse", verseId: "opening" } },
     { time: "14:20", title: "Break Time", place: "", link: { type: "playlist" } },
-    { time: "14:30", title: "공동체 레크레이션", place: "운동장", link: { type: "resource" } },
+    { time: "14:30", title: "레크레이션", place: "운동장", link: { type: "team" } },
     { time: "16:15", title: "Tea Time", place: "", link: { type: "playlist" } },
     { time: "16:30", title: "GBS 1강", place: "각 조", link: { type: "verse", verseId: "gbs-1" } },
     { time: "17:45", title: "저녁식사", place: "식당", link: { type: "menu" } },
