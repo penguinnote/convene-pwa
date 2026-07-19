@@ -244,7 +244,7 @@ function NoticeCard({ notice, highlight, onClick, hideTime = false }) {
   const file = firstFile(notice);
 
   const bodyEl = notice.body && (
-    <p className="mt-2 line-clamp-5 whitespace-pre-line break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
+    <p className="mt-2 line-clamp-2 whitespace-pre-line break-keep [overflow-wrap:anywhere] text-[15px] leading-relaxed text-ink-soft">
       {notice.body}
     </p>
   );
