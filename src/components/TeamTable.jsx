@@ -23,12 +23,12 @@ export default function TeamTable({
         return (
           <div
             key={cell.code}
-            className={`relative rounded-2xl border px-2 pb-3 pt-5 ${
+            className={`relative min-h-[8rem] rounded-2xl border px-3 pb-5 pt-8 ${
               mine ? "border-basil-500 bg-basil-50" : "border-basil-100 bg-white"
             }`}
           >
             <span
-              className={`absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-full px-2.5 py-0.5 text-[11px] font-bold ${
+              className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-[13px] font-bold ${
                 mine ? "bg-basil-600 text-white" : "bg-basil-100 text-basil-700"
               }`}
             >
@@ -37,31 +37,34 @@ export default function TeamTable({
             </span>
 
             {cell.members.length === 0 ? (
-              <p className="py-1 text-center text-[12px] text-basil-200">·</p>
+              <p className="py-2 text-center text-base text-basil-200">·</p>
             ) : (
-              <ul className="space-y-1">
+              <ul className="space-y-1.5">
                 {cell.members.map((m) =>
                   onMemberClick ? (
                     <li key={m.id}>
                       <button
                         type="button"
                         onClick={() => onMemberClick(m)}
-                        className="w-full break-keep rounded-lg px-1.5 py-1 text-center text-[13px] leading-snug text-ink transition hover:bg-basil-100"
+                        className="w-full break-keep rounded-lg px-1.5 py-1 text-center text-[15px] leading-snug text-ink transition hover:bg-basil-100"
                       >
                         <span className="font-semibold">{m.nickname}</span>
                         {m.mokjang && (
-                          <span className="text-ink-faint"> · {m.mokjang}</span>
+                          <span className="text-[13px] text-ink-faint">
+                            {" "}
+                            · {m.mokjang}
+                          </span>
                         )}
                       </button>
                     </li>
                   ) : (
                     <li
                       key={m.id}
-                      className="break-keep px-1.5 py-0.5 text-center text-[13px] leading-snug text-ink"
+                      className="break-keep px-1.5 py-0.5 text-center text-[15px] leading-snug text-ink"
                     >
                       <span className="font-semibold">{m.nickname}</span>
                       {m.mokjang && (
-                        <span className="text-ink-faint"> · {m.mokjang}</span>
+                        <span className="text-[13px] text-ink-faint"> · {m.mokjang}</span>
                       )}
                     </li>
                   )

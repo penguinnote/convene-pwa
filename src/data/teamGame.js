@@ -43,3 +43,18 @@ export function getZone(answers) {
   const row = answers[2] * 2 + answers[3] + 1;
   return { col, row, code: `${col}${row}` };
 }
+
+// 팀 코드는 4개 답의 역함수 → 코드에서 선택 답 인덱스를 복원.
+export function decodeAnswers(code) {
+  const colIdx = "ABCD".indexOf(code[0]); // 0~3
+  const rowIdx = Number(code.slice(1)) - 1; // 0~3
+  return [Math.floor(colIdx / 2), colIdx % 2, Math.floor(rowIdx / 2), rowIdx % 2];
+}
+
+// 라운드·코드로 실제 고른 선택지 문구 배열을 복원.
+export function getChoices(roundId, code) {
+  const rd = TEAM_ROUNDS.find((r) => r.id === roundId);
+  if (!rd || !code) return [];
+  const a = decodeAnswers(code);
+  return rd.questions.map((q, i) => q.options[a[i]]);
+}

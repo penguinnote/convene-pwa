@@ -67,7 +67,8 @@ export default function DesktopTeamGame() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl px-6 py-8">
+    // 결과 팀표가 프레임 전체 폭(max-w-6xl)을 쓰도록 root는 폭 제한 없이, 헤더/설문만 좁게.
+    <div className="px-6 py-8">
       <div className="text-center">
         <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-basil-600">
           Recreation
@@ -112,7 +113,13 @@ export default function DesktopTeamGame() {
 
       {myCode && (
         <div className="mt-6">
-          <Result users={users} roundKey={roundKey} myCode={myCode} cols="grid-cols-4" />
+          <Result
+            users={users}
+            round={round}
+            roundKey={roundKey}
+            myCode={myCode}
+            cols="grid-cols-4"
+          />
         </div>
       )}
     </div>

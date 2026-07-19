@@ -67,7 +67,10 @@ export default function DesktopShell() {
             <Route path="/info" element={<PageFrame element={<Info />} />} />
             <Route path="/menu" element={<DesktopMenu />} />
             <Route path="/playlist" element={<DesktopPlaylist />} />
-            <Route path="/team" element={<PageFrame element={<DesktopTeamGame />} />} />
+            <Route
+              path="/team"
+              element={<PageFrame element={<DesktopTeamGame />} width="max-w-6xl" />}
+            />
             <Route
               path="/participants"
               element={<PageFrame element={<DesktopParticipants />} />}
