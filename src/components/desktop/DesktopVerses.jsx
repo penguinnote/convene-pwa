@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { verseGroups, getVerseById } from "../../data/verses.js";
+import { useVerseFontLevel } from "../../hooks/useVerseFontLevel";
+import FontStepper from "../FontStepper.jsx";
 
 // 3단 언어 세그먼트 (개역개정/NIV/새번역) — VerseDetail과 동일 규칙.
 const LANG_OPTIONS = [
@@ -23,6 +25,7 @@ export default function DesktopVerses() {
 
   const item = getVerseById(selectedId);
   const en = lang === "en";
+  const { level, change, size } = useVerseFontLevel();
 
   return (
     // lg+: 본문 높이를 꽉 채우는 flex 행. 좌/우 패널이 각자 내부 스크롤(바깥 공통 스크롤 없음).
@@ -90,7 +93,10 @@ export default function DesktopVerses() {
                   {en ? item.titleEn : item.title}
                 </h1>
               </div>
-              <LangSegment lang={lang} onChange={setLang} />
+              <div className="flex shrink-0 items-center gap-1.5">
+                <LangSegment lang={lang} onChange={setLang} />
+                <FontStepper level={level} onChange={change} />
+              </div>
             </div>
 
             <div className="mt-6 space-y-5">
@@ -100,11 +106,27 @@ export default function DesktopVerses() {
                   lang === "gae" ? p.text : lang === "sae" ? p.textSae : p.textEn;
                 return (
                   <div key={j} className="border-l-2 border-basil-300 pl-4">
-                    <p className="text-sm font-bold text-basil-600">{ref}</p>
+                    <p className="break-keep [overflow-wrap:anywhere] text-sm font-bold text-basil-600">
+                      {ref}
+                    </p>
                     {text ? (
-                      <p className="mt-1.5 whitespace-pre-wrap break-keep text-[15px] leading-[1.8] text-ink">
-                        {text}
-                      </p>
+                      /* 절마다 개별 <p> + space-y로 절 사이 한 줄 띈 간격.
+                         원문의 빈 줄(비연속 구간)은 spacer로 남겨 더 큰 간격이 된다. */
+                      <div className="mt-1.5 space-y-3">
+                        {text.split("\n").map((line, k) =>
+                          line.trim() ? (
+                            <p
+                              key={k}
+                              className="break-keep [overflow-wrap:anywhere] text-ink"
+                              style={{ fontSize: size.fs, lineHeight: size.lh }}
+                            >
+                              {line}
+                            </p>
+                          ) : (
+                            <div key={k} className="h-2" aria-hidden="true" />
+                          )
+                        )}
+                      </div>
                     ) : (
                       <p className="mt-1.5 text-sm italic text-ink-faint">
                         {en ? "Translation coming soon" : "본문은 준비 중입니다"}
