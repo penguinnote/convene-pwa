@@ -9,6 +9,7 @@ import DesktopRooms from "./DesktopRooms.jsx";
 import DesktopAnnouncements from "./DesktopAnnouncements.jsx";
 import DesktopMenu from "./DesktopMenu.jsx";
 import DesktopPlaylist from "./DesktopPlaylist.jsx";
+import DesktopTeamGame from "./DesktopTeamGame.jsx";
 import Info from "../../pages/Info.jsx";
 import Admin from "../../pages/Admin.jsx";
 import AnnouncementDetail from "../../pages/AnnouncementDetail.jsx";
@@ -65,6 +66,7 @@ export default function DesktopShell() {
             <Route path="/info" element={<PageFrame element={<Info />} />} />
             <Route path="/menu" element={<DesktopMenu />} />
             <Route path="/playlist" element={<DesktopPlaylist />} />
+            <Route path="/team" element={<PageFrame element={<DesktopTeamGame />} />} />
             <Route path="/announcements" element={<DesktopAnnouncements />} />
             <Route
               path="/announcements/:id"
