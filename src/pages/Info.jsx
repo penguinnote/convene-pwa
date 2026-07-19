@@ -3,21 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Cropper from "react-easy-crop";
 import PageHeader from "../components/PageHeader.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
-
-const MOKJANG_LIST = [
-  "기쁨",
-  "다소니",
-  "마음",
-  "밸리",
-  "빛길",
-  "사랑",
-  "새벽",
-  "새싹",
-  "에끌",
-  "토브",
-  "프레쉬",
-  "하품",
-];
+import { MOKJANG_LIST } from "../data/mokjang.js";
 
 export default function Info() {
   const { nickname, mokjang, photoURL, saveProfile, uploadPhoto, removePhoto } =

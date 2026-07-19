@@ -2,21 +2,7 @@ import { useState } from "react";
 import { useAuth } from "../hooks/useAuth.jsx";
 import { logEvent } from "../lib/track";
 import { INSTANCE } from "../config/instance.js";
-
-const MOKJANG_LIST = [
-  "기쁨",
-  "다소니",
-  "마음",
-  "밸리",
-  "빛길",
-  "사랑",
-  "새벽",
-  "새싹",
-  "에끌",
-  "토브",
-  "프레쉬",
-  "하품",
-];
+import { MOKJANG_LIST } from "../data/mokjang.js";
 
 export default function Welcome() {
   const { user, saveProfile } = useAuth();
