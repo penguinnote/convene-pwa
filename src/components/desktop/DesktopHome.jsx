@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { useHomeData } from "../../hooks/useHomeData";
 import { useAuth } from "../../hooks/useAuth.jsx";
+import { useFollowCount } from "../../hooks/useFollowCount";
 import { schedule } from "../../data/schedule.js";
 import { formatRelative } from "../../lib/time";
 import { truncateTitle } from "../../lib/text";
@@ -304,6 +305,7 @@ function AnnouncementCard({ notice, onClick, hideTime = false }) {
 // 프로필 카드(정보 레일)
 function ProfileCard({ onEdit }) {
   const { nickname, mokjang, photoURL } = useAuth();
+  const follow = useFollowCount();
   return (
     <div className="rounded-3xl border border-basil-100 bg-white p-5">
       <div className="flex items-center gap-3">
@@ -325,6 +327,10 @@ function ProfileCard({ onEdit }) {
           {mokjang && <p className="truncate text-sm text-ink-soft">{mokjang}</p>}
         </div>
       </div>
+      <p className="mt-3 text-sm text-ink-soft">
+        팔로워 <span className="font-bold text-basil-600">{follow}</span> · 팔로잉{" "}
+        <span className="font-bold text-basil-600">{follow}</span>
+      </p>
       <button
         type="button"
         onClick={onEdit}

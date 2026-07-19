@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import Cropper from "react-easy-crop";
 import PageHeader from "../components/PageHeader.jsx";
 import { useAuth } from "../hooks/useAuth.jsx";
+import { useFollowCount } from "../hooks/useFollowCount";
 import { MOKJANG_LIST } from "../data/mokjang.js";
 
 export default function Info() {
@@ -10,6 +11,7 @@ export default function Info() {
     useAuth();
   const navigate = useNavigate();
   const fileRef = useRef(null);
+  const follow = useFollowCount();
 
   const [editing, setEditing] = useState(false);
   const [nick, setNick] = useState(nickname);
@@ -286,6 +288,10 @@ export default function Info() {
                     {mokjang}
                   </span>
                 )}
+                <p className="mt-2 text-sm text-ink-soft">
+                  팔로워 <span className="font-bold text-basil-600">{follow}</span> ·
+                  팔로잉 <span className="font-bold text-basil-600">{follow}</span>
+                </p>
               </>
             )}
           </div>
