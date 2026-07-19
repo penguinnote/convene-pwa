@@ -1,19 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { doc, setDoc } from "firebase/firestore";
 import { db } from "../../firebase";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import { useUsers } from "../../hooks/useUsers";
+import { useActiveRound } from "../../hooks/useActiveRound";
 import { TEAM_ROUNDS, getZone } from "../../data/teamGame.js";
-import { Result } from "../../pages/TeamGame.jsx";
+import { Result, StartPanel, LockPanel } from "../../pages/TeamGame.jsx";
 
-// 데스크톱 레크레이션 조 편성. 모바일 TeamGame과 동일 로직/데이터·Firestore 저장 공유,
-// 데스크톱 폭(PageFrame 안) + 4열 팀표.
+// 데스크톱 레크레이션 조 편성. 모바일 TeamGame과 동일 로직/데이터·게이트 공유, 4열 팀표.
 export default function DesktopTeamGame() {
   const { user } = useAuth();
   const users = useUsers();
+  const activeRound = useActiveRound();
   const [round, setRound] = useState(1);
   const [answers, setAnswers] = useState([]);
+  const [started, setStarted] = useState(false);
   const [saving, setSaving] = useState(false);
+  const userSwitched = useRef(false);
 
   const roundKey = `round${round}`;
   const roundData = TEAM_ROUNDS.find((r) => r.id === round) ?? TEAM_ROUNDS[0];
@@ -21,8 +24,21 @@ export default function DesktopTeamGame() {
   const myCode = me?.teams?.[roundKey] ?? null;
 
   useEffect(() => {
+    if (!userSwitched.current && activeRound >= 1 && activeRound <= 3) {
+      setRound(activeRound);
+    }
+  }, [activeRound]);
+
+  useEffect(() => {
     setAnswers([]);
+    setStarted(false);
   }, [round]);
+
+  function selectRound(i) {
+    if (i === round) return;
+    userSwitched.current = true;
+    setRound(i);
+  }
 
   async function pick(optionIdx) {
     if (saving) return;
@@ -39,6 +55,7 @@ export default function DesktopTeamGame() {
           );
         }
         setAnswers([]);
+        setStarted(false);
       } catch {
         /* 저장 실패 시 유지 */
       } finally {
@@ -46,21 +63,6 @@ export default function DesktopTeamGame() {
       }
     } else {
       setAnswers(next);
-    }
-  }
-
-  async function reset() {
-    setAnswers([]);
-    if (user) {
-      try {
-        await setDoc(
-          doc(db, "users", user.uid),
-          { teams: { [roundKey]: null } },
-          { merge: true }
-        );
-      } catch {
-        /* noop */
-      }
     }
   }
 
@@ -79,7 +81,7 @@ export default function DesktopTeamGame() {
           <button
             key={r.id}
             type="button"
-            onClick={() => setRound(r.id)}
+            onClick={() => selectRound(r.id)}
             className={`flex-1 rounded-xl px-2 py-2 text-sm transition ${
               r.id === round ? "bg-basil-600 text-white" : "bg-basil-50 text-ink-soft"
             }`}
@@ -96,19 +98,23 @@ export default function DesktopTeamGame() {
         ))}
       </div>
 
-      <div className="mt-6">
-        {myCode ? (
-          <Result
-            users={users}
-            roundKey={roundKey}
-            myCode={myCode}
-            cols="grid-cols-4"
-            onReset={reset}
-          />
+      <div className="mx-auto mt-6 max-w-md">
+        {myCode ? null : activeRound === null ? (
+          <p className="py-12 text-center text-sm text-ink-faint">불러오는 중…</p>
+        ) : activeRound !== round ? (
+          <LockPanel />
+        ) : !started ? (
+          <StartPanel roundData={roundData} onStart={() => setStarted(true)} />
         ) : (
           <Question roundData={roundData} step={answers.length} onPick={pick} />
         )}
       </div>
+
+      {myCode && (
+        <div className="mt-6">
+          <Result users={users} roundKey={roundKey} myCode={myCode} cols="grid-cols-4" />
+        </div>
+      )}
     </div>
   );
 }
@@ -117,7 +123,7 @@ function Question({ roundData, step, onPick }) {
   const total = roundData.questions.length;
   const q = roundData.questions[step];
   return (
-    <div className="mx-auto max-w-md">
+    <div>
       <p className="text-center text-[13px] font-bold tracking-wide text-basil-600">
         Q {step + 1}/{total}
       </p>
