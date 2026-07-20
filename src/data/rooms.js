@@ -1,4 +1,5 @@
-// 방배정 데이터.
+// 방배정 초기 시드 + 오프라인 폴백. 실데이터는 Firestore config/rooms(useRooms 훅)이며,
+// 문서가 없거나 비었을 때만 이 배열이 쓰인다. 삭제 금지.
 // group: 섹션 구분("4인실"/"6인실"). id: 방 번호가 섹션 간 겹치므로 고유 키. leader: 방장(members 첫 번째).
 export const rooms = [
   // 4인실

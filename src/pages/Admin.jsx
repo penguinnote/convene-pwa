@@ -20,6 +20,7 @@ import { formatRelative } from "../lib/time";
 import { getAutoLive } from "../lib/liveSchedule";
 import AdminTeams from "./AdminTeams.jsx";
 import AdminPeople from "./AdminPeople.jsx";
+import AdminRooms from "./AdminRooms.jsx";
 
 let blockSeq = 0;
 const newId = () => `b${Date.now()}_${blockSeq++}`;
@@ -43,7 +44,7 @@ export default function Admin() {
   const [resendPush, setResendPush] = useState(false); // 수정 시 푸시 재발송 여부
   const [msg, setMsg] = useState("");
   const [sending, setSending] = useState(false);
-  const [view, setView] = useState("list"); // "list" | "editor" | "live" | "teams" | "people"
+  const [view, setView] = useState("list"); // "list" | "editor" | "live" | "teams" | "people" | "rooms"
   const [editingId, setEditingId] = useState(null); // null=새 공지, id=수정
   const [list, setList] = useState([]);
   const [noteInput, setNoteInput] = useState("");
@@ -414,6 +415,11 @@ export default function Admin() {
     return <AdminPeople onBack={() => setView("list")} onLogout={() => signOut(auth)} />;
   }
 
+  // 방배정 편집 (config/rooms 실시간 수정)
+  if (view === "rooms") {
+    return <AdminRooms onBack={() => setView("list")} onLogout={() => signOut(auth)} />;
+  }
+
   // 공지 관리 목록
   if (view === "list") {
     return (
@@ -454,9 +460,16 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setView("people")}
-            className="col-span-2 rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
+            className="rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
           >
             참여자 관리
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("rooms")}
+            className="rounded-xl border border-basil-200 py-2.5 font-semibold text-basil-700"
+          >
+            방배정
           </button>
         </div>
         {msg && <p className="text-sm text-basil-600">{msg}</p>}
