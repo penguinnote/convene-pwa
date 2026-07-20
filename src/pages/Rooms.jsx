@@ -1,8 +1,9 @@
 import { useSearchParams } from "react-router-dom";
 import PageHeader from "../components/PageHeader.jsx";
-import { rooms } from "../data/rooms.js";
+import { useRooms } from "../hooks/useRooms";
 
 export default function Rooms() {
+  const rooms = useRooms(); // config/rooms 실시간, 없으면 정적 폴백
   // 검색어를 URL 쿼리에 둔다. 뒤로가기로 쿼리가 사라지면 검색이 해제되고
   // 방배정 페이지에 그대로 머문다. 검색이 없을 때의 뒤로가기는 홈으로 간다.
   const [params, setParams] = useSearchParams();

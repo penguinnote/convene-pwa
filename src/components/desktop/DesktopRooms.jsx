@@ -1,8 +1,9 @@
 import { useSearchParams } from "react-router-dom";
-import { rooms } from "../../data/rooms.js";
+import { useRooms } from "../../hooks/useRooms";
 
 // 데스크톱 방배정: 검색 + 방 유형(group)별 섹션 카드 그리드. 이름만 표시, 방장은 강조 칩.
 export default function DesktopRooms() {
+  const rooms = useRooms(); // config/rooms 실시간, 없으면 정적 폴백
   const [params, setParams] = useSearchParams();
   const query = params.get("q") ?? "";
 

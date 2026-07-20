@@ -69,8 +69,8 @@ Convene은 다중일 오프라인 행사에서 참가자에게 필요한 정보(
 
 ![아키텍처](docs/architecture.png)
 
-- **DB (Firestore)** — `announcements`(공지), `tokens`(FCM 토큰), `users`(프로필 + 팀 배정 `teams`), `config/live`(라이브 변동 메모), `config/game`(열린 라운드), `events`(로그)
-- **정적 데이터 (`src/data/`)** — 일정·방배정·말씀·식단·조 편성 질문·목장 목록. 변동이 없어 파일에 두어 읽기 비용을 없앤다
+- **DB (Firestore)** — `announcements`(공지), `tokens`(FCM 토큰), `users`(프로필 + 팀 배정 `teams`), `config/live`(라이브 변동 메모), `config/game`(열린 라운드), `config/rooms`(방배정 단일 문서 — 관리자가 배포 없이 실시간 수정), `events`(로그)
+- **정적 데이터 (`src/data/`)** — 일정·말씀·식단·조 편성 질문·목장 목록. 변동이 없어 파일에 두어 읽기 비용을 없앤다. 방배정 정적 파일(`rooms.js`)은 초기 시드·오프라인 폴백으로 유지
 - **푸시 서버 (Cloud Functions)** — 공지 생성 시 `onCreate`로 전체 토큰 일괄 발송(만료 토큰 자동 정리), 수정 재발송은 `onUpdate`가 `resendAt` 변경만 감지해 1회 발송
 - **인증** — 익명 로그인(참가자 프로필·팀 배정) + 이메일 로그인(관리자). `isAdmin = !!user.email`
 - **호스팅·스토리지** — Firebase Hosting, Storage
