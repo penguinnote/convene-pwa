@@ -142,8 +142,9 @@ function AppShell() {
     ) : null;
   }
 
-  // 프로필 미설정 시 온보딩 (관리자는 제외)
-  if (!hasProfile && !isAdmin) {
+  // 프로필 미설정 시 온보딩 (관리자 제외). /admin은 예외 — 익명 상태로 진입해도
+  // 온보딩 대신 Admin의 이메일 로그인 폼이 바로 보인다(관리자를 참가자로 취급하지 않음).
+  if (!hasProfile && !isAdmin && location.pathname !== "/admin") {
     return (
       <>
         {splashVisible && <SplashScreen stage={splashStage} leaving={splashLeaving} />}

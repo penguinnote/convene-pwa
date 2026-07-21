@@ -22,18 +22,20 @@ export default function AdminStats({ onBack, onLogout }) {
     setLoading(true);
     setError("");
     try {
-      const [evSnap, userSnap, tokenSnap, pushSnap] = await Promise.all([
+      const [evSnap, userSnap, tokenSnap, pushSnap, adminSnap] = await Promise.all([
         getDocs(collection(db, "events")),
         getDocs(collection(db, "users")),
         getDocs(collection(db, "tokens")),
-        // pushLogs는 규칙 미배포 등으로 실패해도 나머지 지표는 보여준다
+        // pushLogs·admins는 규칙 미배포 등으로 실패해도 나머지 지표는 보여준다
         getDocs(collection(db, "pushLogs")).catch(() => null),
+        getDocs(collection(db, "admins")).catch(() => null),
       ]);
       setData({
         events: evSnap.docs.map((d) => d.data()),
         users: userSnap.docs.map((d) => d.data()),
         tokenCount: tokenSnap.size,
         pushLogCount: pushSnap ? pushSnap.size : null,
+        admins: adminSnap ? adminSnap.docs.map((d) => d.data()) : null,
       });
     } catch (err) {
       console.error("stats load failed", err);
@@ -146,7 +148,32 @@ export default function AdminStats({ onBack, onLogout }) {
                 label="푸시 발송 로그"
                 value={stats.pushLogCount === null ? "–" : `${stats.pushLogCount}건`}
               />
+              <StatCard
+                label="관리자"
+                value={stats.admins === null ? "–" : `${stats.admins.length}명`}
+                sub="로그인 기록 기준"
+              />
             </div>
+            {stats.admins?.length > 0 && (
+              <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
+                <p className="mb-1.5 text-[11px] font-semibold text-ink-faint">
+                  관리자 로그인
+                </p>
+                <ul className="space-y-1">
+                  {stats.admins.map((a) => (
+                    <li
+                      key={a.email}
+                      className="flex items-center justify-between gap-2 text-[13px]"
+                    >
+                      <span className="min-w-0 truncate text-ink">{a.email}</span>
+                      <span className="shrink-0 text-ink-faint">
+                        {fmtTs(a.lastLoginAt)}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
             <BarList title="플랫폼 (고유 사용자)" rows={stats.platformRows} />
           </Section>
 
@@ -236,7 +263,7 @@ function countBy(items, keyFn) {
   return [...map.entries()].sort((a, b) => b[1] - a[1]);
 }
 
-function computeStats({ events, users, tokenCount, pushLogCount }) {
+function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
   const totalUsers = users.length;
   const participants = users.filter((u) => u.nickname).length;
 
@@ -324,6 +351,7 @@ function computeStats({ events, users, tokenCount, pushLogCount }) {
     pushGranted,
     tokenCount,
     pushLogCount,
+    admins: admins ?? null, // 현재 상태값 — 날짜 필터 대상 아님
     daily,
     teamRounds,
     teamAny,
@@ -337,6 +365,18 @@ function computeStats({ events, users, tokenCount, pushLogCount }) {
 
 function pct(a, b) {
   return b > 0 ? `${Math.round((a / b) * 100)}%` : "–";
+}
+
+// Firestore Timestamp → "M. D. HH:mm" (없으면 빈 문자열)
+function fmtTs(ts) {
+  const d = ts?.toDate?.();
+  if (!d) return "";
+  return d.toLocaleString("ko-KR", {
+    month: "numeric",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 /* --- 표시 컴포넌트 --- */
