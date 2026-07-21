@@ -85,7 +85,7 @@ export default function AdminStats({ onBack, onLogout }) {
       <div className="space-y-2 rounded-2xl border border-basil-100 bg-white p-3.5">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-semibold text-ink-faint">
-            기간 (이벤트 지표만 적용)
+            기간
           </p>
           <button
             type="button"
@@ -204,12 +204,12 @@ export default function AdminStats({ onBack, onLogout }) {
                     sub={`${stats.annViewers}명이 열람`}
                   />
                 </div>
-                <BarList title="라이브 링크 클릭 (type별)" rows={stats.liveRows} />
-                <BarList title="외부 링크 이동 (target별)" rows={stats.externalRows} />
+                <BarList title="라이브 링크 클릭" rows={stats.liveRows} />
+                <BarList title="외부 링크 이동" rows={stats.externalRows} />
               </Section>
 
               {/* 리텐션 */}
-              <Section title="리텐션 (방문 일수 분포)">
+              <Section title="리텐션">
                 <BarList
                   rows={stats.retentionRows}
                   emptyText="아직 방문 데이터가 없습니다."
