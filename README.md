@@ -11,6 +11,7 @@
 </p>
 
 🔗 **Live (첫 배포 인스턴스):** https://rodemcamp.web.app
+📄 **제품 케이스 스터디:** [CASE_STUDY.md](CASE_STUDY.md)
 📐 **디자인 기록:** [DESIGN.md](DESIGN.md)
 
 ---
