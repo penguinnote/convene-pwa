@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
 import {
   ref,
   uploadBytesResumable,
@@ -36,6 +36,18 @@ export function AuthProvider({ children }) {
         if (isStandalone() && !localStorage.getItem("installLogged")) {
           localStorage.setItem("installLogged", "1");
           logEvent("install_detected");
+        }
+        // 이메일 관리자 로그인 기록(관리자 수 통계용). 익명 사용자는 기록하지 않는다.
+        if (u.email) {
+          try {
+            await setDoc(
+              doc(db, "admins", u.uid),
+              { email: u.email, lastLoginAt: serverTimestamp() },
+              { merge: true }
+            );
+          } catch {
+            // 기록 실패 무시
+          }
         }
       } else {
         try {
