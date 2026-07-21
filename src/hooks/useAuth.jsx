@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signInAnonymously } from "firebase/auth";
-import { doc, getDoc, setDoc, serverTimestamp } from "firebase/firestore";
+import { doc, getDoc, setDoc } from "firebase/firestore";
 import {
   ref,
   uploadBytesResumable,
@@ -31,13 +31,10 @@ export function AuthProvider({ children }) {
           setMokjang(d.mokjang ?? "");
           setPhotoURL(d.photoURL ?? "");
         }
-        // 설치(홈화면 추가) 실행 최초 1회만 기록
-        if (isStandalone() && !snap.data()?.installedAt) {
-          await setDoc(
-            doc(db, "users", u.uid),
-            { installedAt: serverTimestamp() },
-            { merge: true }
-          );
+        // 설치(홈화면 추가) 실행은 이벤트로만 기록(설치당 1회, localStorage 플래그).
+        // users 문서는 온보딩(saveProfile)에서 처음 생성 — 이름 없는 유령 문서 방지.
+        if (isStandalone() && !localStorage.getItem("installLogged")) {
+          localStorage.setItem("installLogged", "1");
           logEvent("install_detected");
         }
       } else {

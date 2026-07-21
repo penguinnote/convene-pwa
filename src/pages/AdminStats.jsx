@@ -5,10 +5,18 @@ import { db } from "../firebase";
 // 관리자 통계: 마운트 시 1회 getDocs로 가져와 클라이언트에서 집계.
 // onSnapshot을 쓰지 않는다(캠프 규모 ~90명·4일이라 1회 조회로 충분, 읽기비용·부하 절감).
 // events·tokens·pushLogs 읽기는 firestore.rules에서 이메일 관리자만 허용.
+// 기본 기간: 캠프 일정
+const CAMP_START = "2026-07-29";
+const CAMP_END = "2026-08-01";
+
 export default function AdminStats({ onBack, onLogout }) {
   const [data, setData] = useState(null); // { events, users, tokenCount, pushLogCount }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  // 이벤트 지표 기간 필터(day "YYYY-MM-DD" KST 기준). all=true면 전체.
+  const [start, setStart] = useState(CAMP_START);
+  const [end, setEnd] = useState(CAMP_END);
+  const [all, setAll] = useState(false);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -38,7 +46,13 @@ export default function AdminStats({ onBack, onLogout }) {
     load();
   }, [load]);
 
-  const stats = data ? computeStats(data) : null;
+  // 이벤트 기반 지표만 기간 필터. users/tokens는 현재 상태값이라 필터하지 않는다.
+  const filteredEvents = data
+    ? all
+      ? data.events
+      : data.events.filter((e) => e.day && e.day >= start && e.day <= end)
+    : null;
+  const stats = data ? computeStats({ ...data, events: filteredEvents }) : null;
 
   return (
     <div className="space-y-4 p-6">
@@ -66,6 +80,45 @@ export default function AdminStats({ onBack, onLogout }) {
       </button>
 
       {error && <p className="text-sm text-basil-600">{error}</p>}
+
+      {/* 기간 선택 (이벤트 지표만 적용) */}
+      <div className="space-y-2 rounded-2xl border border-basil-100 bg-white p-3.5">
+        <div className="flex items-center justify-between">
+          <p className="text-[11px] font-semibold text-ink-faint">
+            기간 (이벤트 지표만 적용)
+          </p>
+          <button
+            type="button"
+            onClick={() => setAll((v) => !v)}
+            className={`rounded-full px-3 py-1 text-[12px] font-bold transition ${
+              all
+                ? "bg-basil-600 text-white"
+                : "border border-basil-200 text-basil-600"
+            }`}
+          >
+            전체
+          </button>
+        </div>
+        <div
+          className={`flex items-center gap-2 ${
+            all ? "pointer-events-none opacity-40" : ""
+          }`}
+        >
+          <input
+            type="date"
+            value={start}
+            onChange={(e) => setStart(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border border-basil-100 bg-basil-50 px-3 py-2 text-sm text-ink"
+          />
+          <span className="shrink-0 text-ink-faint">~</span>
+          <input
+            type="date"
+            value={end}
+            onChange={(e) => setEnd(e.target.value)}
+            className="min-w-0 flex-1 rounded-xl border border-basil-100 bg-basil-50 px-3 py-2 text-sm text-ink"
+          />
+        </div>
+      </div>
 
       {!loading && !error && stats && (
         <>
@@ -99,7 +152,9 @@ export default function AdminStats({ onBack, onLogout }) {
 
           {stats.events.length === 0 ? (
             <p className="rounded-2xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
-              아직 이벤트 데이터가 없습니다.
+              {all
+                ? "아직 이벤트 데이터가 없습니다."
+                : "선택한 기간에 이벤트 데이터가 없습니다."}
             </p>
           ) : (
             <>
