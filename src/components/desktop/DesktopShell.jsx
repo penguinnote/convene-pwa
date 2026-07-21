@@ -32,7 +32,7 @@ export default function DesktopShell() {
   // 말씀 2단만 본문 높이를 정확히 채워(안 넘침) 좌·우 패널이 각자 스크롤하게 한다.
   // 다른 페이지는 기존대로 본문이 늘어나며 바깥이 스크롤(패딩 유지).
   const versesRoute = pathname === "/verses" || pathname.startsWith("/verses/");
-  // 관리자는 히어로·가로 탭 없는 독립 화면(넓은 표·폼 작업 공간 확보).
+  // 관리자는 히어로만 유지하고 가로 탭(홈·일정·말씀·사진)은 숨긴다.
   const adminRoute = pathname === "/admin";
 
   // 탭 전환 시 본문 스크롤을 맨 위로 리셋(이전 위치 남지 않게). 일정 페이지의
@@ -45,13 +45,11 @@ export default function DesktopShell() {
   return (
     // lg+: 화면 높이 세로 flex → 상단(히어로+탭) 고정, 본문만 내부 스크롤. md/모바일은 기존대로.
     <div className="min-h-screen bg-white lg:flex lg:h-screen lg:flex-col lg:overflow-hidden">
-      {/* 상단 고정부 (lg에서 스크롤되지 않음). /admin에서는 숨긴다. */}
-      {!adminRoute && (
-        <div className="lg:shrink-0">
-          <DesktopHero />
-          <DesktopNav />
-        </div>
-      )}
+      {/* 상단 고정부 (lg에서 스크롤되지 않음). /admin에서는 탭만 숨긴다. */}
+      <div className="lg:shrink-0">
+        <DesktopHero />
+        {!adminRoute && <DesktopNav />}
+      </div>
 
       {/* 본문 스크롤 영역 (lg에서 이 영역만 내부 스크롤) */}
       <div ref={bodyRef} className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
