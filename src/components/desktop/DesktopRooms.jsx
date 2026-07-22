@@ -1,6 +1,13 @@
 import { useSearchParams } from "react-router-dom";
 import { useRooms } from "../../hooks/useRooms";
 
+// 섹션 고정 순서: 형제 → 자매. 그 외 그룹은 뒤(안정 정렬이라 등장 순서 유지).
+const SECTION_ORDER = ["형제", "자매"];
+const sectionOrder = (g) => {
+  const i = SECTION_ORDER.indexOf(g);
+  return i === -1 ? SECTION_ORDER.length : i;
+};
+
 // 데스크톱 방배정: 검색 + 방 유형(group)별 섹션 카드 그리드. 이름만 표시, 방장은 강조 칩.
 export default function DesktopRooms() {
   const rooms = useRooms(); // config/rooms 실시간, 없으면 정적 폴백
@@ -31,7 +38,9 @@ export default function DesktopRooms() {
     const key = room.group ?? room.floor ?? "기타";
     (sections[key] ??= []).push(room);
   });
-  const sectionKeys = Object.keys(sections).sort((a, b) => a.localeCompare(b, "ko"));
+  const sectionKeys = Object.keys(sections).sort(
+    (a, b) => sectionOrder(a) - sectionOrder(b)
+  );
 
   return (
     <div>
