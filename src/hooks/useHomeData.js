@@ -29,8 +29,6 @@ export function resolveLinkLabel(link, pinned) {
       return "관련 말씀";
     case "versesTab":
       return "말씀 보기";
-    case "menu":
-      return "메뉴 보기";
     case "playlist":
       return "플레이리스트";
     case "team":
@@ -108,9 +106,6 @@ export function useHomeData() {
         break;
       case "versesTab":
         goChild(navigate, path, "/verses");
-        break;
-      case "menu":
-        goChild(navigate, path, "/menu");
         break;
       case "playlist":
         goChild(navigate, path, "/playlist");

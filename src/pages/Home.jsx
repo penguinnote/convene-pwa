@@ -91,9 +91,6 @@ export default function Home() {
       case "versesTab":
         goChild(navigate, path, "/verses");
         break;
-      case "menu":
-        goChild(navigate, path, "/menu");
-        break;
       case "playlist":
         goChild(navigate, path, "/playlist");
         break;
@@ -328,8 +325,6 @@ function resolveLink(link, pinned) {
       return { label: "관련 말씀" };
     case "versesTab":
       return { label: "말씀 보기" };
-    case "menu":
-      return { label: "메뉴 보기" };
     case "playlist":
       return { label: "플레이리스트" };
     case "team":
