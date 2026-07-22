@@ -2,6 +2,13 @@ import { useSearchParams } from "react-router-dom";
 import PageHeader from "../components/PageHeader.jsx";
 import { useRooms } from "../hooks/useRooms";
 
+// 섹션 고정 순서: 형제 → 자매. 그 외 그룹은 뒤(안정 정렬이라 등장 순서 유지).
+const SECTION_ORDER = ["형제", "자매"];
+const sectionOrder = (g) => {
+  const i = SECTION_ORDER.indexOf(g);
+  return i === -1 ? SECTION_ORDER.length : i;
+};
+
 export default function Rooms() {
   const rooms = useRooms(); // config/rooms 실시간, 없으면 정적 폴백
   // 검색어를 URL 쿼리에 둔다. 뒤로가기로 쿼리가 사라지면 검색이 해제되고
@@ -33,7 +40,9 @@ export default function Rooms() {
     const key = room.group ?? room.floor ?? "기타";
     (sections[key] ??= []).push(room);
   });
-  const sectionKeys = Object.keys(sections).sort((a, b) => a.localeCompare(b, "ko"));
+  const sectionKeys = Object.keys(sections).sort(
+    (a, b) => sectionOrder(a) - sectionOrder(b)
+  );
 
   return (
     <div>
