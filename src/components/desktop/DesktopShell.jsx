@@ -7,7 +7,6 @@ import DesktopSchedule from "./DesktopSchedule.jsx";
 import DesktopVerses from "./DesktopVerses.jsx";
 import DesktopRooms from "./DesktopRooms.jsx";
 import DesktopAnnouncements from "./DesktopAnnouncements.jsx";
-import DesktopMenu from "./DesktopMenu.jsx";
 import DesktopPlaylist from "./DesktopPlaylist.jsx";
 import DesktopTeamGame from "./DesktopTeamGame.jsx";
 import DesktopParticipants from "./DesktopParticipants.jsx";
@@ -67,7 +66,6 @@ export default function DesktopShell() {
             <Route path="/verses" element={<DesktopVerses />} />
             <Route path="/verses/:id" element={<DesktopVerses />} />
             <Route path="/info" element={<PageFrame element={<Info />} />} />
-            <Route path="/menu" element={<DesktopMenu />} />
             <Route path="/playlist" element={<DesktopPlaylist />} />
             <Route
               path="/team"

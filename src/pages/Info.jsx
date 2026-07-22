@@ -339,17 +339,6 @@ export default function Info() {
           </button>
           <button
             type="button"
-            onClick={() => navigate("/menu")}
-            className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
-          >
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
-              <MealIcon />
-            </span>
-            <span className="flex-1 font-bold text-title">식단표</span>
-            <span className="text-basil-300">›</span>
-          </button>
-          <button
-            type="button"
             onClick={() => navigate("/team")}
             className="flex w-full items-center gap-3 px-4 py-4 text-left"
           >
@@ -423,16 +412,6 @@ function BedIcon() {
     <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
       <path d="M3 7v12M3 13h18v6M21 13v-2a3 3 0 0 0-3-3H9v5" />
       <circle cx="6.5" cy="10.5" r="1.5" />
-    </svg>
-  );
-}
-
-function MealIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" {...sw}>
-      <path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2" />
-      <path d="M7 2v20" />
-      <path d="M21 15V2v0a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3zm0 0v7" />
     </svg>
   );
 }

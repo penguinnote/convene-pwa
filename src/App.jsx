@@ -18,7 +18,6 @@ import Rooms from "./pages/Rooms.jsx";
 import Verses from "./pages/Verses.jsx";
 import VerseDetail from "./pages/VerseDetail.jsx";
 import Info from "./pages/Info.jsx";
-import Menu from "./pages/Menu.jsx";
 import Playlist from "./pages/Playlist.jsx";
 import TeamGame from "./pages/TeamGame.jsx";
 import Participants from "./pages/Participants.jsx";
@@ -189,7 +188,6 @@ function AppShell() {
               <Route path="/verses" element={<Verses />} />
               <Route path="/verses/:id" element={<VerseDetail />} />
               <Route path="/info" element={<Info />} />
-              <Route path="/menu" element={<Menu />} />
               <Route path="/playlist" element={<Playlist />} />
               <Route path="/team" element={<TeamGame />} />
               <Route path="/participants" element={<Participants />} />
