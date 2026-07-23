@@ -91,7 +91,6 @@ export default function Rooms() {
                           }`}
                         >
                           {m}
-                          {m === room.leader && " · 리더"}
                         </span>
                       ))}
                     </div>
