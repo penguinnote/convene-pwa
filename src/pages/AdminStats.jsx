@@ -174,7 +174,7 @@ export default function AdminStats({ onBack, onLogout }) {
                 </ul>
               </div>
             )}
-            <BarList title="플랫폼 (고유 사용자)" rows={stats.platformRows} />
+            <BarList title="플랫폼 (참여자 기준)" rows={stats.platformRows} />
           </Section>
 
           {stats.events.length === 0 ? (
@@ -276,10 +276,11 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
     ...new Set(byName("install_detected").map((e) => e.uid).filter(Boolean)),
   ].filter((uid) => participantUids.has(uid)).length;
 
-  // 플랫폼: uid별 마지막 관측 platform으로 고유 사용자 분해
+  // 플랫폼: 현재 참여자 uid별 마지막 관측 platform으로 분해.
+  // 삭제된 유저·유령 uid를 제외해 합계가 참여자 수를 넘지 않는다.
   const uidPlatform = new Map();
   events.forEach((e) => {
-    if (e.uid) uidPlatform.set(e.uid, e.platform ?? "other");
+    if (e.uid && participantUids.has(e.uid)) uidPlatform.set(e.uid, e.platform ?? "other");
   });
   const platformCount = { ios: 0, android: 0, other: 0 };
   uidPlatform.forEach((p) => {
