@@ -404,7 +404,6 @@ function RoomEditor({ room, participants, onPatch, onRemove }) {
               className="break-keep"
             >
               {m}
-              {i === 0 && " · 리더"}
             </button>
             <button
               type="button"
