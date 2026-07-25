@@ -129,9 +129,9 @@ export default function AdminStats({ onBack, onLogout }) {
             <div className="grid grid-cols-2 gap-2">
               <StatCard label="참여자" value={`${stats.participants}명`} sub="닉네임 등록 기준" />
               <StatCard
-                label="설치"
-                value={`${stats.installs}명`}
-                sub={`참여자 중 설치 · 설치율 ${pct(stats.installs, stats.participants)}`}
+                label="설치율"
+                value={pct(stats.installs, stats.participants)}
+                sub={`참여자 ${stats.participants}명 중 ${stats.installs}명 설치`}
               />
               <StatCard
                 label="온보딩 완료율"
