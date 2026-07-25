@@ -135,8 +135,8 @@ export default function AdminStats({ onBack, onLogout }) {
               />
               <StatCard
                 label="온보딩 완료율"
-                value={pct(stats.participants, stats.totalUsers)}
-                sub={`${stats.participants} / ${stats.totalUsers}`}
+                value={pct(stats.onboardCompleted, stats.onboardVisitors)}
+                sub={`완료 ${stats.onboardCompleted} / 방문 ${stats.onboardVisitors}`}
               />
               <StatCard
                 label="푸시 권한 허용률"
@@ -264,7 +264,6 @@ function countBy(items, keyFn) {
 }
 
 function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
-  const totalUsers = users.length;
   const participants = users.filter((u) => u.nickname).length;
 
   const byName = (name) => events.filter((e) => e.name === name);
@@ -275,6 +274,12 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
   const installs = [
     ...new Set(byName("install_detected").map((e) => e.uid).filter(Boolean)),
   ].filter((uid) => participantUids.has(uid)).length;
+
+  // 온보딩 완료율: 앱을 연 방문자(app_open 고유 uid) 중 온보딩(닉네임 등록)까지 마친 비율.
+  // users 문서는 온보딩해야 생기므로 전체 users를 분모로 쓰면 항상 100%라 의미가 없다.
+  const visitorUids = new Set(byName("app_open").map((e) => e.uid).filter(Boolean));
+  const onboardVisitors = visitorUids.size;
+  const onboardCompleted = [...visitorUids].filter((uid) => participantUids.has(uid)).length;
 
   // 플랫폼: 현재 참여자 uid별 마지막 관측 platform으로 분해.
   // 삭제된 유저·유령 uid를 제외해 합계가 참여자 수를 넘지 않는다.
@@ -348,8 +353,9 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
 
   return {
     events,
-    totalUsers,
     participants,
+    onboardVisitors,
+    onboardCompleted,
     installs,
     platformRows,
     pushAsked,
