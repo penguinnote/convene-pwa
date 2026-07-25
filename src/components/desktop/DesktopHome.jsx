@@ -364,6 +364,7 @@ function ProfileCard({ onEdit }) {
 const INFO_LINKS = [
   { to: "/participants", label: "참여자" },
   { to: "/rooms", label: "방배정" },
+  { to: "/menu", label: "식단표" },
   { to: "/playlist", label: "플레이리스트" },
   { to: "/team", label: "레크레이션" },
 ];
