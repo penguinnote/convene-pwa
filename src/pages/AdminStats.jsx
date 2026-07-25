@@ -32,7 +32,7 @@ export default function AdminStats({ onBack, onLogout }) {
       ]);
       setData({
         events: evSnap.docs.map((d) => d.data()),
-        users: userSnap.docs.map((d) => d.data()),
+        users: userSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
         tokenCount: tokenSnap.size,
         pushLogCount: pushSnap ? pushSnap.size : null,
         admins: adminSnap ? adminSnap.docs.map((d) => d.data()) : null,
@@ -131,7 +131,7 @@ export default function AdminStats({ onBack, onLogout }) {
               <StatCard
                 label="설치"
                 value={`${stats.installs}명`}
-                sub={`설치율 ${pct(stats.installs, stats.participants)}`}
+                sub={`참여자 중 설치 · 설치율 ${pct(stats.installs, stats.participants)}`}
               />
               <StatCard
                 label="온보딩 완료율"
@@ -269,8 +269,12 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
 
   const byName = (name) => events.filter((e) => e.name === name);
 
-  // 설치: install_detected의 고유 uid
-  const installs = distinct(byName("install_detected").map((e) => e.uid).filter(Boolean));
+  // 설치: install_detected의 고유 uid 중 현재 참여자만.
+  // 참여자 관리에서 삭제된 유저의 이벤트가 남아도 분자에서 자동 제외되어 설치율이 100%를 넘지 않는다.
+  const participantUids = new Set(users.filter((u) => u.nickname).map((u) => u.id));
+  const installs = [
+    ...new Set(byName("install_detected").map((e) => e.uid).filter(Boolean)),
+  ].filter((uid) => participantUids.has(uid)).length;
 
   // 플랫폼: uid별 마지막 관측 platform으로 고유 사용자 분해
   const uidPlatform = new Map();
