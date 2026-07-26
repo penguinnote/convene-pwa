@@ -56,12 +56,7 @@ export default function Mokjang() {
         ) : (
           filtered.map((g) => (
             <div key={g.name} className="rounded-2xl border border-basil-100 bg-white p-4">
-              <p className="text-base font-bold text-title">
-                {g.name}
-                <span className="ml-1.5 text-[13px] font-medium text-ink-faint">
-                  {g.members.length}명
-                </span>
-              </p>
+              <p className="text-base font-bold text-title">{g.name}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {g.members.map((m) => (
                   <span
