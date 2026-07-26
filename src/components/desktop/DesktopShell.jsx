@@ -10,7 +10,7 @@ import DesktopAnnouncements from "./DesktopAnnouncements.jsx";
 import DesktopMenu from "./DesktopMenu.jsx";
 import DesktopPlaylist from "./DesktopPlaylist.jsx";
 import DesktopTeamGame from "./DesktopTeamGame.jsx";
-import DesktopParticipants from "./DesktopParticipants.jsx";
+import DesktopMokjang from "./DesktopMokjang.jsx";
 import Info from "../../pages/Info.jsx";
 import Admin from "../../pages/Admin.jsx";
 import AnnouncementDetail from "../../pages/AnnouncementDetail.jsx";
@@ -67,15 +67,12 @@ export default function DesktopShell() {
             <Route path="/verses" element={<DesktopVerses />} />
             <Route path="/verses/:id" element={<DesktopVerses />} />
             <Route path="/info" element={<PageFrame element={<Info />} />} />
+            <Route path="/mokjang" element={<DesktopMokjang />} />
             <Route path="/menu" element={<DesktopMenu />} />
             <Route path="/playlist" element={<DesktopPlaylist />} />
             <Route
               path="/team"
               element={<PageFrame element={<DesktopTeamGame />} width="max-w-6xl" />}
-            />
-            <Route
-              path="/participants"
-              element={<PageFrame element={<DesktopParticipants />} />}
             />
             <Route path="/announcements" element={<DesktopAnnouncements />} />
             <Route

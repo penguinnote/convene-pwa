@@ -306,13 +306,13 @@ export default function Info() {
         <div className="overflow-hidden rounded-2xl border border-basil-100 bg-white">
           <button
             type="button"
-            onClick={() => navigate("/participants")}
+            onClick={() => navigate("/mokjang")}
             className="flex w-full items-center gap-3 border-b border-basil-100 px-4 py-4 text-left"
           >
             <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-basil-50 text-basil-600">
               <PeopleIcon />
             </span>
-            <span className="flex-1 font-bold text-title">참여자</span>
+            <span className="flex-1 font-bold text-title">목장</span>
             <span className="text-basil-300">›</span>
           </button>
           <button
