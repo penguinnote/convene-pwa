@@ -362,7 +362,7 @@ function ProfileCard({ onEdit }) {
 
 // INFO 바로가기 (모바일 정보 탭과 같은 순서 유지)
 const INFO_LINKS = [
-  { to: "/participants", label: "참여자" },
+  { to: "/mokjang", label: "목장" },
   { to: "/rooms", label: "방배정" },
   { to: "/menu", label: "식단표" },
   { to: "/playlist", label: "플레이리스트" },
