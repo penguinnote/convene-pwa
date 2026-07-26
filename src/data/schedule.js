@@ -22,7 +22,7 @@ export const schedule = [
     { time: "19:30", title: "주제 1강", place: "본관 강당", link: { type: "verse", verseId: "topic-1" } },
     { time: "20:50", title: "휴식 시간", place: "", link: { type: "playlist" } },
     { time: "21:00", title: "Life Testimony", place: "본관 강당", link: { type: "resource" } },
-    { time: "22:20", title: "개인 기도 및 취침", place: "각 방", link: { type: "playlist" } },
+    { time: "22:20", title: "개인 기도 & 취침", place: "각 방", link: { type: "playlist" } },
   ]},
   { day: "2일차", date: "7/30 (목)", items: [
     { time: "07:00", title: "아침묵상", place: "본관 강당", link: { type: "verse", verseId: "dawn-1" } },
@@ -39,7 +39,7 @@ export const schedule = [
     { time: "19:30", title: "주제 3강", place: "본관 강당", link: { type: "verse", verseId: "topic-3" } },
     { time: "20:50", title: "휴식 시간", place: "", link: { type: "playlist" } },
     { time: "21:00", title: "공동체 기도", place: "본관 강당" },
-    { time: "22:20", title: "영혼의 대화 & 취침", place: "각 방", link: { type: "playlist" } },
+    { time: "22:20", title: "개인 기도 & 취침", place: "각 방", link: { type: "playlist" } },
   ]},
   { day: "3일차", date: "7/31 (금)", items: [
     { time: "07:00", title: "아침묵상", place: "본관 강당", link: { type: "verse", verseId: "dawn-2" } },
