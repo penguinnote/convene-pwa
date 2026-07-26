@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Routes, Route, Navigate, useNavigate, useLocation } from "react-router-dom";
 import { INSTANCE } from "../../config/instance.js";
-import { logEvent } from "../../lib/track";
 import DesktopHome from "./DesktopHome.jsx";
 import DesktopSchedule from "./DesktopSchedule.jsx";
 import DesktopVerses from "./DesktopVerses.jsx";
@@ -32,7 +31,7 @@ export default function DesktopShell() {
   // 말씀 2단만 본문 높이를 정확히 채워(안 넘침) 좌·우 패널이 각자 스크롤하게 한다.
   // 다른 페이지는 기존대로 본문이 늘어나며 바깥이 스크롤(패딩 유지).
   const versesRoute = pathname === "/verses" || pathname.startsWith("/verses/");
-  // 관리자는 히어로만 유지하고 가로 탭(홈·일정·말씀·사진)은 숨긴다.
+  // 관리자는 히어로만 유지하고 가로 탭(홈·일정·말씀)은 숨긴다.
   const adminRoute = pathname === "/admin";
 
   // 탭 전환 시 본문 스크롤을 맨 위로 리셋(이전 위치 남지 않게). 일정 페이지의
@@ -165,18 +164,6 @@ function DesktopNav() {
             </button>
           );
         })}
-
-        {/* 사진 — 외부 앨범을 새 탭으로 (라우트 아님) */}
-        <button
-          type="button"
-          onClick={() => {
-            logEvent("external_open", { target: "photos" });
-            window.open(INSTANCE.photosAlbumUrl, "_blank");
-          }}
-          className="px-4 py-4 text-[15px] font-medium text-ink-faint transition-colors hover:text-ink"
-        >
-          사진
-        </button>
       </div>
     </nav>
   );
