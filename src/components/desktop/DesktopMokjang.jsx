@@ -56,12 +56,7 @@ export default function DesktopMokjang() {
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((g) => (
             <div key={g.name} className="rounded-2xl border border-basil-100 bg-white p-5 text-center">
-              <p className="text-lg font-bold text-title">
-                {g.name}
-                <span className="ml-1.5 text-[13px] font-medium text-ink-faint">
-                  {g.members.length}명
-                </span>
-              </p>
+              <p className="text-lg font-bold text-title">{g.name}</p>
               <div className="my-3 h-px bg-basil-100" />
               <div className="flex flex-wrap justify-center gap-1.5">
                 {g.members.map((m) => (
