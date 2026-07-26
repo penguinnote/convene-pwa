@@ -14,7 +14,7 @@ export const schedule = [
     { time: "12:00", title: "점심식사 & 휴식", place: "식당" },
     { time: "13:30", title: "개회 메시지", place: "본관 강당", link: { type: "verse", verseId: "opening" } },
     { time: "14:20", title: "Break Time", place: "", link: { type: "playlist" } },
-    { time: "14:30", title: "레크레이션", place: "운동장", link: { type: "team" } },
+    { time: "14:30", title: "레크레이션", place: "본관 강당", link: { type: "team" } },
     { time: "16:15", title: "Tea Time", place: "", link: { type: "playlist" } },
     { time: "16:30", title: "GBS 1강", place: "각 조", link: { type: "verse", verseId: "gbs-1" } },
     { time: "17:45", title: "저녁식사", place: "식당" },
