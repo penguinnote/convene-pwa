@@ -5,6 +5,7 @@ const tabsBefore = [
   { to: "/", label: "홈", icon: HomeIcon },
   { to: "/schedule", label: "일정", icon: CalendarIcon },
   { to: "/verses", label: "말씀", icon: BookIcon },
+  { to: "/announcements", label: "공지", icon: BellIcon },
 ];
 
 export default function BottomNav() {
@@ -49,7 +50,7 @@ export default function BottomNav() {
 
   return (
     <nav className="shrink-0 border-t border-[#D4E6EC] bg-white/90 backdrop-blur-md">
-      <div className="grid grid-cols-4 pb-[max(6px,calc(env(safe-area-inset-bottom)-12px))]">
+      <div className="grid grid-cols-5 pb-[max(6px,calc(env(safe-area-inset-bottom)-12px))]">
         {tabsBefore.map(renderNavLink)}
 
         {/* 정보 */}
@@ -103,6 +104,14 @@ function BookIcon({ active }) {
     <svg {...base(active)}>
       <path d="M12 7v14" />
       <path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z" />
+    </svg>
+  );
+}
+function BellIcon({ active }) {
+  return (
+    <svg {...base(active)}>
+      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9" />
+      <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
     </svg>
   );
 }

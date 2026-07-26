@@ -134,6 +134,7 @@ const NAV_TABS = [
   { to: "/", label: "홈", match: (p) => p === "/" },
   { to: "/schedule", label: "일정", match: (p) => p.startsWith("/schedule") },
   { to: "/verses", label: "말씀", match: (p) => p.startsWith("/verses") },
+  { to: "/announcements", label: "공지", match: (p) => p.startsWith("/announcements") },
 ];
 
 function DesktopNav() {
