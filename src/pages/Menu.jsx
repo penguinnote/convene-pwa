@@ -19,21 +19,32 @@ export default function Menu() {
           </div>
         ) : (
           menu.map((day) => (
-            <div key={day.day} className="rounded-2xl border border-basil-100 bg-white p-4">
+            <div key={day.day} className="rounded-2xl border border-basil-100 bg-white p-5">
               <p className="text-base font-bold text-title">{day.day}</p>
 
               {day.meals.length === 0 ? (
                 <p className="mt-2 text-sm text-ink-faint">준비 중입니다.</p>
               ) : (
-                <div className="mt-3 space-y-3">
+                <div className="mt-4 space-y-4">
                   {day.meals.map((meal) => (
                     <div key={meal.type}>
-                      <span className="rounded-full bg-basil-50 px-2.5 py-1 text-xs font-semibold text-basil-600">
-                        {meal.type}
+                      <span
+                        className={`inline-block rounded-full bg-basil-50 px-3 py-1 text-[13px] font-bold ${
+                          meal.type === "저녁" ? "text-title" : "text-basil-600"
+                        }`}
+                      >
+                        {meal.type} 식사
                       </span>
-                      <p className="mt-1.5 break-keep text-sm leading-relaxed text-ink-soft">
-                        {meal.items.join(" · ")}
-                      </p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {meal.items.map((item) => (
+                          <span
+                            key={item}
+                            className="break-keep rounded-lg border border-basil-100 bg-white px-[11px] py-[5px] text-sm text-ink"
+                          >
+                            {item}
+                          </span>
+                        ))}
+                      </div>
                     </div>
                   ))}
                 </div>
