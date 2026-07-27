@@ -11,6 +11,7 @@ import { useBackControl } from "./hooks/useBackControl";
 import { useIsDesktop } from "./hooks/useIsDesktop";
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
 import { logEvent } from "./lib/track";
+import { refreshPushToken } from "./lib/push";
 import DesktopShell from "./components/desktop/DesktopShell.jsx";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
@@ -53,12 +54,13 @@ function AppShell() {
   // 홈 위에 센티넬을 상시 유지 → 홈에서 뒤로가기해도 앱이 종료·재시작되지 않는다.
   useBackControl();
 
-  // app_open — uid 준비된 뒤 세션당 1회
+  // app_open — uid 준비된 뒤 세션당 1회. 권한 허용 기기는 토큰도 재등록(지워져도 자동 복구).
   const openedRef = useRef(false);
   useEffect(() => {
     if (ready && user && !openedRef.current) {
       openedRef.current = true;
       logEvent("app_open");
+      refreshPushToken();
     }
   }, [ready, user]);
 

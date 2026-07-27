@@ -268,11 +268,17 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
 
   const byName = (name) => events.filter((e) => e.name === name);
 
-  // 설치: install_detected의 고유 uid 중 현재 참여자만.
-  // 참여자 관리에서 삭제된 유저의 이벤트가 남아도 분자에서 자동 제외되어 설치율이 100%를 넘지 않는다.
+  // 설치: app_open 중 standalone(설치 실행)인 고유 uid ∩ 현재 참여자.
+  // 설치당 1회인 install_detected와 달리 앱을 열 때마다 찍히므로,
+  // 이벤트를 지워도 사용자가 앱을 다시 열면 자동 회복된다. 삭제된 유저는 분자에서 자동 제외.
   const participantUids = new Set(users.filter((u) => u.nickname).map((u) => u.id));
   const installs = [
-    ...new Set(byName("install_detected").map((e) => e.uid).filter(Boolean)),
+    ...new Set(
+      byName("app_open")
+        .filter((e) => e.standalone === true)
+        .map((e) => e.uid)
+        .filter(Boolean)
+    ),
   ].filter((uid) => participantUids.has(uid)).length;
 
   // 온보딩 완료율: 앱을 연 방문자(app_open 고유 uid) 중 온보딩(닉네임 등록)까지 마친 비율.
