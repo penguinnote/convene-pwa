@@ -72,51 +72,9 @@ export const verseGroups = [
         titleEn: "This Son of Mine Was Lost and Is Found",
         passages: [
           {
-            ref: "누가복음 15:1-32",
-            refEn: "Luke 15:1-32",
-            textSae: `1 세리들과 죄인들이 모두 예수의 말씀을 들으려고 그에게 가까이 몰려들었다.
-2 바리새파 사람들과 율법학자들은 투덜거리며 말하였다. "이 사람이 죄인들을 맞아들이고, 그들과 함께 음식을 먹는구나."
-3 그래서 예수께서는 그들에게 이 비유를 말씀하셨다.
-4 "너희 가운데서 어떤 사람이 양 백 마리를 가지고 있는데, 그 가운데서 한 마리를 잃으면, 아흔아홉 마리를 들에 두고, 그 잃은 양을 찾을 때까지 찾아 다니지 않겠느냐?
-5 찾으면, 기뻐하며 자기 어깨에 메고
-6 집으로 돌아와서, 벗과 이웃 사람을 불러모으고, '나와 함께 기뻐해 주십시오. 잃었던 내 양을 찾았습니다' 하고 말할 것이다.
-7 내가 너희에게 말한다. 이와 같이 하늘에서는, 회개할 필요가 없는 의인 아흔아홉보다, 회개하는 죄인 한 사람을 두고 더 기뻐할 것이다."
-8 "어떤 여자에게 드라크마 열 닢이 있는데, 그가 그 가운데서 하나를 잃으면, 등불을 켜고, 온 집안을 쓸며, 그것을 찾을 때까지 샅샅이 뒤지지 않겠느냐?
-9 그래서 찾으면, 벗과 이웃 사람을 불러모으고 말하기를 '나와 함께 기뻐해 주십시오. 잃었던 드라크마를 찾았습니다' 할 것이다.
-10 내가 너희에게 말한다. 이와 같이 회개하는 죄인 한 사람을 두고, 하나님의 천사들이 기뻐할 것이다."
-11 예수께서 말씀하셨다. "어떤 사람에게 아들이 둘 있는데
-12 작은 아들이 아버지에게 말하기를 '아버지, 재산 가운데서 내게 돌아올 몫을 내게 주십시오' 하였다. 그래서 아버지는 살림을 두 아들에게 나누어 주었다.
-13 며칠 뒤에 작은 아들은 제 것을 다 챙겨서 먼 지방으로 가서, 거기서 방탕하게 살면서, 그 재산을 낭비하였다.
-14 그가 모든 것을 탕진했을 때에, 그 지방에 크게 흉년이 들어서, 그는 아주 궁핍하게 되었다.
-15 그래서 그는 그 지방의 주민 가운데 한 사람을 찾아가서, 몸을 의탁하였다. 그 사람은 그를 들로 보내서 돼지를 치게 하였다.
-16 그는 돼지가 먹는 쥐엄 열매라도 좀 먹고 배를 채우고 싶은 심정이었으나, 그에게 먹을 것을 주는 사람이 없었다.
-17 그제서야 그는 제정신이 들어서, 이렇게 말하였다. '내 아버지의 그 많은 품꾼들에게는 먹을 것이 남아도는데, 나는 여기서 굶어 죽는구나.
-18 내가 일어나 아버지에게 돌아가서, 이렇게 말씀드려야 하겠다. 아버지, 내가 하늘과 아버지 앞에 죄를 지었습니다.
-19 나는 더 이상 아버지의 아들이라고 불릴 자격이 없으니, 나를 품꾼의 하나로 삼아 주십시오.'
-20 그는 일어나서, 아버지에게로 갔다. 그가 아직도 먼 거리에 있는데, 그의 아버지가 그를 보고 측은히 여겨서, 달려가 그의 목을 껴안고, 입을 맞추었다.
-21 아들이 아버지에게 말하였다. '아버지, 내가 하늘과 아버지 앞에 죄를 지었습니다. 이제부터 나는 아버지의 아들이라고 불릴 자격이 없습니다.'
-22 그러나 아버지는 종들에게 말하였다. '어서, 가장 좋은 옷을 꺼내서, 그에게 입히고, 손에 반지를 끼우고, 발에 신을 신겨라.
-23 그리고 살진 송아지를 끌어내다가 잡아라. 우리가 먹고 즐기자.
-24 나의 이 아들은 죽었다가 살아났고, 내가 잃었다가 되찾았다.' 그래서 그들은 잔치를 벌였다.
-25 그런데 큰 아들이 밭에 있다가 돌아오는데, 집에 가까이 이르렀을 때에, 음악 소리와 춤추면서 노는 소리를 듣고,
-26 종 하나를 불러서, 무슨 일인지를 물어 보았다.
-27 종이 그에게 말하였다. '아우님이 집에 돌아왔습니다. 건강한 몸으로 돌아온 것을 반겨서, 주인 어른께서 살진 송아지를 잡으셨습니다.'
-28 큰 아들은 화가 나서, 집으로 들어가려고 하지 않았다. 아버지가 나와서 그를 달랬다.
-29 그러나 그는 아버지에게 대답하였다. '나는 이렇게 여러 해를 두고 아버지를 섬기고 있고, 아버지의 명령을 한 번도 어긴 일이 없는데, 나에게는 친구들과 함께 즐기라고, 염소 새끼 한 마리도 주신 일이 없습니다.
-30 그런데 창녀들과 어울려서 아버지의 재산을 다 삼켜 버린 이 아들이 오니까, 그를 위해서는 살진 송아지를 잡으셨습니다.'
-31 아버지가 그에게 말하였다. '얘야, 너는 늘 나와 함께 있으니 내가 가진 모든 것은 다 네 것이다.
-32 그런데 너의 이 아우는 죽었다가 살아났고, 내가 잃었다가 되찾았으니, 즐기며 기뻐하는 것이 마땅하다.'"`,
-            text: `1 모든 세리와 죄인들이 말씀을 들으러 가까이 나아오니
-2 바리새인과 서기관들이 수군거려 이르되 이 사람이 죄인을 영접하고 음식을 같이 먹는다 하더라
-3 예수께서 그들에게 이 비유로 이르시되
-4 너희 중에 어떤 사람이 양 백 마리가 있는데 그 중의 하나를 잃으면 아흔아홉 마리를 들에 두고 그 잃은 것을 찾아내기까지 찾아다니지 아니하겠느냐
-5 또 찾아낸즉 즐거워 어깨에 메고
-6 집에 와서 그 벗과 이웃을 불러 모으고 말하되 나와 함께 즐기자 나의 잃은 양을 찾아내었노라 하리라
-7 내가 너희에게 이르노니 이와 같이 죄인 한 사람이 회개하면 하늘에서는 회개할 것 없는 의인 아흔아홉으로 말미암아 기뻐하는 것보다 더하리라
-8 어떤 여자가 열 드라크마가 있는데 하나를 잃으면 등불을 켜고 집을 쓸며 찾아내기까지 부지런히 찾지 아니하겠느냐
-9 또 찾아낸즉 벗과 이웃을 불러 모으고 말하되 나와 함께 즐기자 잃은 드라크마를 찾아내었노라 하리라
-10 내가 너희에게 이르노니 이와 같이 죄인 한 사람이 회개하면 하나님의 사자들 앞에 기쁨이 되느니라
-11 또 이르시되 어떤 사람에게 두 아들이 있는데
+            ref: "누가복음 15:11-32",
+            refEn: "Luke 15:11-32",
+            text: `11 또 이르시되 어떤 사람에게 두 아들이 있는데
 12 그 둘째가 아버지에게 말하되 아버지여 재산 중에서 내게 돌아올 분깃을 내게 주소서 하는지라 아버지가 그 살림을 각각 나눠 주었더니
 13 그 후 며칠이 안 되어 둘째 아들이 재물을 다 모아 가지고 먼 나라에 가 거기서 허랑방탕하여 그 재산을 낭비하더니
 14 다 없앤 후 그 나라에 크게 흉년이 들어 그가 비로소 궁핍한지라
@@ -138,38 +96,120 @@ export const verseGroups = [
 30 아버지의 살림을 창녀들과 함께 삼켜 버린 이 아들이 돌아오매 이를 위하여 살진 송아지를 잡으셨나이다
 31 아버지가 이르되 얘 너는 항상 나와 함께 있으니 내 것이 다 네 것이로되
 32 이 네 동생은 죽었다가 살아났으며 내가 잃었다가 얻었기로 우리가 즐거워하고 기뻐하는 것이 마땅하다 하니라`,
-            textEn: `1 Now the tax collectors and sinners were all gathering around to hear Jesus.
-2 But the Pharisees and the teachers of the law muttered, "This man welcomes sinners and eats with them."
-3 Then Jesus told them this parable:
-4 "Suppose one of you has a hundred sheep and loses one of them. Doesn't he leave the ninety-nine in the open country and go after the lost sheep until he finds it?
-5 And when he finds it, he joyfully puts it on his shoulders
-6 and goes home. Then he calls his friends and neighbors together and says, 'Rejoice with me; I have found my lost sheep.'
-7 I tell you that in the same way there will be more rejoicing in heaven over one sinner who repents than over ninety-nine righteous persons who do not need to repent.
-8 "Or suppose a woman has ten silver coins and loses one. Doesn't she light a lamp, sweep the house and search carefully until she finds it?
-9 And when she finds it, she calls her friends and neighbors together and says, 'Rejoice with me; I have found my lost coin.'
-10 In the same way, I tell you, there is rejoicing in the presence of the angels of God over one sinner who repents."
-11 Jesus continued: "There was a man who had two sons.
+            textEn: `11 Jesus continued: "There was a man who had two sons.
 12 The younger one said to his father, 'Father, give me my share of the estate.' So he divided his property between them.
-13 "Not long after that, the younger son got together all he had, set off for a distant country and there squandered his wealth in wild living.
+13 Not long after that, the younger son got together all he had, set off for a distant country and there squandered his wealth in wild living.
 14 After he had spent everything, there was a severe famine in that whole country, and he began to be in need.
 15 So he went and hired himself out to a citizen of that country, who sent him to his fields to feed pigs.
 16 He longed to fill his stomach with the pods that the pigs were eating, but no one gave him anything.
-17 "When he came to his senses, he said, 'How many of my father's hired servants have food to spare, and here I am starving to death!
+17 When he came to his senses, he said, 'How many of my father's hired servants have food to spare, and here I am starving to death!
 18 I will set out and go back to my father and say to him: Father, I have sinned against heaven and against you.
 19 I am no longer worthy to be called your son; make me like one of your hired servants.'
 20 So he got up and went to his father. But while he was still a long way off, his father saw him and was filled with compassion for him; he ran to his son, threw his arms around him and kissed him.
-21 "The son said to him, 'Father, I have sinned against heaven and against you. I am no longer worthy to be called your son.'
-22 "But the father said to his servants, 'Quick! Bring the best robe and put it on him. Put a ring on his finger and sandals on his feet.
+21 The son said to him, 'Father, I have sinned against heaven and against you. I am no longer worthy to be called your son.'
+22 But the father said to his servants, 'Quick! Bring the best robe and put it on him. Put a ring on his finger and sandals on his feet.
 23 Bring the fattened calf and kill it. Let's have a feast and celebrate.
 24 For this son of mine was dead and is alive again; he was lost and is found.' So they began to celebrate.
-25 "Meanwhile, the older son was in the field. When he came near the house, he heard music and dancing.
+25 Meanwhile, the older son was in the field. When he came near the house, he heard music and dancing.
 26 So he called one of the servants and asked him what was going on.
 27 'Your brother has come,' he replied, 'and your father has killed the fattened calf because he has him back safe and sound.'
-28 "The older brother became angry and refused to go in. So his father went out and pleaded with him.
+28 The older brother became angry and refused to go in. So his father went out and pleaded with him.
 29 But he answered his father, 'Look! All these years I've been slaving for you and never disobeyed your orders. Yet you never gave me even a young goat so I could celebrate with my friends.
 30 But when this son of yours who has squandered your property with prostitutes comes home, you kill the fattened calf for him!'
-31 "'My son,' the father said, 'you are always with me, and everything I have is yours.
+31 'My son,' the father said, 'you are always with me, and everything I have is yours.
 32 But we had to celebrate and be glad, because this brother of yours was dead and is alive again; he was lost and is found.'"`,
+            textSae: `11 예수께서 말씀하셨다. "어떤 사람에게 아들이 둘 있는데
+12 작은 아들이 아버지에게 말하기를 '아버지, 재산 가운데서 내게 돌아올 몫을 내게 주십시오' 하였다. 그래서 아버지는 살림을 두 아들에게 나누어 주었다.
+13 며칠 뒤에 작은 아들은 제 것을 다 챙겨서 먼 지방으로 가서, 거기서 방탕하게 살면서, 그 재산을 낭비하였다.
+14 그가 모든 것을 탕진했을 때에, 그 지방에 크게 흉년이 들어서, 그는 아주 궁핍하게 되었다.
+15 그래서 그는 그 지방의 주민 가운데 한 사람을 찾아가서, 몸을 의탁하였다. 그 사람은 그를 들로 보내서 돼지를 치게 하였다.
+16 그는 돼지가 먹는 쥐엄 열매라도 좀 먹고 배를 채우고 싶은 심정이었으나, 그에게 먹을 것을 주는 사람이 없었다.
+17 그제서야 그는 제정신이 들어서, 이렇게 말하였다. '내 아버지의 그 많은 품꾼들에게는 먹을 것이 남아도는데, 나는 여기서 굶어 죽는구나.
+18 내가 일어나 아버지에게 돌아가서, 이렇게 말씀드려야 하겠다. 아버지, 내가 하늘과 아버지 앞에 죄를 지었습니다.
+19 나는 더 이상 아버지의 아들이라고 불릴 자격이 없으니, 나를 품꾼의 하나로 삼아 주십시오.'
+20 그는 일어나서, 아버지에게로 갔다. 그가 아직도 먼 거리에 있는데, 그의 아버지가 그를 보고 측은히 여겨서, 달려가 그의 목을 껴안고, 입을 맞추었다.
+21 아들이 아버지에게 말하였다. '아버지, 내가 하늘과 아버지 앞에 죄를 지었습니다. 이제부터 나는 아버지의 아들이라고 불릴 자격이 없습니다.'
+22 그러나 아버지는 종들에게 말하였다. '어서, 가장 좋은 옷을 꺼내서, 그에게 입히고, 손에 반지를 끼우고, 발에 신을 신겨라.
+23 그리고 살진 송아지를 끌어내다가 잡아라. 우리가 먹고 즐기자.
+24 나의 이 아들은 죽었다가 살아났고, 내가 잃었다가 되찾았다.' 그래서 그들은 잔치를 벌였다.
+25 그런데 큰 아들이 밭에 있다가 돌아오는데, 집에 가까이 이르렀을 때에, 음악 소리와 춤추면서 노는 소리를 듣고,
+26 종 하나를 불러서, 무슨 일인지를 물어 보았다.
+27 종이 그에게 말하였다. '아우님이 집에 돌아왔습니다. 건강한 몸으로 돌아온 것을 반겨서, 주인 어른께서 살진 송아지를 잡으셨습니다.'
+28 큰 아들은 화가 나서, 집으로 들어가려고 하지 않았다. 아버지가 나와서 그를 달랬다.
+29 그러나 그는 아버지에게 대답하였다. '나는 이렇게 여러 해를 두고 아버지를 섬기고 있고, 아버지의 명령을 한 번도 어긴 일이 없는데, 나에게는 친구들과 함께 즐기라고, 염소 새끼 한 마리도 주신 일이 없습니다.
+30 그런데 창녀들과 어울려서 아버지의 재산을 다 삼켜 버린 이 아들이 오니까, 그를 위해서는 살진 송아지를 잡으셨습니다.'
+31 아버지가 그에게 말하였다. '얘야, 너는 늘 나와 함께 있으니 내가 가진 모든 것은 다 네 것이다.
+32 그런데 너의 이 아우는 죽었다가 살아났고, 내가 잃었다가 되찾았으니, 즐기며 기뻐하는 것이 마땅하다.'"`,
+          },
+          {
+            ref: "룻기 4:1-22",
+            refEn: "Ruth 4:1-22",
+            text: `1 보아스가 성문으로 올라가서 거기 앉아 있더니 마침 보아스가 말하던 기업 무를 자가 지나가는지라 보아스가 그에게 이르되 아무개여 이리로 와서 앉으라 하니 그가 와서 앉으매
+2 보아스가 그 성읍 장로 열 명을 청하여 이르되 당신들은 여기 앉으라 하니 그들이 앉으매
+3 보아스가 그 기업 무를 자에게 이르되 모압 지방에서 돌아온 나오미가 우리 형제 엘리멜렉의 소유지를 팔려 하므로
+4 내가 여기 앉은 이들과 내 백성의 장로들 앞에서 그것을 사라고 네게 말하여 알게 하려 하였노라 만일 네가 무르려면 무르려니와 만일 네가 무르지 아니하려거든 내게 고하여 알게 하라 네 다음은 나요 그 외에는 무를 자가 없느니라 하니 그가 이르되 내가 무르리라 하는지라
+5 보아스가 이르되 네가 나오미의 손에서 그 밭을 사는 날에 곧 죽은 자의 아내 모압 여인 룻에게서 사서 그 죽은 자의 기업을 그의 이름으로 세워야 할지니라 하니
+6 그 기업 무를 자가 이르되 나는 내 기업에 손해가 있을까 하여 나를 위하여 무르지 못하노니 내가 무를 것을 네가 무르라 나는 무르지 못하겠노라 하는지라
+7 옛적 이스라엘 중에는 모든 것을 무르거나 교환하는 일을 확정하기 위하여 사람이 그의 신을 벗어 그의 이웃에게 주더니 이것이 이스라엘 중에 증명하는 전례가 된지라
+8 이에 그 기업 무를 자가 보아스에게 이르되 네가 너를 위하여 사라 하고 그의 신을 벗는지라
+9 보아스가 장로들과 모든 백성에게 이르되 내가 엘리멜렉과 기룐과 말론에게 있던 모든 것을 나오미의 손에서 산 일에 너희가 오늘 증인이 되었고
+10 또 말론의 아내 모압 여인 룻을 사서 나의 아내로 맞이하고 그 죽은 자의 기업을 그의 이름으로 세워 그의 이름이 그의 형제 중과 그 곳 성문에서 끊어지지 아니하게 함에 너희가 오늘 증인이 되었느니라 하니
+11 성문에 있는 모든 백성과 장로들이 이르되 우리가 증인이 되나니 여호와께서 네 집에 들어가는 여인으로 이스라엘의 집을 세운 라헬과 레아 두 사람과 같게 하시고 네가 에브랏에서 유력하고 베들레헴에서 유명하게 하시기를 원하며
+12 여호와께서 이 젊은 여자로 말미암아 네게 상속자를 주사 네 집이 다말이 유다에게 낳아준 베레스의 집과 같게 하시기를 원하노라 하니라
+13 이에 보아스가 룻을 맞이하여 아내로 삼고 그에게 들어갔더니 여호와께서 그에게 임신하게 하시므로 그가 아들을 낳은지라
+14 여인들이 나오미에게 이르되 찬송할지로다 여호와께서 오늘 네게 기업 무를 자가 없게 하지 아니하셨도다 이 아이의 이름이 이스라엘 중에 유명하게 되기를 원하노라
+15 이는 네 생명의 회복자이며 네 노년의 봉양자라 곧 너를 사랑하며 일곱 아들보다 귀한 네 며느리가 낳은 자로다 하니라
+16 나오미가 아기를 받아 품에 품고 그의 양육자가 되니
+17 그의 이웃 여인들이 그에게 이름을 지어 주되 나오미에게 아들이 태어났다 하여 그의 이름을 오벳이라 하였는데 그는 다윗의 아버지인 이새의 아버지였더라
+18 베레스의 계보는 이러하니라 베레스는 헤스론을 낳고
+19 헤스론은 람을 낳았고 람은 암미나답을 낳았고
+20 암미나답은 나손을 낳았고 나손은 살몬을 낳았고
+21 살몬은 보아스를 낳았고 보아스는 오벳을 낳았고
+22 오벳은 이새를 낳고 이새는 다윗을 낳았더라`,
+            textEn: `1 Meanwhile Boaz went up to the town gate and sat down there just as the guardian-redeemer he had mentioned came along. Boaz said, "Come over here, my friend, and sit down." So he went over and sat down.
+2 Boaz took ten of the elders of the town and said, "Sit here," and they did so.
+3 Then he said to the guardian-redeemer, "Naomi, who has come back from Moab, is selling the piece of land that belonged to our relative Elimelek.
+4 I thought I should bring the matter to your attention and suggest that you buy it in the presence of these seated here and in the presence of the elders of my people. If you will redeem it, do so. But if you will not, tell me, so I will know. For no one has the right to do it except you, and I am next in line." "I will redeem it," he said.
+5 Then Boaz said, "On the day you buy the land from Naomi, you also acquire Ruth the Moabite, the dead man's widow, in order to maintain the name of the dead with his property."
+6 At this, the guardian-redeemer said, "Then I cannot redeem it because I might endanger my own estate. You redeem it yourself. I cannot do it."
+7 (Now in earlier times in Israel, for the redemption and transfer of property to become final, one party took off his sandal and gave it to the other. This was the method of legalizing transactions in Israel.)
+8 So the guardian-redeemer said to Boaz, "Buy it yourself." And he removed his sandal.
+9 Then Boaz announced to the elders and all the people, "Today you are witnesses that I have bought from Naomi all the property of Elimelek, Kilion and Mahlon.
+10 I have also acquired Ruth the Moabite, Mahlon's widow, as my wife, in order to maintain the name of the dead with his property, so that his name will not disappear from among his family or from his hometown. Today you are witnesses!"
+11 Then the elders and all the people at the gate said, "We are witnesses. May the Lord make the woman who is coming into your home like Rachel and Leah, who together built up the family of Israel. May you have standing in Ephrathah and be famous in Bethlehem.
+12 Through the offspring the Lord gives you by this young woman, may your family be like that of Perez, whom Tamar bore to Judah."
+13 So Boaz took Ruth and she became his wife. When he made love to her, the Lord enabled her to conceive, and she gave birth to a son.
+14 The women said to Naomi: "Praise be to the Lord, who this day has not left you without a guardian-redeemer. May he become famous throughout Israel!
+15 He will renew your life and sustain you in your old age. For your daughter-in-law, who loves you and who is better to you than seven sons, has given him birth."
+16 Then Naomi took the child in her arms and cared for him.
+17 The women living there said, "Naomi has a son!" And they named him Obed. He was the father of Jesse, the father of David.
+18 This, then, is the family line of Perez: Perez was the father of Hezron,
+19 Hezron the father of Ram, Ram the father of Amminadab,
+20 Amminadab the father of Nahshon, Nahshon the father of Salmon,
+21 Salmon the father of Boaz, Boaz the father of Obed,
+22 Obed the father of Jesse, and Jesse the father of David.`,
+            textSae: `1 보아스가 성문 위 회관으로 올라가서 앉아 있는데, 그가 말하던, 집안간으로서의 책임을 져야 할 바로 그 사람이 마침 지나가고 있었다. 보아스가 그에게 "여보시오, 이리로 좀 올라와서 앉으시오" 하고 말하였다. 그러자 그가 올라와서 앉았다.
+2 보아스는 성읍 원로 열 사람을 청하여, 그 자리에 함께 앉도록 하였다. 그 사람들이 모두 자리에 와서 앉자
+3 보아스가 집안간으로서 책임을 져야 할 사람에게 말하였다. "모압 지방에서 돌아온 나오미가 우리의 친족 엘리멜렉이 가지고 있는 밭을 팔려고 내놓았소.
+4 나는 이 사실을 분명히 알려 드리오. 여기 앉아 계시는 분들과 우리 마을 어른들께서 보시는 앞에서, 나는 당신이 그 밭을 사라고 말씀드리오. 당신이 집안간으로서의 책임을 지겠다면, 그렇게 하시오. 그러나 집안간으로서의 책임을 지지 않겠다면, 그렇게 하지 않겠다고 분명히 말하여 주시오. 당신이 집안간으로서의 책임이 있는 첫째 사람이오. 나는 그 다음이오." 그러자 그가 대답하였다. "내가 집안간으로서의 책임을 지겠소."
+5 보아스가 다시 말하였다. "그렇다면, 나오미의 손에서 그 밭을 사는 날로, 고인의 아내인 모압 여인 룻도 아내로 맞아들여야 하오. 그렇게 하여야만, 그가 물려받은 그 유산이 고인의 이름으로 남게 될 것이오."
+6 그러자 집안간으로서의 책임이 있는 그 사람이 말하였다. "그런 조건이라면 나는 집안간으로서의 책임을 질 수 없소. 잘못하다가는 내 재산만 축나겠소. 나는 그 책임을 질 수 없으니, 당신이 내가 져야 할 집안간으로서의 책임을 지시오."
+7 옛적에 이스라엘에는, 유산매매나 물물교환과 같은 일을 법적으로 분명히 할 때에는, 한쪽 사람이 다른 한쪽 사람에게 자기의 신을 벗어서 주는 관습이 있었다. 이스라엘에서는 이렇게 함으로써 일이 확정된다는 증거를 삼았다.
+8 집안간으로서의 책임이 있는 그 사람이 보아스에게 "당신이 사시오" 하면서, 자기의 신을 벗어 주었다.
+9 그러자 보아스가 원로들과 온 마을 사람들에게 선언하였다. "여러분은 오늘 이 일의 증인입니다. 나는 엘리멜렉이 가지고 있던 모든 것과, 기룐과 말론이 가지고 있던 모든 것을 나오미의 손에서 사겠습니다.
+10 나는 말론의 아내인 모압 여인 룻도 아내로 맞아들여서, 그 유산이 고인의 이름으로 남아 있도록 하겠습니다. 그렇게 하여, 고인의 이름이 그의 고향 마을에서도 끊어지지 않고, 친족들 사이에서도 끊어지지 않도록 하겠습니다. 여러분은 오늘 이 일의 증인입니다."
+11 그러자 성문 위 회관에 모인 온 마을 사람들과 원로들이 대답하였다. "우리가 증인입니다. 주님께서, 그대의 집안으로 들어가는 그 여인을, 이스라엘 집안을 일으킨 두 여인 곧 라헬과 레아처럼 되게 해주시기를 빕니다. 에브랏 가문에서 그대가 번성하고, 또한 베들레헴에서 이름을 떨치기를 빕니다.
+12 주님께서 그 젊은 부인을 통하여 그대에게 자손을 주셔서, 그대의 집안이 다말과 유다 사이에서 태어난 아들 베레스의 집안처럼 되게 하시기를 빕니다."
+13 보아스는 룻을 아내로 맞이하였다. 그 여인이 자기 아내가 되자, 그는 그 여인과 동침하였다. 주님께서 그 여인을 보살피시니, 그가 임신하여 아들을 낳았다.
+14 그러자 이웃 여인들이 나오미에게 말하였다. "주님께 찬양을 드립니다. 주님께서는 오늘 이 집에 자손을 주셔서, 대가 끊어지지 않게 하셨습니다. 그의 이름이 이스라엘에서 늘 기리어지기를 바랍니다.
+15 시어머니를 사랑하는 며느리, 아들 일곱보다도 더 나은 며느리가 아기를 낳아 주었으니, 그 아기가 그대에게 생기를 되찾아 줄 것이며, 늘그막에 그대를 돌보아 줄 것입니다."
+16 나오미가 그 아기를 받아 자기 품에 안고 어머니 노릇을 하였다.
+17 이웃 여인들이 그 아기에게 이름을 지어 주면서 "나오미가 아들을 보았다!" 하고 환호하였다. 그들은 그 아기의 이름을 오벳이라고 하였다. 그가 바로 이새의 아버지요, 다윗의 할아버지이다.
+18 다음은 베레스의 계보이다. 베레스는 헤스론을 낳고,
+19 헤스론은 람을 낳고, 람은 암미나답을 낳고,
+20 암미나답은 나손을 낳고, 나손은 살몬을 낳고,
+21 살몬은 보아스를 낳고, 보아스는 오벳을 낳고,
+22 오벳은 이새를 낳고, 이새는 다윗을 낳았다.`,
           },
         ],
       },
