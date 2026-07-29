@@ -68,8 +68,8 @@ export const verseGroups = [
       {
         id: "topic-2",
         label: "2강",
-        title: "이 내 아들은 잃었다가 다시 얻었노라",
-        titleEn: "This Son of Mine Was Lost and Is Found",
+        title: "달려오시는 아버지, 값을 치르시는 하나님",
+        titleEn: "The Father Who Runs, the God Who Pays the Price",
         passages: [
           {
             ref: "누가복음 15:11-32",
@@ -480,8 +480,8 @@ export const verseGroups = [
       {
         id: "opening",
         label: "개회",
-        title: "아담아 네가 어디 있느냐?",
-        titleEn: "Where Are You?",
+        title: "아담아, 네가 어디 있느냐",
+        titleEn: "Adam, Where Are You?",
         passages: [
           {
             ref: "창세기 3:7-24",
@@ -546,8 +546,8 @@ export const verseGroups = [
       {
         id: "closing",
         label: "폐회",
-        title: "너희는 가지니",
-        titleEn: "You Are the Branches",
+        title: "열매맺는 제자가 되려면",
+        titleEn: "To Become a Fruitful Disciple",
         passages: [
           {
             ref: "요한복음 15:1-27",
@@ -645,8 +645,8 @@ export const verseGroups = [
       {
         id: "gbs-1",
         label: "1강",
-        title: "네 죄 사함을 받았느니라",
-        titleEn: "Your Sins Are Forgiven",
+        title: "문제의 뿌리를 찾아라",
+        titleEn: "Find the Root of the Problem",
         passages: [
           {
             ref: "마가복음 2:1-12",
@@ -693,8 +693,8 @@ export const verseGroups = [
       {
         id: "gbs-2",
         label: "2강",
-        title: "삭개오야 속히 내려오라",
-        titleEn: "Zacchaeus, Come Down",
+        title: "잃어버린 자를 찾아서",
+        titleEn: "Seeking the Lost",
         passages: [
           {
             ref: "누가복음 19:1-10",
@@ -736,7 +736,7 @@ export const verseGroups = [
         id: "gbs-3",
         label: "3강",
         title: "청년아 일어나라",
-        titleEn: "Young Man, Get Up",
+        titleEn: "Arise, Young Man!",
         passages: [
           {
             ref: "누가복음 7:11-17",
@@ -774,8 +774,8 @@ export const verseGroups = [
       {
         id: "dawn-1",
         label: "1강",
-        title: "인격적인 만남",
-        titleEn: "A Personal Encounter",
+        title: "야곱이야기 1 - 인격적인 만남",
+        titleEn: "Jacob's Story - A Personal Encounter",
         passages: [
           {
             ref: "창세기 28:10-22",
@@ -825,8 +825,8 @@ export const verseGroups = [
       {
         id: "dawn-2",
         label: "2강",
-        title: "네 이름이 무엇이냐?",
-        titleEn: "Transformation of Being",
+        title: "야곱이야기 2 - 네 이름이 무엇이냐?",
+        titleEn: "Jacob's Story - What Is Your Name?",
         passages: [
           {
             ref: "창세기 32:22-32",
@@ -919,8 +919,8 @@ export const verseGroups = [
       {
         id: "dawn-3",
         label: "3강",
-        title: "잃음을 넘어 흘려보냄으로",
-        titleEn: "Beyond Surrender",
+        title: "야곱이야기 3 - 잃음을 넘어 흘려보냄으로",
+        titleEn: "Jacob's Story - From Loss to Letting Go",
         passages: [
           {
             ref: "창세기 43:1-15",
