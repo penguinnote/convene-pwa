@@ -22,13 +22,14 @@ export default function AdminStats({ onBack, onLogout }) {
     setLoading(true);
     setError("");
     try {
-      const [evSnap, userSnap, tokenSnap, pushSnap, adminSnap] = await Promise.all([
+      const [evSnap, userSnap, tokenSnap, pushSnap, adminSnap, annSnap] = await Promise.all([
         getDocs(collection(db, "events")),
         getDocs(collection(db, "users")),
         getDocs(collection(db, "tokens")),
-        // pushLogs·admins는 규칙 미배포 등으로 실패해도 나머지 지표는 보여준다
+        // pushLogs·admins·announcements는 실패해도 나머지 지표는 보여준다
         getDocs(collection(db, "pushLogs")).catch(() => null),
         getDocs(collection(db, "admins")).catch(() => null),
+        getDocs(collection(db, "announcements")).catch(() => null),
       ]);
       setData({
         events: evSnap.docs.map((d) => d.data()),
@@ -36,6 +37,9 @@ export default function AdminStats({ onBack, onLogout }) {
         tokenCount: tokenSnap.size,
         pushLogCount: pushSnap ? pushSnap.size : null,
         admins: adminSnap ? adminSnap.docs.map((d) => d.data()) : null,
+        announcements: annSnap
+          ? annSnap.docs.map((d) => ({ id: d.id, title: d.data().title }))
+          : [],
       });
     } catch (err) {
       console.error("stats load failed", err);
@@ -235,6 +239,31 @@ export default function AdminStats({ onBack, onLogout }) {
                 <BarList title="외부 링크 이동" rows={stats.externalRows} />
               </Section>
 
+              {/* 공지별 열람 */}
+              <Section title="공지별 열람">
+                {stats.annPerRows.length === 0 ? (
+                  <p className="rounded-2xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
+                    아직 열람 기록이 없습니다.
+                  </p>
+                ) : (
+                  <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
+                    <ul className="space-y-1.5">
+                      {stats.annPerRows.map((r) => (
+                        <li
+                          key={r.id}
+                          className="flex items-center justify-between gap-2 text-[13px]"
+                        >
+                          <span className="min-w-0 truncate text-ink">{r.title}</span>
+                          <span className="shrink-0 text-ink-faint">
+                            열람 {r.viewers}명 · 총 {r.total}회
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </Section>
+
               {/* 리텐션 */}
               <Section title="리텐션">
                 <BarList
@@ -263,7 +292,7 @@ function countBy(items, keyFn) {
   return [...map.entries()].sort((a, b) => b[1] - a[1]);
 }
 
-function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
+function computeStats({ events, users, tokenCount, pushLogCount, admins, announcements }) {
   const participants = users.filter((u) => u.nickname).length;
 
   const byName = (name) => events.filter((e) => e.name === name);
@@ -339,6 +368,26 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
   const liveRows = countBy(byName("live_link_click"), (e) => e.params?.type);
   const externalRows = countBy(byName("external_open"), (e) => e.params?.target);
 
+  // 공지별 열람: params.id별 열람 인원(고유 uid)·총 열람 횟수. 제목은 announcements에서 매핑.
+  const annTitle = new Map((announcements ?? []).map((a) => [a.id, a.title]));
+  const annById = new Map();
+  annEvents.forEach((e) => {
+    const id = e.params?.id;
+    if (!id) return;
+    if (!annById.has(id)) annById.set(id, { total: 0, uids: new Set() });
+    const rec = annById.get(id);
+    rec.total += 1;
+    if (e.uid) rec.uids.add(e.uid);
+  });
+  const annPerRows = [...annById.entries()]
+    .map(([id, r]) => ({
+      id,
+      title: annTitle.get(id) ?? "(삭제된 공지)",
+      viewers: r.uids.size,
+      total: r.total,
+    }))
+    .sort((a, b) => b.viewers - a.viewers || b.total - a.total);
+
   // 리텐션: uid별 방문 distinct day 수 → 1/2/3/4일+ 분포
   const uidDays = new Map();
   events.forEach((e) => {
@@ -374,6 +423,7 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins }) {
     teamAny,
     annViews,
     annViewers,
+    annPerRows,
     liveRows,
     externalRows,
     retentionRows,
