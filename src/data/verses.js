@@ -1105,9 +1105,3 @@ export function shortRef(ref) {
   const rest = ref.slice(sp + 1);
   return (BOOK_ABBR[book] || book) + " " + rest;
 }
-
-// 한 항목의 모든 passages를 축약해서 ", "로 연결
-export function shortRefList(item) {
-  if (!item?.passages?.length) return "";
-  return item.passages.map((p) => shortRef(p.ref)).join(", ");
-}

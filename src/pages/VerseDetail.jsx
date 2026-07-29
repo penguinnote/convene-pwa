@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { getVerseById, shortRefList } from "../data/verses.js";
+import { getVerseById } from "../data/verses.js";
+import VerseRefs from "../components/VerseRefs.jsx";
 import { useVerseFontLevel } from "../hooks/useVerseFontLevel";
 import FontStepper from "../components/FontStepper.jsx";
 
@@ -54,10 +55,8 @@ export default function VerseDetail() {
 
             <h1 className="mt-3 break-keep text-2xl font-bold leading-snug text-title">
               {en ? item.titleEn : item.title}
-              <span className="ml-2 align-middle text-xs font-normal text-ink-faint">
-                {shortRefList(item)}
-              </span>
             </h1>
+            <VerseRefs item={item} className="mt-1.5" />
 
             <div className="mt-6 space-y-5">
               {item.passages.map((p, j) => {
