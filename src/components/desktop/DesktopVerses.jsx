@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { verseGroups, getVerseById, shortRefList } from "../../data/verses.js";
+import { verseGroups, getVerseById } from "../../data/verses.js";
+import VerseRefs from "../VerseRefs.jsx";
 import { useVerseFontLevel } from "../../hooks/useVerseFontLevel";
 import FontStepper from "../FontStepper.jsx";
 
@@ -91,10 +92,8 @@ export default function DesktopVerses() {
                 </div>
                 <h1 className="mt-3 break-keep text-2xl font-bold leading-snug text-title">
                   {en ? item.titleEn : item.title}
-                  <span className="ml-2 align-middle text-xs font-normal text-ink-faint">
-                    {shortRefList(item)}
-                  </span>
                 </h1>
+                <VerseRefs item={item} className="mt-1.5" />
               </div>
               <div className="flex shrink-0 items-center gap-1.5">
                 <LangSegment lang={lang} onChange={setLang} />

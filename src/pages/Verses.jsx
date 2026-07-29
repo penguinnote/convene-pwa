@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import PageHeader from "../components/PageHeader.jsx";
-import { verseGroups, shortRefList } from "../data/verses.js";
+import { verseGroups } from "../data/verses.js";
+import VerseRefs from "../components/VerseRefs.jsx";
 import { goToVerse } from "../lib/nav";
 
 export default function Verses() {
@@ -37,10 +38,8 @@ export default function Verses() {
                           {item.note}
                         </span>
                       )}
-                      <span className="ml-1.5 align-middle text-xs font-normal text-ink-faint">
-                        {shortRefList(item)}
-                      </span>
                     </p>
+                    <VerseRefs item={item} className="mt-0.5" />
                   </div>
                   <span className="shrink-0 text-basil-300">›</span>
                 </button>
