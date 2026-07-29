@@ -100,6 +100,9 @@ export default function Home() {
       case "schedule":
         goChild(navigate, path, "/schedule");
         break;
+      case "menu":
+        goChild(navigate, path, "/menu");
+        break;
       case "resource":
         if (pinned) goToAnnouncement(navigate, path, pinned.id);
         break;
@@ -334,6 +337,8 @@ function resolveLink(link, pinned) {
       return { label: "조 편성 하러 가기" };
     case "schedule":
       return { label: "시간표 보기" };
+    case "menu":
+      return { label: "식단표 보기" };
     case "resource":
       return pinned ? { label: "자료실 보기" } : null; // 고정 공지 없으면 숨김
     default:
