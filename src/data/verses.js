@@ -919,7 +919,7 @@ export const verseGroups = [
       {
         id: "dawn-3",
         label: "3강",
-        title: "잃음을 너머 흘려보냄으로",
+        title: "잃음을 넘어 흘려보냄으로",
         titleEn: "Beyond Surrender",
         passages: [
           {
