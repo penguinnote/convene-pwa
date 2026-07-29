@@ -774,7 +774,7 @@ export const verseGroups = [
       {
         id: "dawn-1",
         label: "1강",
-        title: "인격적 만남",
+        title: "인격적인 만남",
         titleEn: "A Personal Encounter",
         passages: [
           {
@@ -825,7 +825,7 @@ export const verseGroups = [
       {
         id: "dawn-2",
         label: "2강",
-        title: "존재의 변화",
+        title: "네 이름이 무엇이냐?",
         titleEn: "Transformation of Being",
         passages: [
           {
@@ -868,7 +868,6 @@ export const verseGroups = [
           {
             ref: "창세기 35:1-15",
             refEn: "Genesis 35:1-15",
-            textSae: "",
             text: `1 하나님이 야곱에게 이르시되 일어나 벧엘로 올라가서 거기 거주하며 네가 네 형 에서의 낯을 피하여 도망하던 때에 네게 나타났던 하나님께 거기서 제단을 쌓으라 하신지라
 2 야곱이 이에 자기 집안 사람과 자기와 함께 한 모든 자에게 이르되 너희 중에 있는 이방 신상들을 버리고 자신을 정결하게 하고 너희들의 의복을 바꾸어 입으라
 3 우리가 일어나 벧엘로 올라가자 내 환난 날에 내게 응답하시며 내가 가는 길에서 나와 함께 하신 하나님께 내가 거기서 제단을 쌓으려 하노라 하매
@@ -893,19 +892,34 @@ export const verseGroups = [
 7 There he built an altar, and he called the place El Bethel, because it was there that God revealed himself to him when he was fleeing from his brother.
 8 Now Deborah, Rebekah's nurse, died and was buried under the oak outside Bethel. So it was named Allon Bakuth.
 9 After Jacob returned from Paddan Aram, God appeared to him again and blessed him.
-10 God said to him, "Your name is Jacob, but you will no longer be called Jacob; your name will be Israel. " So he named him Israel.
-11 And God said to him, "I am God Almighty ; be fruitful and increase in number. A nation and a community of nations will come from you, and kings will be among your descendants.
+10 God said to him, "Your name is Jacob, but you will no longer be called Jacob; your name will be Israel." So he named him Israel.
+11 And God said to him, "I am God Almighty; be fruitful and increase in number. A nation and a community of nations will come from you, and kings will be among your descendants.
 12 The land I gave to Abraham and Isaac I also give to you, and I will give this land to your descendants after you."
 13 Then God went up from him at the place where he had talked with him.
 14 Jacob set up a stone pillar at the place where God had talked with him, and he poured out a drink offering on it; he also poured oil on it.
 15 Jacob called the place where God had talked with him Bethel.`,
+            textSae: `1 하나님이 야곱에게 말씀하셨다. "어서 베델로 올라가, 거기에서 살아라. 네가 너의 형 에서 앞에서 피해 도망칠 때에, 너에게 나타난 그 하나님께 제단을 쌓아서 바쳐라."
+2 야곱은, 자기의 가족과 자기가 거느리고 있는 모든 사람에게 명령하였다. "너희가 가지고 있는 이방 신상들을 다 버려라. 몸을 깨끗이 씻고, 옷을 갈아입어라.
+3 이제 우리는 이 곳을 떠나서, 베델로 올라간다. 거기에다 나는, 내가 고생할 때에 나의 간구를 들어 주시고, 내가 가는 길 어디에서나 나와 함께 다니면서 보살펴 주신, 그 하나님께 제단을 쌓아서 바치고자 한다."
+4 그들은, 자기들이 가지고 있는 모든 이방 신상과 귀에 걸고 있는 귀고리를 야곱에게 가져 왔다. 야곱은 그것들을 세겜 근처 상수리나무 밑에 묻었다.
+5 그런 다음에 그들은 길을 떠났다. 하나님이 사방에 있는 모든 성읍 사람을 두려워 떨게 하셨으므로, 아무도 야곱의 아들들을 추격하지 못하였다.
+6 야곱과, 그가 거느린 모든 사람이, 가나안 땅 루스 곧 베델에 이르렀다.
+7 야곱이 거기에서 제단을 쌓은 뒤에, 그가 형을 피해서 떠날 때에, 베델에서 하나님이 나타나신 것을 생각하고, 그 곳 이름을 엘베델이라고 하였다.
+8 리브가의 유모 드보라가 죽어서, 베델 아래쪽 상수리나무 밑에 묻히니, 사람들이 그 나무 이름을 알론바굿이라고 하였다.
+9 야곱이 밧단아람에서 돌아온 뒤에, 하나님이 그에게 다시 나타나셔서 복을 주셨다.
+10 하나님이 그에게 말씀하셨다. "너의 이름이 야곱이었지만, 이제부터 너의 이름은 야곱이 아니라 이스라엘이다." 하나님이 그의 이름을 이스라엘이라고 하셨다.
+11 하나님이 그에게 말씀하셨다. "나는 전능한 하나님이다. 너는 생육하고 번성할 것이다. 한 민족과 많은 갈래의 민족이 너에게서 나오고, 너의 자손에게서 왕들이 나올 것이다.
+12 내가 아브라함과 이삭에게 준 땅을 너에게 주고, 그 땅을 내가 너의 자손에게도 주겠다."
+13 그런 다음에 하나님은 야곱과 말씀하시던 곳을 떠나서 올라가셨다.
+14 야곱은 하나님이 자기와 말씀을 나누시던 곳에 기둥 곧 돌기둥을 세우고, 그 위에 부어 드리는 제물을 붓고, 그 위에 기름을 부었다.
+15 야곱은 하나님이 자기와 말씀을 나누시던 곳의 이름을 베델이라고 하였다.`,
           },
         ],
       },
       {
         id: "dawn-3",
         label: "3강",
-        title: "내려놓음 그 너머",
+        title: "잃음을 너머 흘려보냄으로",
         titleEn: "Beyond Surrender",
         passages: [
           {
