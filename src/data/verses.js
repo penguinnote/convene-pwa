@@ -444,11 +444,62 @@ export const verseGroups = [
         titleEn: "Where Are You?",
         passages: [
           {
-            ref: "창세기 3:9",
-            refEn: "Genesis 3:9",
-            textSae: `9 주 하나님이 그 남자를 부르시며 물으셨다. "네가 어디에 있느냐?"`,
-            text: `9 여호와 하나님이 아담을 부르시며 그에게 이르시되 네가 어디 있느냐`,
-            textEn: `9 But the Lord God called to the man, "Where are you?"`,
+            ref: "창세기 3:7-24",
+            refEn: "Genesis 3:7-24",
+            text: `7 이에 그들의 눈이 밝아져 자기들이 벗은 줄을 알고 무화과나무 잎을 엮어 치마로 삼았더라
+8 그들이 그 날 바람이 불 때 동산에 거니시는 여호와 하나님의 소리를 듣고 아담과 그의 아내가 여호와 하나님의 낯을 피하여 동산 나무 사이에 숨은지라
+9 여호와 하나님이 아담을 부르시며 그에게 이르시되 네가 어디 있느냐
+10 이르되 내가 동산에서 하나님의 소리를 듣고 내가 벗었으므로 두려워하여 숨었나이다
+11 이르시되 누가 너의 벗었음을 네게 알렸느냐 내가 네게 먹지 말라 명한 그 나무 열매를 네가 먹었느냐
+12 아담이 이르되 하나님이 주셔서 나와 함께 있게 하신 여자 그가 그 나무 열매를 내게 주므로 내가 먹었나이다
+13 여호와 하나님이 여자에게 이르시되 네가 어찌하여 이렇게 하였느냐 여자가 이르되 뱀이 나를 꾀므로 내가 먹었나이다
+14 여호와 하나님이 뱀에게 이르시되 네가 이렇게 하였으니 네가 모든 가축과 들의 모든 짐승보다 더욱 저주를 받아 배로 다니고 살아 있는 동안 흙을 먹을지니라
+15 내가 너로 여자와 원수가 되게 하고 네 후손도 여자의 후손과 원수가 되게 하리니 여자의 후손은 네 머리를 상하게 할 것이요 너는 그의 발꿈치를 상하게 할 것이니라 하시고
+16 또 여자에게 이르시되 내가 네게 임신하는 고통을 크게 더하리니 네가 수고하고 자식을 낳을 것이며 너는 남편을 원하고 남편은 너를 다스릴 것이니라 하시고
+17 아담에게 이르시되 네가 네 아내의 말을 듣고 내가 네게 먹지 말라 한 나무의 열매를 먹었은즉 땅은 너로 말미암아 저주를 받고 너는 네 평생에 수고하여야 그 소산을 먹으리라
+18 땅이 네게 가시덤불과 엉겅퀴를 낼 것이라 네가 먹을 것은 밭의 채소인즉
+19 네가 흙으로 돌아갈 때까지 얼굴에 땀을 흘려야 먹을 것을 먹으리니 네가 그것에서 취함을 입었음이라 너는 흙이니 흙으로 돌아갈 것이니라 하시니라
+20 아담이 그의 아내의 이름을 하와라 불렀으니 그는 모든 산 자의 어머니가 됨이더라
+21 여호와 하나님이 아담과 그의 아내를 위하여 가죽옷을 지어 입히시니라
+22 여호와 하나님이 이르시되 보라 이 사람이 선악을 아는 일에 우리 중 하나 같이 되었으니 그가 그의 손을 들어 생명 나무 열매도 따먹고 영생할까 하노라 하시고
+23 여호와 하나님이 에덴 동산에서 그를 내보내어 그의 근원이 된 땅을 갈게 하시니라
+24 이같이 하나님이 그 사람을 쫓아내시고 에덴 동산 동쪽에 그룹들과 두루 도는 불 칼을 두어 생명 나무의 길을 지키게 하시니라`,
+            textEn: `7 Then the eyes of both of them were opened, and they realized they were naked; so they sewed fig leaves together and made coverings for themselves.
+8 Then the man and his wife heard the sound of the Lord God as he was walking in the garden in the cool of the day, and they hid from the Lord God among the trees of the garden.
+9 But the Lord God called to the man, "Where are you?"
+10 He answered, "I heard you in the garden, and I was afraid because I was naked; so I hid."
+11 And he said, "Who told you that you were naked? Have you eaten from the tree that I commanded you not to eat from?"
+12 The man said, "The woman you put here with me—she gave me some fruit from the tree, and I ate it."
+13 Then the Lord God said to the woman, "What is this you have done?" The woman said, "The serpent deceived me, and I ate."
+14 So the Lord God said to the serpent, "Because you have done this, cursed are you above all livestock and all wild animals! You will crawl on your belly and you will eat dust all the days of your life.
+15 And I will put enmity between you and the woman, and between your offspring and hers; he will crush your head, and you will strike his heel."
+16 To the woman he said, "I will make your pains in childbearing very severe; with painful labor you will give birth to children. Your desire will be for your husband, and he will rule over you."
+17 To Adam he said, "Because you listened to your wife and ate fruit from the tree about which I commanded you, 'You must not eat from it,' cursed is the ground because of you; through painful toil you will eat food from it all the days of your life.
+18 It will produce thorns and thistles for you, and you will eat the plants of the field.
+19 By the sweat of your brow you will eat your food until you return to the ground, since from it you were taken; for dust you are and to dust you will return."
+20 Adam named his wife Eve, because she would become the mother of all the living.
+21 The Lord God made garments of skin for Adam and his wife and clothed them.
+22 And the Lord God said, "The man has now become like one of us, knowing good and evil. He must not be allowed to reach out his hand and take also from the tree of life and eat, and live forever."
+23 So the Lord God banished him from the Garden of Eden to work the ground from which he had been taken.
+24 After he drove the man out, he placed on the east side of the Garden of Eden cherubim and a flaming sword flashing back and forth to guard the way to the tree of life.`,
+            textSae: `7 그러자 두 사람의 눈이 밝아져서, 자기들이 벗은 몸인 것을 알고, 무화과나무 잎으로 치마를 엮어서, 몸을 가렸다.
+8 그 남자와 그 아내는, 날이 저물고 바람이 서늘할 때에, 주 하나님이 동산을 거니시는 소리를 들었다. 남자와 그 아내는 주 하나님의 낯을 피하여서, 동산 나무 사이에 숨었다.
+9 주 하나님이 그 남자를 부르시며 물으셨다. "네가 어디에 있느냐?"
+10 그가 대답하였다. "하나님께서 동산을 거니시는 소리를, 제가 들었습니다. 저는 벗은 몸인 것이 두려워서 숨었습니다."
+11 하나님이 물으셨다. "네가 벗은 몸이라고, 누가 일러주더냐? 내가 너더러 먹지 말라고 한 그 나무의 열매를, 네가 먹었느냐?"
+12 그 남자는 핑계를 대었다. "하나님께서 저와 함께 살라고 짝지어 주신 여자, 그 여자가 그 나무의 열매를 저에게 주기에, 제가 그것을 먹었습니다."
+13 주 하나님이 그 여자에게 물으셨다. "너는 어쩌다가 이런 일을 저질렀느냐?" 여자도 핑계를 대었다. "뱀이 저를 꾀어서 먹었습니다."
+14 주 하나님이 뱀에게 말씀하셨다. "네가 이런 일을 저질렀으니, 모든 집짐승과 들짐승 가운데서 네가 저주를 받아, 사는 동안 평생토록 배로 기어다니고, 흙을 먹어야 할 것이다.
+15 내가 너로 여자와 원수가 되게 하고, 너의 자손을 여자의 자손과 원수가 되게 하겠다. 여자의 자손은 너의 머리를 상하게 하고, 너는 여자의 자손의 발꿈치를 상하게 할 것이다."
+16 여자에게는 이렇게 말씀하셨다. "내가 너에게 임신하는 고통을 크게 더할 것이니, 너는 고통을 겪으며 자식을 낳을 것이다. 네가 남편을 지배하려고 해도 남편이 너를 다스릴 것이다."
+17 남자에게는 이렇게 말씀하셨다. "네가 아내의 말을 듣고서, 내가 너에게 먹지 말라고 한 그 나무의 열매를 먹었으니, 이제, 땅이 너 때문에 저주를 받을 것이다. 너는, 죽는 날까지 수고를 하여야만, 땅에서 나는 것을 먹을 수 있을 것이다.
+18 땅은 너에게 가시덤불과 엉겅퀴를 낼 것이다. 너는 들에서 자라는 푸성귀를 먹을 것이다.
+19 너는 흙에서 나왔으니, 흙으로 돌아갈 것이다. 그 때까지, 너는 얼굴에 땀을 흘려야 낟알을 먹을 수 있을 것이다. 너는 흙이니, 흙으로 돌아갈 것이다."
+20 아담은 자기 아내의 이름을 하와라고 하였다. 그가 생명이 있는 모든 것의 어머니이기 때문이다.
+21 주 하나님이 가죽옷을 만들어서, 아담과 그의 아내에게 입혀 주셨다.
+22 주 하나님이 말씀하셨다. "보아라, 이 사람이 우리 가운데 하나처럼, 선과 악을 알게 되었다. 이제 그가 손을 내밀어서, 생명나무의 열매까지 따서 먹고, 끝없이 살게 하여서는 안 된다."
+23 그래서 주 하나님은 그를 에덴 동산에서 내쫓으시고, 그가 흙에서 나왔으므로, 흙을 갈게 하셨다.
+24 그를 쫓아내신 다음에, 에덴 동산의 동쪽에 그룹들을 세우시고, 빙빙 도는 불칼을 두셔서, 생명나무에 이르는 길을 지키게 하셨다.`,
           },
         ],
       },
