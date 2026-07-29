@@ -33,6 +33,8 @@ export function resolveLinkLabel(link, pinned) {
       return "플레이리스트";
     case "team":
       return "조 편성 하러 가기";
+    case "schedule":
+      return "시간표 보기";
     case "resource":
       return pinned ? "자료실 보기" : null;
     default:
@@ -112,6 +114,9 @@ export function useHomeData() {
         break;
       case "team":
         goChild(navigate, path, "/team");
+        break;
+      case "schedule":
+        goChild(navigate, path, "/schedule");
         break;
       case "resource":
         if (pinned) goToAnnouncement(navigate, path, pinned.id);
