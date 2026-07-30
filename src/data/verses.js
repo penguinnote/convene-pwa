@@ -292,8 +292,8 @@ export const verseGroups = [
         titleEn: "Today You Will Be With Me in Paradise",
         passages: [
           {
-            ref: "누가복음 23:1-49",
-            refEn: "Luke 23:1-49",
+            ref: "누가복음 23:1-56",
+            refEn: "Luke 23:1-56",
             textSae: `1 그들 온 무리가 일어나서, 예수를 빌라도 앞으로 끌고 갔다.
 2 그들이 예수를 고발하여 말하기를 "우리가 보니, 이 사람은 우리 민족을 오도하고, 황제에게 세금 바치는 것을 반대하고, 자칭 그리스도 곧 왕이라고 하였습니다."
 3 그래서 빌라도가 예수께 물었다. "당신이 유대인의 왕이오?" 예수께서 빌라도에게 대답하셨다. "당신이 그렇게 말하고 있소."
@@ -342,7 +342,14 @@ export const verseGroups = [
 46 예수께서 큰 소리로 부르짖어 말씀하셨다. "아버지, 내 영혼을 아버지 손에 맡깁니다." 이 말씀을 하시고, 그는 숨을 거두셨다.
 47 그런데 백부장은 그 일어난 일을 보고, 하나님께 영광을 돌리며 말하였다. "이 사람은 참으로 의로운 사람이었다."
 48 구경하러 모여든 무리도 그 일어난 일을 보고, 모두 가슴을 치면서 돌아갔다.
-49 예수를 아는 사람들과 갈릴리에서부터 예수를 따라다닌 여자들은, 다 멀찍이 서서 이 일을 지켜보았다.`,
+49 예수를 아는 사람들과 갈릴리에서부터 예수를 따라다닌 여자들은, 다 멀찍이 서서 이 일을 지켜보았다.
+50 요셉이라는 사람이 있었는데, 그는 공의회 의원이고, 착하고 의로운 사람이었다.
+51 —이 사람은 의회의 결정과 처사에 찬성하지 않았다.— 그는 유대 사람의 고을 아리마대 출신으로, 하나님의 나라를 기다리는 사람이었다.
+52 이 사람이 빌라도에게 가서, 예수의 시신을 내어 달라고 청하였다.
+53 그는 시신을 십자가에서 내려서, 삼베로 싼 다음에, 바위를 파서 만든 무덤에다가 모셨다. 그 무덤은 아직 아무도 묻힌 적이 없는 것이었다.
+54 그 날은 준비일이고, 안식일이 시작될 무렵이었다.
+55 갈릴리에서부터 예수를 따라다닌 여자들이 뒤따라가서, 그 무덤을 보고, 또 그의 시신이 어떻게 안장되었는지를 살펴보았다.
+56 그리고 그들은 집에 돌아가서, 향료와 향유를 마련하였다.`,
             text: `1 무리가 다 일어나 예수를 빌라도에게 끌고 가서
 2 고발하여 이르되 우리가 이 사람을 보매 우리 백성을 미혹하고 가이사에게 세금 바치는 것을 금하며 자칭 왕 그리스도라 하더이다 하니
 3 빌라도가 예수께 물어 이르되 네가 유대인의 왕이냐 대답하여 이르시되 네 말이 옳도다
@@ -391,7 +398,14 @@ export const verseGroups = [
 46 예수께서 큰 소리로 불러 이르시되 아버지 내 영혼을 아버지 손에 부탁하나이다 하고 이 말씀을 하신 후 숨지시니라
 47 백부장이 그 된 일을 보고 하나님께 영광을 돌려 이르되 이 사람은 정녕 의인이었도다 하고
 48 이를 구경하러 모인 무리도 그 된 일을 보고 다 가슴을 치며 돌아가고
-49 예수를 아는 자들과 갈릴리로부터 따라온 여자들도 다 멀리 서서 이 일을 보니라`,
+49 예수를 아는 자들과 갈릴리로부터 따라온 여자들도 다 멀리 서서 이 일을 보니라
+50 공회 의원으로 선하고 의로운 요셉이라 하는 사람이 있으니
+51 (그들의 결의와 행사에 찬성하지 아니한 자라) 그는 유대인의 동네 아리마대 사람이요 하나님의 나라를 기다리는 자라
+52 그가 빌라도에게 가서 예수의 시체를 달라 하여
+53 이를 내려 세마포로 싸고 아직 사람을 장사한 일이 없는 바위에 판 무덤에 넣어 두니
+54 이 날은 준비일이요 안식일이 거의 되었더라
+55 갈릴리에서 예수와 함께 온 여자들이 뒤를 따라 그 무덤과 그의 시체를 어떻게 두었는지를 보고
+56 돌아가 향품과 향유를 준비하더라`,
             textEn: `1 Then the whole assembly rose and led him off to Pilate.
 2 And they began to accuse him, saying, "We have found this man subverting our nation. He opposes payment of taxes to Caesar and claims to be Messiah, a king."
 3 So Pilate asked Jesus, "Are you the king of the Jews?" "You have said so," Jesus replied.
@@ -440,7 +454,14 @@ export const verseGroups = [
 46 Jesus called out with a loud voice, "Father, into your hands I commit my spirit." When he had said this, he breathed his last.
 47 The centurion, seeing what had happened, praised God and said, "Surely this was a righteous man."
 48 When all the people who had gathered to witness this sight saw what took place, they beat their breasts and went away.
-49 But all those who knew him, including the women who had followed him from Galilee, stood at a distance, watching these things.`,
+49 But all those who knew him, including the women who had followed him from Galilee, stood at a distance, watching these things.
+50 Now there was a man named Joseph, a member of the Council, a good and upright man,
+51 who had not consented to their decision and action. He came from the Judean town of Arimathea, and he himself was waiting for the kingdom of God.
+52 Going to Pilate, he asked for Jesus' body.
+53 Then he took it down, wrapped it in linen cloth and placed it in a tomb cut in the rock, one in which no one had yet been laid.
+54 It was Preparation Day, and the Sabbath was about to begin.
+55 The women who had come with Jesus from Galilee followed Joseph and saw the tomb and how his body was laid in it.
+56 Then they went home and prepared spices and perfumes. But they rested on the Sabbath in obedience to the commandment.`,
           },
         ],
       },
