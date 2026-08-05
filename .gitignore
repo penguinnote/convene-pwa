@@ -12,3 +12,12 @@ firebase-debug.log
 
 # 인스턴스 작업 지침(로컬 유지, 공개 레포에서 감춤)
 CLAUDE.md
+
+# 디버그 로그(공백/번호 붙은 변형 포함)
+firebase-debug*.log
+firestore-debug*.log
+.DS_Store
+**/.DS_Store
+
+# 임시 오피스 파일
+~$*
