@@ -1,6 +1,7 @@
 import { getToken } from "firebase/messaging";
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 import { db, getMessagingIfSupported } from "../firebase";
+import { auth } from "../firebase";
 import { logEvent } from "./track";
 
 // 권한이 허용된 상태에서 현재 기기 토큰을 발급받아 tokens에 upsert.
@@ -19,6 +20,7 @@ async function saveCurrentToken() {
 
   await setDoc(doc(db, "tokens", token), {
     token,
+    uid: auth.currentUser?.uid ?? null,
     ua: navigator.userAgent,
     createdAt: serverTimestamp(),
   });

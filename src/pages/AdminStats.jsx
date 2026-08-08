@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { collection, getDocs } from "firebase/firestore";
 import { db } from "../firebase";
+import { INSTANCE } from "../config/instance";
 
 // 관리자 통계: 마운트 시 1회 getDocs로 가져와 클라이언트에서 집계.
 // onSnapshot을 쓰지 않는다(캠프 규모 ~90명·4일이라 1회 조회로 충분, 읽기비용·부하 절감).
@@ -9,18 +10,18 @@ import { db } from "../firebase";
 const CAMP_START = "2026-07-29";
 const CAMP_END = "2026-08-01";
 
+const EXPECTED = INSTANCE.expectedParticipants ?? 0;
+
 export default function AdminStats({ onBack, onLogout }) {
-  const [data, setData] = useState(null); // { events, users, tokenCount, pushLogCount }
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  // 이벤트 지표 기간 필터(day "YYYY-MM-DD" KST 기준). all=true면 전체.
   const [start, setStart] = useState(CAMP_START);
   const [end, setEnd] = useState(CAMP_END);
   const [all, setAll] = useState(false);
-  // uid 기준 / 사람 기준 토글. 기본값은 사람 기준.
   const [mode, setMode] = useState("person"); // "uid" | "person"
-  // 병합 내역 접이식 펼침 상태
   const [mergeOpen, setMergeOpen] = useState(false);
+  const [excludeAdmins, setExcludeAdmins] = useState(true);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -30,7 +31,6 @@ export default function AdminStats({ onBack, onLogout }) {
         getDocs(collection(db, "events")),
         getDocs(collection(db, "users")),
         getDocs(collection(db, "tokens")),
-        // pushLogs·admins·announcements는 실패해도 나머지 지표는 보여준다
         getDocs(collection(db, "pushLogs")).catch(() => null),
         getDocs(collection(db, "admins")).catch(() => null),
         getDocs(collection(db, "announcements")).catch(() => null),
@@ -38,11 +38,15 @@ export default function AdminStats({ onBack, onLogout }) {
       setData({
         events: evSnap.docs.map((d) => d.data()),
         users: userSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
+        tokens: tokenSnap.docs.map((d) => ({ id: d.id, ...d.data() })),
         tokenCount: tokenSnap.size,
         pushLogCount: pushSnap ? pushSnap.size : null,
-        admins: adminSnap ? adminSnap.docs.map((d) => d.data()) : null,
+        // admins 문서 ID = uid (useAuth.jsx:44)
+        admins: adminSnap
+          ? adminSnap.docs.map((d) => ({ uid: d.id, ...d.data() }))
+          : null,
         announcements: annSnap
-          ? annSnap.docs.map((d) => ({ id: d.id, title: d.data().title }))
+          ? annSnap.docs.map((d) => ({ id: d.id, ...d.data() }))
           : [],
       });
     } catch (err) {
@@ -56,28 +60,82 @@ export default function AdminStats({ onBack, onLogout }) {
     load();
   }, [load]);
 
-  // 이벤트 기반 지표만 기간 필터. users/tokens는 현재 상태값이라 필터하지 않는다.
+  // --- 기간 필터 ---
   const filteredEvents = data
     ? all
       ? data.events
       : data.events.filter((e) => e.day && e.day >= start && e.day <= end)
     : null;
 
-  // uid 기준 집계 (기존)
-  const uidStats = data ? computeStats({ ...data, events: filteredEvents }) : null;
-  // 사람 기준 집계 (병합)
-  const mergeResult = data ? buildIdentityMap(data.users) : null;
+  // uid별 첫 app_open day (users에 createdAt이 없으므로 대용값)
+  const uidFirstDay = data
+    ? buildUidFirstDay(data.events)
+    : new Map();
+
+  // 운영진 uid 집합 (admins 문서 ID = uid)
+  const adminUidSet = data?.admins
+    ? new Set(data.admins.map((a) => a.uid))
+    : new Set();
+
+  // 기간 내 users 필터 (전체 모드면 전부 포함)
+  const { filteredUsers, excludedByDateCount } = data
+    ? filterUsersByPeriod(data.users, uidFirstDay, all, start, end)
+    : { filteredUsers: [], excludedByDateCount: 0 };
+
+  // 운영진 제외
+  const { users: activeUsers, excludedAdminCount } = excludeAdmins
+    ? filterOutAdmins(filteredUsers, adminUidSet)
+    : { users: filteredUsers, excludedAdminCount: 0 };
+  const allUsersCount = data
+    ? data.users.filter((u) => u.nickname).length
+    : 0;
+
+  // 운영진 uid를 이벤트·병합에도 일관 적용하기 위한 제외 셋
+  const excludeUidSet = excludeAdmins ? adminUidSet : new Set();
+
+  // uid 기준 집계
+  const uidStats = data
+    ? computeStats({
+        events: filteredEvents,
+        users: activeUsers,
+        tokenCount: data.tokenCount,
+        pushLogCount: data.pushLogCount,
+        admins: data.admins,
+        announcements: data.announcements,
+        excludeUidSet,
+      })
+    : null;
+
+  // 사람 기준 집계
+  const mergeResult = data ? buildIdentityMap(activeUsers) : null;
   const personStats =
     data && mergeResult
       ? computePersonStats({
-          ...data,
           events: filteredEvents,
+          users: activeUsers,
+          tokenCount: data.tokenCount,
+          pushLogCount: data.pushLogCount,
+          admins: data.admins,
+          announcements: data.announcements,
           uidToPersonId: mergeResult.uidToPersonId,
           persons: mergeResult.persons,
+          excludeUidSet,
         })
       : null;
 
   const stats = mode === "person" ? personStats : uidStats;
+
+  // 토큰 uid 기록 비율 (#5)
+  const tokenUidRatio = data
+    ? (() => {
+        const withUid = data.tokens.filter((t) => t.uid).length;
+        return { withUid, total: data.tokens.length };
+      })()
+    : null;
+
+  // 공지당 도달 요약 (#4)
+  const annReachSummary =
+    stats && data ? computeAnnReachSummary(stats.annPerRows, data.announcements, stats.participants) : null;
 
   return (
     <div className="space-y-4 p-6">
@@ -106,12 +164,10 @@ export default function AdminStats({ onBack, onLogout }) {
 
       {error && <p className="text-sm text-basil-600">{error}</p>}
 
-      {/* 기간 선택 (이벤트 지표만 적용) */}
+      {/* 기간 선택 */}
       <div className="space-y-2 rounded-2xl border border-basil-100 bg-white p-3.5">
         <div className="flex items-center justify-between">
-          <p className="text-[11px] font-semibold text-ink-faint">
-            기간
-          </p>
+          <p className="text-[11px] font-semibold text-ink-faint">기간</p>
           <button
             type="button"
             onClick={() => setAll((v) => !v)}
@@ -143,28 +199,51 @@ export default function AdminStats({ onBack, onLogout }) {
             className="min-w-0 flex-1 rounded-xl border border-basil-100 bg-basil-50 px-3 py-2 text-sm text-ink"
           />
         </div>
+        {!all && excludedByDateCount > 0 && (
+          <p className="text-[11px] text-ink-faint">
+            ※ 기간 외 참여자 {excludedByDateCount}명 제외 (첫 app_open 이벤트 날짜 기준 대용값*)
+          </p>
+        )}
       </div>
 
-      {/* uid/사람 기준 토글 */}
+      {/* uid/사람 토글 + 운영진 제외 토글 */}
       {!loading && !error && stats && (
-        <div className="flex gap-1 rounded-xl border border-basil-100 bg-basil-50 p-1">
-          {[
-            { key: "person", label: "사람 기준(닉네임 병합)" },
-            { key: "uid", label: "uid 기준" },
-          ].map((opt) => (
+        <div className="space-y-2">
+          <div className="flex gap-1 rounded-xl border border-basil-100 bg-basil-50 p-1">
+            {[
+              { key: "person", label: "사람 기준(닉네임 병합)" },
+              { key: "uid", label: "uid 기준" },
+            ].map((opt) => (
+              <button
+                key={opt.key}
+                type="button"
+                onClick={() => setMode(opt.key)}
+                className={`flex-1 rounded-lg px-3 py-1.5 text-[12px] font-bold transition ${
+                  mode === opt.key
+                    ? "bg-white text-basil-700 shadow-sm"
+                    : "text-ink-faint"
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+          <div className="flex items-center justify-between rounded-xl border border-basil-100 bg-white px-3.5 py-2">
+            <span className="text-[12px] text-ink-soft">
+              운영진 제외 {excludedAdminCount > 0 && `(${excludedAdminCount}명)`}
+            </span>
             <button
-              key={opt.key}
               type="button"
-              onClick={() => setMode(opt.key)}
-              className={`flex-1 rounded-lg px-3 py-1.5 text-[12px] font-bold transition ${
-                mode === opt.key
-                  ? "bg-white text-basil-700 shadow-sm"
-                  : "text-ink-faint"
+              onClick={() => setExcludeAdmins((v) => !v)}
+              className={`rounded-full px-3 py-1 text-[11px] font-bold transition ${
+                excludeAdmins
+                  ? "bg-basil-600 text-white"
+                  : "border border-basil-200 text-basil-600"
               }`}
             >
-              {opt.label}
+              {excludeAdmins ? "ON" : "OFF"}
             </button>
-          ))}
+          </div>
         </div>
       )}
 
@@ -179,7 +258,9 @@ export default function AdminStats({ onBack, onLogout }) {
                   <StatCard
                     label="병합 요약"
                     value={`${mergeResult.persons.length}명`}
-                    sub={`프로필 ${mergeResult.totalProfiles}건 → 사람 ${mergeResult.persons.length}명 (중복 ${mergeResult.totalProfiles - mergeResult.persons.length}건 병합)`}
+                    sub={`프로필 ${mergeResult.totalProfiles}건 → 사람 ${mergeResult.persons.length}명 (중복 ${mergeResult.totalProfiles - mergeResult.persons.length}건 병합)${
+                      !all ? `\n기간 내 ${stats.participants}명 / 전체 ${allUsersCount}명` : ""
+                    }`}
                   />
                   {personStats.unidentifiedInstalls > 0 && (
                     <StatCard
@@ -253,14 +334,18 @@ export default function AdminStats({ onBack, onLogout }) {
                 value={`${stats.participants}명`}
                 sub={
                   mode === "person"
-                    ? "닉네임 병합 기준"
-                    : "닉네임 등록 기준"
+                    ? `닉네임 병합 기준${EXPECTED > 0 ? ` · 앱 사용률 ${pct(stats.participants, EXPECTED)}` : ""}`
+                    : `닉네임 등록 기준${EXPECTED > 0 ? ` · 앱 사용률 ${pct(stats.participants, EXPECTED)}` : ""}`
                 }
               />
               <StatCard
                 label="설치율"
                 value={pct(stats.installs, stats.participants)}
-                sub={`참여자 ${stats.participants}명 중 ${stats.installs}명 설치`}
+                sub={`참여자 ${stats.participants}명 중 ${stats.installs}명 설치${
+                  EXPECTED > 0
+                    ? `\n등록 명단 기준 ${pct(stats.installs, EXPECTED)}`
+                    : ""
+                }`}
               />
               <StatCard
                 label="온보딩 완료율"
@@ -278,9 +363,15 @@ export default function AdminStats({ onBack, onLogout }) {
               <StatCard
                 label="푸시 권한 허용률"
                 value={pct(stats.pushGranted, stats.pushAsked)}
-                sub={`허용 ${stats.pushGranted} / 요청 ${stats.pushAsked}명`}
+                sub={`허용 ${stats.pushGranted} / 요청 ${stats.pushAsked}명${
+                  EXPECTED > 0
+                    ? `\n등록 명단 기준 ${pct(stats.pushGranted, EXPECTED)}`
+                    : ""
+                }`}
               />
-              <StatCard label="등록 토큰" value={`${stats.tokenCount}개`} />
+              <StatCard label="등록 토큰" value={`${stats.tokenCount}개`}
+                sub={tokenUidRatio ? `uid 기록 ${tokenUidRatio.withUid}/${tokenUidRatio.total}건 (${pct(tokenUidRatio.withUid, tokenUidRatio.total)})` : undefined}
+              />
               <StatCard
                 label="푸시 발송 로그"
                 value={stats.pushLogCount === null ? "–" : `${stats.pushLogCount}건`}
@@ -290,6 +381,17 @@ export default function AdminStats({ onBack, onLogout }) {
                 value={stats.admins === null ? "–" : `${stats.admins.length}명`}
                 sub="로그인 기록 기준"
               />
+              {excludeAdmins && excludedAdminCount > 0 && (
+                <StatCard
+                  label="운영진 제외"
+                  value={`${excludedAdminCount}명`}
+                  sub={`admins 컬렉션 uid 기준${
+                    adminUidSet.size > excludedAdminCount
+                      ? ` (닉네임 없는 운영진 ${adminUidSet.size - excludedAdminCount}명은 이미 참여자 밖)`
+                      : ""
+                  }`}
+                />
+              )}
             </div>
             {stats.admins?.length > 0 && (
               <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
@@ -312,6 +414,38 @@ export default function AdminStats({ onBack, onLogout }) {
               </div>
             )}
             <BarList title="플랫폼 (참여자 기준)" rows={stats.platformRows} />
+
+            {/* 등록 명단 기준 비율 */}
+            {EXPECTED > 0 && (
+              <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
+                <p className="mb-2 text-[11px] font-semibold text-ink-faint">
+                  등록 명단 {EXPECTED}명 기준
+                </p>
+                <div className="grid grid-cols-2 gap-2 text-[13px]">
+                  <div>
+                    <span className="text-ink-faint">앱 사용률</span>
+                    <span className="ml-1 font-semibold text-ink">{pct(stats.participants, EXPECTED)}</span>
+                  </div>
+                  <div>
+                    <span className="text-ink-faint">설치율</span>
+                    <span className="ml-1 font-semibold text-ink">{pct(stats.installs, EXPECTED)}</span>
+                  </div>
+                  <div>
+                    <span className="text-ink-faint">3일+ 방문</span>
+                    <span className="ml-1 font-semibold text-ink">
+                      {pct(
+                        (stats.retentionRows[2]?.[1] ?? 0) + (stats.retentionRows[3]?.[1] ?? 0),
+                        EXPECTED,
+                      )}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-ink-faint">푸시 허용</span>
+                    <span className="ml-1 font-semibold text-ink">{pct(stats.pushGranted, EXPECTED)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </Section>
 
           {stats.events.length === 0 ? (
@@ -372,6 +506,53 @@ export default function AdminStats({ onBack, onLogout }) {
                 <BarList title="외부 링크 이동" rows={stats.externalRows} />
               </Section>
 
+              {/* 공지당 도달 (#4) */}
+              <Section title="공지당 도달">
+                {annReachSummary ? (
+                  <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
+                      <StatCard
+                        label="공지당 평균 열람자"
+                        value={`${annReachSummary.avgViewers.toFixed(1)}명`}
+                        sub={`중앙값 ${annReachSummary.medianViewers}명 · 전체 ${annReachSummary.totalAnn}건`}
+                      />
+                      <StatCard
+                        label="공지당 평균 열람률"
+                        value={annReachSummary.avgReachRate}
+                        sub={`평균 열람자 / 참여자 ${stats.participants}명`}
+                      />
+                    </div>
+                    {(annReachSummary.pinnedCount > 0 || annReachSummary.normalCount > 0) && (
+                      <div className="grid grid-cols-2 gap-2">
+                        {annReachSummary.pinnedCount > 0 && (
+                          <StatCard
+                            label="📌 고정 공지 평균"
+                            value={`${annReachSummary.pinnedAvg.toFixed(1)}명`}
+                            sub={`${annReachSummary.pinnedCount}건 · 상단 상시 노출`}
+                          />
+                        )}
+                        {annReachSummary.normalCount > 0 && (
+                          <StatCard
+                            label="일반 공지 평균"
+                            value={`${annReachSummary.normalAvg.toFixed(1)}명`}
+                            sub={`${annReachSummary.normalCount}건`}
+                          />
+                        )}
+                      </div>
+                    )}
+                    {annReachSummary.deletedViewers > 0 && (
+                      <p className="text-[11px] text-ink-faint">
+                        ※ 삭제된 공지 열람 {annReachSummary.deletedViewers}건은 평균에서 제외
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="rounded-2xl border border-basil-100 bg-white p-5 text-sm text-ink-soft">
+                    공지 열람 데이터가 없습니다.
+                  </p>
+                )}
+              </Section>
+
               {/* 공지별 열람 */}
               <Section title="공지별 열람">
                 {stats.annPerRows.length === 0 ? (
@@ -386,7 +567,9 @@ export default function AdminStats({ onBack, onLogout }) {
                           key={r.id}
                           className="flex items-center justify-between gap-2 text-[13px]"
                         >
-                          <span className="min-w-0 truncate text-ink">{r.title}</span>
+                          <span className="min-w-0 truncate text-ink">
+                            {r.pinned && "📌 "}{r.title}
+                          </span>
                           <span className="shrink-0 text-ink-faint">
                             열람 {r.viewers}명 · 총 {r.total}회
                           </span>
@@ -403,8 +586,24 @@ export default function AdminStats({ onBack, onLogout }) {
                   rows={stats.retentionRows}
                   emptyText="아직 방문 데이터가 없습니다."
                 />
+                {EXPECTED > 0 && (
+                  <p className="text-[11px] text-ink-faint">
+                    등록 명단 기준 3일+ 방문: {pct(
+                      (stats.retentionRows[2]?.[1] ?? 0) + (stats.retentionRows[3]?.[1] ?? 0),
+                      EXPECTED,
+                    )}
+                  </p>
+                )}
               </Section>
             </>
+          )}
+
+          {/* 기간 필터 각주 */}
+          {!all && (
+            <p className="text-[10px] text-ink-faint">
+              * users 문서에 생성 시각(createdAt)이 없어, 해당 uid의 첫 app_open 이벤트 날짜를 기간 판정 대용값으로 사용합니다.
+              이벤트가 전혀 없는 사용자 {excludedByDateCount}명은 기간 내 분모에서 제외됐습니다.
+            </p>
           )}
         </>
       )}
@@ -412,21 +611,67 @@ export default function AdminStats({ onBack, onLogout }) {
   );
 }
 
+/* === 기간별 users 필터 (#1) === */
+
+// 전체 이벤트에서 uid별 첫 app_open 날짜를 추출 (users에 createdAt이 없으므로 대용값)
+function buildUidFirstDay(allEvents) {
+  const map = new Map(); // uid → earliest day
+  allEvents.forEach((e) => {
+    if (e.name === "app_open" && e.uid && e.day) {
+      const prev = map.get(e.uid);
+      if (!prev || e.day < prev) map.set(e.uid, e.day);
+    }
+  });
+  return map;
+}
+
+// users를 기간 필터링. 기준일 = 첫 app_open day. 없으면 제외.
+function filterUsersByPeriod(users, uidFirstDay, all, start, end) {
+  if (all) return { filteredUsers: users, excludedByDateCount: 0 };
+  const filtered = [];
+  let excluded = 0;
+  users.forEach((u) => {
+    if (!u.nickname) { filtered.push(u); return; } // 닉네임 없는 유저는 어차피 참여자 아님
+    const day = uidFirstDay.get(u.id);
+    if (!day) { excluded += 1; return; } // 이벤트 없음 → 제외
+    if (day >= start && day <= end) {
+      filtered.push(u);
+    } else {
+      excluded += 1;
+    }
+  });
+  return { filteredUsers: filtered, excludedByDateCount: excluded };
+}
+
+/* === 운영진 제외 (#2) === */
+
+// admins 컬렉션 uid로 users 필터. 문서 ID = uid (useAuth.jsx:44 확인).
+function filterOutAdmins(users, adminUidSet) {
+  if (adminUidSet.size === 0) return { users, excludedAdminCount: 0 };
+  const filtered = [];
+  let count = 0;
+  users.forEach((u) => {
+    if (adminUidSet.has(u.id) && u.nickname) {
+      count += 1; // 닉네임 있는 운영진만 카운트 (없으면 어차피 참여자 아님)
+    } else {
+      filtered.push(u);
+    }
+  });
+  return { users: filtered, excludedAdminCount: count };
+}
+
 /* === Identity merge: nickname+mokjang 기준으로 uid를 사람(person)에 묶는다 === */
 
-// 정규화: trim, 연속 공백→하나, NFC, 영문 소문자
 function normalizeStr(s) {
   if (!s) return "";
   return s.trim().replace(/\s+/g, " ").normalize("NFC").toLowerCase();
 }
 
-// users 문서 배열 → { uidToPersonId, persons, mergedGroups, totalProfiles }
 function buildIdentityMap(users) {
   const withNick = users.filter((u) => u.nickname);
   const totalProfiles = withNick.length;
 
-  // 병합 키: 정규화 nickname + mokjang. mokjang 없으면 nickname 단독.
-  const groups = new Map(); // key → { nickname, mokjang, uids[] }
+  const groups = new Map();
   withNick.forEach((u) => {
     const nn = normalizeStr(u.nickname);
     const mj = normalizeStr(u.mokjang || "");
@@ -442,9 +687,8 @@ function buildIdentityMap(users) {
     groups.get(key).uids.push(u.id);
   });
 
-  // uid → personId 매핑
   const uidToPersonId = new Map();
-  const persons = []; // { personId, nickname, mokjang, uids[] }
+  const persons = [];
   let pid = 0;
   groups.forEach((g) => {
     const personId = `p${pid++}`;
@@ -452,12 +696,67 @@ function buildIdentityMap(users) {
     persons.push({ personId, nickname: g.nickname, mokjang: g.mokjang, uids: g.uids });
   });
 
-  // 다중 uid 그룹만 추출 (병합 내역 표시용), uid 수 내림차순
   const mergedGroups = [...groups.values()]
     .filter((g) => g.uids.length > 1)
     .sort((a, b) => b.uids.length - a.uids.length);
 
   return { uidToPersonId, persons, mergedGroups, totalProfiles };
+}
+
+/* === 공지당 도달 요약 (#4) === */
+
+function computeAnnReachSummary(annPerRows, announcements, participants) {
+  if (!annPerRows || annPerRows.length === 0) return null;
+
+  const annMap = new Map((announcements ?? []).map((a) => [a.id, a]));
+
+  // 삭제된 공지 분리
+  const existing = [];
+  let deletedViewers = 0;
+  annPerRows.forEach((r) => {
+    if (r.title === "(삭제된 공지)") {
+      deletedViewers += r.viewers;
+    } else {
+      existing.push(r);
+    }
+  });
+
+  if (existing.length === 0) return { totalAnn: 0, avgViewers: 0, medianViewers: 0, avgReachRate: "–", pinnedCount: 0, pinnedAvg: 0, normalCount: 0, normalAvg: 0, deletedViewers };
+
+  const viewers = existing.map((r) => r.viewers);
+  const avgViewers = viewers.reduce((s, v) => s + v, 0) / viewers.length;
+  const sorted = [...viewers].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const medianViewers = sorted.length % 2 === 0
+    ? Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+    : sorted[mid];
+  const avgReachRate = participants > 0 ? pct(Math.round(avgViewers), participants) : "–";
+
+  // 고정 / 일반 분리
+  const pinned = [];
+  const normal = [];
+  existing.forEach((r) => {
+    const ann = annMap.get(r.id);
+    if (ann?.pinned) {
+      pinned.push(r.viewers);
+    } else {
+      normal.push(r.viewers);
+    }
+  });
+  const pinnedAvg = pinned.length > 0 ? pinned.reduce((s, v) => s + v, 0) / pinned.length : 0;
+  const normalAvg = normal.length > 0 ? normal.reduce((s, v) => s + v, 0) / normal.length : 0;
+
+  return {
+    totalAnn: existing.length,
+    avgViewers,
+    medianViewers,
+    avgReachRate,
+    pinnedCount: pinned.length,
+    pinnedAvg,
+    normalCount: normal.length,
+    normalAvg,
+    deletedViewers,
+  };
 }
 
 /* === 사람 단위 집계 === */
@@ -471,21 +770,19 @@ function computePersonStats({
   announcements,
   uidToPersonId,
   persons,
+  excludeUidSet,
 }) {
-  const byName = (name) => events.filter((e) => e.name === name);
+  const byName = (name) => events.filter((e) => e.name === name && !excludeUidSet.has(e.uid));
   const participants = persons.length;
-
-  // uid → personId 변환 헬퍼. 매핑 없는 uid는 null 반환.
   const toPerson = (uid) => uidToPersonId.get(uid) ?? null;
 
-  // 설치: person에 속한 uid 중 하나라도 standalone app_open이 있으면 설치.
+  // 설치
   const standaloneUids = new Set(
     byName("app_open")
       .filter((e) => e.standalone === true && e.uid)
       .map((e) => e.uid)
   );
   const installedPersons = new Set();
-  // 미식별 설치: standalone이지만 uidToPersonId에 없는 uid
   const unidentifiedInstallUids = new Set();
   standaloneUids.forEach((uid) => {
     const pid = toPerson(uid);
@@ -498,8 +795,7 @@ function computePersonStats({
   const installs = installedPersons.size;
   const unidentifiedInstalls = unidentifiedInstallUids.size;
 
-  // 온보딩 완료율:
-  // 방문 person = app_open uid 중 person에 매핑되는 것 + 미식별 uid는 각각 1인
+  // 온보딩 완료율
   const visitorUids = new Set(byName("app_open").map((e) => e.uid).filter(Boolean));
   const visitedPersons = new Set();
   let unidentifiedVisitors = 0;
@@ -512,14 +808,12 @@ function computePersonStats({
     }
   });
   const onboardVisitors = visitedPersons.size + unidentifiedVisitors;
-  // 온보딩 완료 = 닉네임 등록 person (= persons 전체, 이미 닉네임이 있는 uid만 병합했으므로)
-  // 방문한 person 중 닉네임이 있는 person
   const onboardCompleted = visitedPersons.size;
 
-  // 플랫폼: person별 마지막 관측 platform
+  // 플랫폼
   const personPlatform = new Map();
   events.forEach((e) => {
-    if (!e.uid) return;
+    if (!e.uid || excludeUidSet.has(e.uid)) return;
     const pid = toPerson(e.uid);
     if (pid) personPlatform.set(pid, e.platform ?? "other");
   });
@@ -533,7 +827,7 @@ function computePersonStats({
     ["기타", platformCount.other],
   ];
 
-  // 푸시 권한: person 단위
+  // 푸시 권한
   const perm = byName("push_permission");
   const askedPersons = new Set();
   const grantedPersons = new Set();
@@ -547,13 +841,13 @@ function computePersonStats({
   const pushAsked = askedPersons.size;
   const pushGranted = grantedPersons.size;
 
-  // 일자별: DAU는 person 단위
+  // 일자별
   const days = [...new Set(events.map((e) => e.day).filter(Boolean))].sort();
   const daily = days.map((day) => {
     const dayEvents = events.filter((e) => e.day === day);
     const dauPersons = new Set();
     dayEvents
-      .filter((e) => e.name === "app_open" && e.uid)
+      .filter((e) => e.name === "app_open" && e.uid && !excludeUidSet.has(e.uid))
       .forEach((e) => {
         const pid = toPerson(e.uid);
         if (pid) dauPersons.add(pid);
@@ -561,13 +855,13 @@ function computePersonStats({
     return {
       day,
       dau: dauPersons.size,
-      sessions: distinct(dayEvents.map((e) => e.sessionId).filter(Boolean)),
-      pageViews: dayEvents.filter((e) => e.name === "page_view").length,
+      sessions: distinct(dayEvents.filter((e) => !excludeUidSet.has(e.uid)).map((e) => e.sessionId).filter(Boolean)),
+      pageViews: dayEvents.filter((e) => e.name === "page_view" && !excludeUidSet.has(e.uid)).length,
     };
   });
 
-  // 조 편성: person 단위 (person에 속한 uid 중 하나라도 teams가 있으면 완료)
-  const personTeams = new Map(); // personId → { round1, round2, round3 }
+  // 조 편성
+  const personTeams = new Map();
   users.forEach((u) => {
     if (!u.nickname) return;
     const pid = toPerson(u.id);
@@ -585,7 +879,7 @@ function computePersonStats({
     (t) => t.round1 || t.round2 || t.round3
   ).length;
 
-  // 공지 열람: person 단위
+  // 공지 열람
   const annEvents = byName("announcement_view");
   const annViews = annEvents.length;
   const annViewerPersons = new Set();
@@ -599,8 +893,8 @@ function computePersonStats({
   const liveRows = countBy(byName("live_link_click"), (e) => e.params?.type);
   const externalRows = countBy(byName("external_open"), (e) => e.params?.target);
 
-  // 공지별 열람: person 단위
-  const annTitle = new Map((announcements ?? []).map((a) => [a.id, a.title]));
+  // 공지별 열람
+  const annTitleMap = new Map((announcements ?? []).map((a) => [a.id, a]));
   const annById = new Map();
   annEvents.forEach((e) => {
     const id = e.params?.id;
@@ -614,24 +908,28 @@ function computePersonStats({
     }
   });
   const annPerRows = [...annById.entries()]
-    .map(([id, r]) => ({
-      id,
-      title: annTitle.get(id) ?? "(삭제된 공지)",
-      viewers: r.persons.size,
-      total: r.total,
-    }))
+    .map(([id, r]) => {
+      const ann = annTitleMap.get(id);
+      return {
+        id,
+        title: ann?.title ?? "(삭제된 공지)",
+        pinned: ann?.pinned ?? false,
+        viewers: r.persons.size,
+        total: r.total,
+      };
+    })
     .sort((a, b) => b.viewers - a.viewers || b.total - a.total);
 
-  // 리텐션: person별 방문 distinct day 수
+  // 리텐션
   const personDays = new Map();
   events.forEach((e) => {
-    if (!e.uid || !e.day) return;
+    if (!e.uid || !e.day || excludeUidSet.has(e.uid)) return;
     const pid = toPerson(e.uid);
     if (!pid) return;
     if (!personDays.has(pid)) personDays.set(pid, new Set());
     personDays.get(pid).add(e.day);
   });
-  const buckets = [0, 0, 0, 0]; // 1일 / 2일 / 3일 / 4일+
+  const buckets = [0, 0, 0, 0];
   personDays.forEach((set) => {
     buckets[Math.min(set.size, 4) - 1] += 1;
   });
@@ -681,14 +979,11 @@ function countBy(items, keyFn) {
   return [...map.entries()].sort((a, b) => b[1] - a[1]);
 }
 
-function computeStats({ events, users, tokenCount, pushLogCount, admins, announcements }) {
+function computeStats({ events, users, tokenCount, pushLogCount, admins, announcements, excludeUidSet }) {
   const participants = users.filter((u) => u.nickname).length;
 
-  const byName = (name) => events.filter((e) => e.name === name);
+  const byName = (name) => events.filter((e) => e.name === name && !excludeUidSet.has(e.uid));
 
-  // 설치: app_open 중 standalone(설치 실행)인 고유 uid ∩ 현재 참여자.
-  // 설치당 1회인 install_detected와 달리 앱을 열 때마다 찍히므로,
-  // 이벤트를 지워도 사용자가 앱을 다시 열면 자동 회복된다. 삭제된 유저는 분자에서 자동 제외.
   const participantUids = new Set(users.filter((u) => u.nickname).map((u) => u.id));
   const installs = [
     ...new Set(
@@ -699,17 +994,14 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     ),
   ].filter((uid) => participantUids.has(uid)).length;
 
-  // 온보딩 완료율: 앱을 연 방문자(app_open 고유 uid) 중 온보딩(닉네임 등록)까지 마친 비율.
-  // users 문서는 온보딩해야 생기므로 전체 users를 분모로 쓰면 항상 100%라 의미가 없다.
   const visitorUids = new Set(byName("app_open").map((e) => e.uid).filter(Boolean));
   const onboardVisitors = visitorUids.size;
   const onboardCompleted = [...visitorUids].filter((uid) => participantUids.has(uid)).length;
 
-  // 플랫폼: 현재 참여자 uid별 마지막 관측 platform으로 분해.
-  // 삭제된 유저·유령 uid를 제외해 합계가 참여자 수를 넘지 않는다.
   const uidPlatform = new Map();
   events.forEach((e) => {
-    if (e.uid && participantUids.has(e.uid)) uidPlatform.set(e.uid, e.platform ?? "other");
+    if (e.uid && participantUids.has(e.uid) && !excludeUidSet.has(e.uid))
+      uidPlatform.set(e.uid, e.platform ?? "other");
   });
   const platformCount = { ios: 0, android: 0, other: 0 };
   uidPlatform.forEach((p) => {
@@ -721,17 +1013,15 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     ["기타", platformCount.other],
   ];
 
-  // 푸시 권한: push_permission 이벤트 기준 고유 uid
   const perm = byName("push_permission");
   const pushAsked = distinct(perm.map((e) => e.uid).filter(Boolean));
   const pushGranted = distinct(
     perm.filter((e) => e.params?.result === "granted").map((e) => e.uid).filter(Boolean)
   );
 
-  // 일자별: DAU(app_open 고유 uid) · 세션(고유 sessionId) · 화면 조회(page_view 수)
   const days = [...new Set(events.map((e) => e.day).filter(Boolean))].sort();
   const daily = days.map((day) => {
-    const dayEvents = events.filter((e) => e.day === day);
+    const dayEvents = events.filter((e) => e.day === day && !excludeUidSet.has(e.uid));
     return {
       day,
       dau: distinct(
@@ -742,7 +1032,6 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     };
   });
 
-  // 조 편성: users.teams 기준
   const teamRounds = [1, 2, 3].map(
     (n) => users.filter((u) => u.nickname && u.teams?.[`round${n}`]).length
   );
@@ -750,15 +1039,13 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     (u) => u.nickname && (u.teams?.round1 || u.teams?.round2 || u.teams?.round3)
   ).length;
 
-  // 공지 열람 / 라이브 링크 / 외부 링크
   const annEvents = byName("announcement_view");
   const annViews = annEvents.length;
   const annViewers = distinct(annEvents.map((e) => e.uid).filter(Boolean));
   const liveRows = countBy(byName("live_link_click"), (e) => e.params?.type);
   const externalRows = countBy(byName("external_open"), (e) => e.params?.target);
 
-  // 공지별 열람: params.id별 열람 인원(고유 uid)·총 열람 횟수. 제목은 announcements에서 매핑.
-  const annTitle = new Map((announcements ?? []).map((a) => [a.id, a.title]));
+  const annTitleMap = new Map((announcements ?? []).map((a) => [a.id, a]));
   const annById = new Map();
   annEvents.forEach((e) => {
     const id = e.params?.id;
@@ -769,22 +1056,25 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     if (e.uid) rec.uids.add(e.uid);
   });
   const annPerRows = [...annById.entries()]
-    .map(([id, r]) => ({
-      id,
-      title: annTitle.get(id) ?? "(삭제된 공지)",
-      viewers: r.uids.size,
-      total: r.total,
-    }))
+    .map(([id, r]) => {
+      const ann = annTitleMap.get(id);
+      return {
+        id,
+        title: ann?.title ?? "(삭제된 공지)",
+        pinned: ann?.pinned ?? false,
+        viewers: r.uids.size,
+        total: r.total,
+      };
+    })
     .sort((a, b) => b.viewers - a.viewers || b.total - a.total);
 
-  // 리텐션: uid별 방문 distinct day 수 → 1/2/3/4일+ 분포
   const uidDays = new Map();
   events.forEach((e) => {
-    if (!e.uid || !e.day) return;
+    if (!e.uid || !e.day || excludeUidSet.has(e.uid)) return;
     if (!uidDays.has(e.uid)) uidDays.set(e.uid, new Set());
     uidDays.get(e.uid).add(e.day);
   });
-  const buckets = [0, 0, 0, 0]; // 1일 / 2일 / 3일 / 4일+
+  const buckets = [0, 0, 0, 0];
   uidDays.forEach((set) => {
     buckets[Math.min(set.size, 4) - 1] += 1;
   });
@@ -806,7 +1096,7 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     pushGranted,
     tokenCount,
     pushLogCount,
-    admins: admins ?? null, // 현재 상태값 — 날짜 필터 대상 아님
+    admins: admins ?? null,
     daily,
     teamRounds,
     teamAny,
@@ -823,7 +1113,6 @@ function pct(a, b) {
   return b > 0 ? `${Math.round((a / b) * 100)}%` : "–";
 }
 
-// Firestore Timestamp → "M. D. HH:mm" (없으면 빈 문자열)
 function fmtTs(ts) {
   const d = ts?.toDate?.();
   if (!d) return "";
@@ -853,12 +1142,11 @@ function StatCard({ label, value, sub }) {
     <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
       <p className="text-[11px] font-semibold text-ink-faint">{label}</p>
       <p className="mt-1 text-xl font-bold text-title">{value}</p>
-      {sub && <p className="mt-0.5 break-keep text-[11px] text-ink-faint">{sub}</p>}
+      {sub && <p className="mt-0.5 whitespace-pre-line break-keep text-[11px] text-ink-faint">{sub}</p>}
     </div>
   );
 }
 
-// 라벨·수·막대 목록. rows: [label, count][]
 function BarList({ title, rows, emptyText = "데이터가 없습니다." }) {
   const max = Math.max(...rows.map(([, c]) => c), 1);
   const total = rows.reduce((s, [, c]) => s + c, 0);
