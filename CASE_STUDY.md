@@ -159,7 +159,7 @@ PWA 역시 완전한 해법은 아니었으며, **미해결로 남긴 설치 마
 
 ## 8. 결과 — 가설 검증
 
-![운영 지표](docs/camp_metrics_v4.png)
+![운영 지표](docs/camp_metrics_v5.png)
 
 ### 집계 기준의 재정의
 
