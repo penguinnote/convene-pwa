@@ -11,6 +11,10 @@ export const INSTANCE = {
   slogan: "아담아, 네가 어디 있느냐?", // 대표 표어(h1)
   sloganEn: "Where are you?", // 이탤릭 영문 표어
 
+  // 행사 등록 명단 기준 실참가 인원. 앱 데이터가 아니라 외부 명단 기준값.
+  // 설정하면 통계(AdminStats)에서 등록 명단 대비 비율을 병기한다. 0이면 표시하지 않는다.
+  expectedParticipants: 96,
+
   // 외부 링크
   photosAlbumUrl: "https://photos.app.goo.gl/nZAFegzZbWZtQnx8A",
 
