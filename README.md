@@ -304,9 +304,19 @@ export const INSTANCE = {
 
 ## 9. 스크린샷
 
+**참가자 화면**
+
 | 홈 | 일정 | 공지 푸시 |
 |---|---|---|
 | ![home](docs/home.png) | ![schedule](docs/schedule.png) | ![push](docs/push.png) |
+
+**관리자 통계 대시보드**
+
+자체 이벤트 로그를 집계해 직접 구축했다. uid 기준과 사람 기준을 전환하고, 운영진을 제외하며, 병합 내역을 확인하고, 등록 명단 대비 비율을 함께 표시한다.
+
+| 개요 · 사람 단위 병합 | 공지당 도달 |
+|---|---|
+| ![관리자 통계 개요](docs/admin-stats-overview.png) | ![공지당 도달](docs/admin-stats-reach.png) |
 
 ---
 
