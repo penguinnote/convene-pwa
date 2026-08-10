@@ -6,8 +6,10 @@ import { logEvent } from "../lib/track";
 const KEY_DISMISSED = "installHint:dismissed";
 const KEY_SNOOZE = "installHint:snoozeUntil";
 
-// 스누즈 기간: 24시간
-const SNOOZE_MS = 24 * 60 * 60 * 1000;
+// 스누즈 기간: 1시간
+// 캠프가 3박 4일뿐이라 24시간 스누즈는 노출 기회가 3~4회에 그친다.
+// 영구 차단은 '다시 보지 않기'가 담당하므로 스누즈는 짧게 둔다.
+const SNOOZE_MS = 60 * 60 * 1000;
 
 function detectPlatform() {
   const ua = navigator.userAgent;
