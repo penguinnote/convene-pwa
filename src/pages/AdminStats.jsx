@@ -22,6 +22,7 @@ export default function AdminStats({ onBack, onLogout }) {
   const [mode, setMode] = useState("person"); // "uid" | "person"
   const [mergeOpen, setMergeOpen] = useState(false);
   const [excludeAdmins, setExcludeAdmins] = useState(true);
+  const [unidOpen, setUnidOpen] = useState(false); // 미식별 uid 진단 접이식
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -67,37 +68,32 @@ export default function AdminStats({ onBack, onLogout }) {
       : data.events.filter((e) => e.day && e.day >= start && e.day <= end)
     : null;
 
-  // uid별 첫 app_open day (users에 createdAt이 없으므로 대용값)
-  const uidFirstDay = data
-    ? buildUidFirstDay(data.events)
-    : new Map();
+  // 기간 내 활동(app_open) 있는 uid 집합. 전체 모드면 null(필터 없음).
+  const activeUidSet = data && !all
+    ? buildActiveUidSet(filteredEvents)
+    : null;
 
   // 운영진 uid 집합 (admins 문서 ID = uid)
   const adminUidSet = data?.admins
     ? new Set(data.admins.map((a) => a.uid))
     : new Set();
 
-  // 기간 내 users 필터 (전체 모드면 전부 포함)
-  const { filteredUsers, excludedByDateCount } = data
-    ? filterUsersByPeriod(data.users, uidFirstDay, all, start, end)
-    : { filteredUsers: [], excludedByDateCount: 0 };
-
-  // 운영진 제외
-  const { users: activeUsers, excludedAdminCount } = excludeAdmins
-    ? filterOutAdmins(filteredUsers, adminUidSet)
-    : { users: filteredUsers, excludedAdminCount: 0 };
-  const allUsersCount = data
-    ? data.users.filter((u) => u.nickname).length
-    : 0;
-
   // 운영진 uid를 이벤트·병합에도 일관 적용하기 위한 제외 셋
   const excludeUidSet = excludeAdmins ? adminUidSet : new Set();
 
-  // uid 기준 집계
+  // --- uid 기준 ---
+  // users를 활동 기준으로 필터 → 운영진 제외 → 집계
+  const { filteredUsers: uidFilteredUsers, excludedByActivityCount: uidExcludedByActivity } = data
+    ? filterUsersByActivity(data.users, activeUidSet)
+    : { filteredUsers: [], excludedByActivityCount: 0 };
+  const { users: uidActiveUsers, excludedAdminCount: uidAdminExcluded } = excludeAdmins
+    ? filterOutAdmins(uidFilteredUsers, adminUidSet)
+    : { users: uidFilteredUsers, excludedAdminCount: 0 };
+
   const uidStats = data
     ? computeStats({
         events: filteredEvents,
-        users: activeUsers,
+        users: uidActiveUsers,
         tokenCount: data.tokenCount,
         pushLogCount: data.pushLogCount,
         admins: data.admins,
@@ -106,22 +102,37 @@ export default function AdminStats({ onBack, onLogout }) {
       })
     : null;
 
-  // 사람 기준 집계
-  const mergeResult = data ? buildIdentityMap(activeUsers) : null;
+  // --- 사람 기준 ---
+  // 1. 운영진 제외 (병합 전)
+  const { users: nonAdminUsers, excludedAdminCount } = data
+    ? excludeAdmins
+      ? filterOutAdmins(data.users, adminUidSet)
+      : { users: data.users, excludedAdminCount: 0 }
+    : { users: [], excludedAdminCount: 0 };
+  // 2. 전체 users를 병합 (활동 필터 전 — person에 모든 uid를 묶어야 함)
+  const mergeResult = data ? buildIdentityMap(nonAdminUsers) : null;
+  // 3. 병합 후 활동 필터: person에 속한 uid 중 하나라도 기간 내 app_open이 있으면 포함
+  const { activePersons, activeUidToPersonId, excludedPersonCount } = mergeResult
+    ? filterPersonsByActivity(mergeResult, activeUidSet)
+    : { activePersons: [], activeUidToPersonId: new Map(), excludedPersonCount: 0 };
+  // 4. 집계
   const personStats =
     data && mergeResult
       ? computePersonStats({
           events: filteredEvents,
-          users: activeUsers,
+          users: nonAdminUsers,
           tokenCount: data.tokenCount,
           pushLogCount: data.pushLogCount,
           admins: data.admins,
           announcements: data.announcements,
-          uidToPersonId: mergeResult.uidToPersonId,
-          persons: mergeResult.persons,
+          uidToPersonId: activeUidToPersonId,
+          persons: activePersons,
           excludeUidSet,
         })
       : null;
+
+  // 현재 모드에 맞는 제외 인원 수
+  const excludedByActivityCount = mode === "person" ? excludedPersonCount : uidExcludedByActivity;
 
   const stats = mode === "person" ? personStats : uidStats;
 
@@ -199,9 +210,9 @@ export default function AdminStats({ onBack, onLogout }) {
             className="min-w-0 flex-1 rounded-xl border border-basil-100 bg-basil-50 px-3 py-2 text-sm text-ink"
           />
         </div>
-        {!all && excludedByDateCount > 0 && (
+        {!all && excludedByActivityCount > 0 && (
           <p className="text-[11px] text-ink-faint">
-            ※ 기간 외 참여자 {excludedByDateCount}명 제외 (첫 app_open 이벤트 날짜 기준 대용값*)
+            ※ 기간 내 활동(app_open) 기록이 없는 참여자 {excludedByActivityCount}명 제외
           </p>
         )}
       </div>
@@ -259,7 +270,7 @@ export default function AdminStats({ onBack, onLogout }) {
                     label="병합 요약"
                     value={`${mergeResult.persons.length}명`}
                     sub={`프로필 ${mergeResult.totalProfiles}건 → 사람 ${mergeResult.persons.length}명 (중복 ${mergeResult.totalProfiles - mergeResult.persons.length}건 병합)${
-                      !all ? `\n기간 내 ${stats.participants}명 / 전체 ${allUsersCount}명` : ""
+                      !all ? `\n기간 내 활동 ${activePersons.length}명 / 전체 ${mergeResult.persons.length}명(사람)` : ""
                     }`}
                   />
                   {personStats.unidentifiedInstalls > 0 && (
@@ -269,7 +280,39 @@ export default function AdminStats({ onBack, onLogout }) {
                       sub="프로필 미등록 설치 uid"
                     />
                   )}
+                  {personStats.unidentifiedUidCount > 0 && (
+                    <StatCard
+                      label="미식별 uid"
+                      value={`${personStats.unidentifiedUidCount}개`}
+                      sub="병합 불가 · 사람 단위 지표에서 제외"
+                    />
+                  )}
                 </div>
+                {/* 미식별 uid 이벤트 분포 진단 */}
+                {personStats.unidentifiedUidCount > 0 && (
+                  <div className="rounded-2xl border border-basil-100 bg-white">
+                    <button
+                      type="button"
+                      onClick={() => setUnidOpen((v) => !v)}
+                      className="flex w-full items-center justify-between p-3.5 text-left"
+                    >
+                      <span className="text-[11px] font-semibold text-ink-faint">
+                        미식별 uid 진단 (이벤트 수 분포)
+                      </span>
+                      <span className="text-[12px] text-ink-faint">
+                        {unidOpen ? "▲ 접기" : "▼ 펼치기"}
+                      </span>
+                    </button>
+                    {unidOpen && (
+                      <div className="border-t border-basil-100 p-3.5">
+                        <BarList rows={personStats.unidentifiedDistribution} />
+                        <p className="mt-2 text-[11px] text-ink-faint">
+                          1~2건: 중복 uid·이탈 가능성 높음 · 10건+: 실제 미등록 사용자 가능성
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                )}
                 {/* 병합 내역 접이식 */}
                 <div className="rounded-2xl border border-basil-100 bg-white">
                   <button
@@ -347,19 +390,13 @@ export default function AdminStats({ onBack, onLogout }) {
                     : ""
                 }`}
               />
-              <StatCard
-                label="온보딩 완료율"
-                value={pct(stats.onboardCompleted, stats.onboardVisitors)}
-                sub={
-                  mode === "person"
-                    ? `완료 ${stats.onboardCompleted} / 방문 ${stats.onboardVisitors}${
-                        personStats?.unidentifiedVisitors
-                          ? ` (미식별 ${personStats.unidentifiedVisitors} 포함)`
-                          : ""
-                      }`
-                    : `완료 ${stats.onboardCompleted} / 방문 ${stats.onboardVisitors}`
-                }
-              />
+              {EXPECTED > 0 && (
+                <StatCard
+                  label="앱 사용률"
+                  value={pct(stats.participants, EXPECTED)}
+                  sub={`등록 명단 ${EXPECTED}명 중 ${stats.participants}명이 프로필 등록`}
+                />
+              )}
               <StatCard
                 label="푸시 권한 허용률"
                 value={pct(stats.pushGranted, stats.pushAsked)}
@@ -502,6 +539,32 @@ export default function AdminStats({ onBack, onLogout }) {
                     sub={`${stats.annViewers}명이 열람`}
                   />
                 </div>
+                {/* 설치 안내 전환율 */}
+                {stats.installHint && stats.installHint.shown > 0 && (
+                  <div className="rounded-2xl border border-basil-100 bg-white p-3.5">
+                    <p className="mb-2 text-[11px] font-semibold text-ink-faint">
+                      설치 안내 팝업 전환
+                    </p>
+                    <div className="grid grid-cols-3 gap-2 text-center text-[13px]">
+                      <div>
+                        <p className="font-semibold text-ink">{stats.installHint.shown}</p>
+                        <p className="text-[11px] text-ink-faint">노출</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-ink">{stats.installHint.prompted}</p>
+                        <p className="text-[11px] text-ink-faint">설치 시도</p>
+                      </div>
+                      <div>
+                        <p className="font-semibold text-ink">{stats.installHint.accepted}</p>
+                        <p className="text-[11px] text-ink-faint">설치 완료</p>
+                      </div>
+                    </div>
+                    <div className="mt-2 grid grid-cols-2 gap-2 text-[11px] text-ink-faint">
+                      <span>닫기 {stats.installHint.closed} · 나중에 {stats.installHint.snoozed}</span>
+                      <span className="text-right">다시 보지 않기 {stats.installHint.dismissed}</span>
+                    </div>
+                  </div>
+                )}
                 <BarList title="라이브 링크 클릭" rows={stats.liveRows} />
                 <BarList title="외부 링크 이동" rows={stats.externalRows} />
               </Section>
@@ -599,10 +662,9 @@ export default function AdminStats({ onBack, onLogout }) {
           )}
 
           {/* 기간 필터 각주 */}
-          {!all && (
+          {!all && excludedByActivityCount > 0 && (
             <p className="text-[10px] text-ink-faint">
-              * users 문서에 생성 시각(createdAt)이 없어, 해당 uid의 첫 app_open 이벤트 날짜를 기간 판정 대용값으로 사용합니다.
-              이벤트가 전혀 없는 사용자 {excludedByDateCount}명은 기간 내 분모에서 제외됐습니다.
+              * 기간 내 app_open 이벤트가 없는 참여자 {excludedByActivityCount}명은 분모에서 제외됐습니다.
             </p>
           )}
         </>
@@ -611,36 +673,58 @@ export default function AdminStats({ onBack, onLogout }) {
   );
 }
 
-/* === 기간별 users 필터 (#1) === */
+/* === 기간별 활동 필터 === */
 
-// 전체 이벤트에서 uid별 첫 app_open 날짜를 추출 (users에 createdAt이 없으므로 대용값)
-function buildUidFirstDay(allEvents) {
-  const map = new Map(); // uid → earliest day
-  allEvents.forEach((e) => {
-    if (e.name === "app_open" && e.uid && e.day) {
-      const prev = map.get(e.uid);
-      if (!prev || e.day < prev) map.set(e.uid, e.day);
-    }
+// 기간 내 app_open 이벤트가 있는 uid 집합을 반환.
+function buildActiveUidSet(filteredEvents) {
+  const set = new Set();
+  filteredEvents.forEach((e) => {
+    if (e.name === "app_open" && e.uid) set.add(e.uid);
   });
-  return map;
+  return set;
 }
 
-// users를 기간 필터링. 기준일 = 첫 app_open day. 없으면 제외.
-function filterUsersByPeriod(users, uidFirstDay, all, start, end) {
-  if (all) return { filteredUsers: users, excludedByDateCount: 0 };
+// uid 기준 모드: 기간 내 활동 있는 users만 남긴다.
+// activeUidSet이 null이면 전체 모드(필터 없음).
+function filterUsersByActivity(users, activeUidSet) {
+  if (!activeUidSet) return { filteredUsers: users, excludedByActivityCount: 0 };
   const filtered = [];
   let excluded = 0;
   users.forEach((u) => {
-    if (!u.nickname) { filtered.push(u); return; } // 닉네임 없는 유저는 어차피 참여자 아님
-    const day = uidFirstDay.get(u.id);
-    if (!day) { excluded += 1; return; } // 이벤트 없음 → 제외
-    if (day >= start && day <= end) {
+    if (!u.nickname) { filtered.push(u); return; } // 닉네임 없는 유저는 참여자 아님 — 통과
+    if (activeUidSet.has(u.id)) {
       filtered.push(u);
     } else {
       excluded += 1;
     }
   });
-  return { filteredUsers: filtered, excludedByDateCount: excluded };
+  return { filteredUsers: filtered, excludedByActivityCount: excluded };
+}
+
+// 사람 기준 모드: 병합 후 person 단위로 활동 필터.
+// person에 속한 uid 중 하나라도 activeUidSet에 있으면 해당 person을 포함(OR 판정).
+// activeUidSet이 null이면 전체 모드(필터 없음).
+function filterPersonsByActivity(mergeResult, activeUidSet) {
+  if (!activeUidSet) {
+    return {
+      activePersons: mergeResult.persons,
+      activeUidToPersonId: mergeResult.uidToPersonId,
+      excludedPersonCount: 0,
+    };
+  }
+  const activePersons = [];
+  const activeUidToPersonId = new Map();
+  let excluded = 0;
+  mergeResult.persons.forEach((p) => {
+    const hasActivity = p.uids.some((uid) => activeUidSet.has(uid));
+    if (hasActivity) {
+      activePersons.push(p);
+      p.uids.forEach((uid) => activeUidToPersonId.set(uid, p.personId));
+    } else {
+      excluded += 1;
+    }
+  });
+  return { activePersons, activeUidToPersonId, excludedPersonCount: excluded };
 }
 
 /* === 운영진 제외 (#2) === */
@@ -701,6 +785,21 @@ function buildIdentityMap(users) {
     .sort((a, b) => b.uids.length - a.uids.length);
 
   return { uidToPersonId, persons, mergedGroups, totalProfiles };
+}
+
+/* === 설치 안내 팝업 전환 집계 === */
+
+function computeInstallHintStats(events, excludeUidSet) {
+  const hint = events.filter((e) => !excludeUidSet.has(e.uid));
+  const shown = hint.filter((e) => e.name === "install_hint_shown").length;
+  const actions = hint.filter((e) => e.name === "install_hint_action");
+  const closed = actions.filter((e) => e.params?.action === "close").length;
+  const snoozed = actions.filter((e) => e.params?.action === "snooze").length;
+  const dismissed = actions.filter((e) => e.params?.action === "dismiss").length;
+  const prompted = actions.filter((e) => e.params?.action === "install_prompt").length;
+  const results = hint.filter((e) => e.name === "install_hint_prompt_result");
+  const accepted = results.filter((e) => e.params?.outcome === "accepted").length;
+  return { shown, closed, snoozed, dismissed, prompted, accepted };
 }
 
 /* === 공지당 도달 요약 (#4) === */
@@ -795,20 +894,32 @@ function computePersonStats({
   const installs = installedPersons.size;
   const unidentifiedInstalls = unidentifiedInstallUids.size;
 
-  // 온보딩 완료율
+  // 미식별 uid: 닉네임이 없어 병합 불가능한 uid (진단용)
   const visitorUids = new Set(byName("app_open").map((e) => e.uid).filter(Boolean));
-  const visitedPersons = new Set();
-  let unidentifiedVisitors = 0;
-  visitorUids.forEach((uid) => {
-    const pid = toPerson(uid);
-    if (pid) {
-      visitedPersons.add(pid);
-    } else {
-      unidentifiedVisitors += 1;
+  const unidentifiedUids = [...visitorUids].filter((uid) => !toPerson(uid));
+  const unidentifiedUidCount = unidentifiedUids.length;
+
+  // 미식별 uid 이벤트 수 분포 (진단: 중복/이탈 vs 실사용자 판별)
+  const unidEventCounts = new Map(); // uid → event count
+  events.forEach((e) => {
+    if (!e.uid || excludeUidSet.has(e.uid)) return;
+    if (!toPerson(e.uid) && visitorUids.has(e.uid)) {
+      unidEventCounts.set(e.uid, (unidEventCounts.get(e.uid) ?? 0) + 1);
     }
   });
-  const onboardVisitors = visitedPersons.size + unidentifiedVisitors;
-  const onboardCompleted = visitedPersons.size;
+  const distBuckets = [0, 0, 0, 0]; // 1건 / 2~4건 / 5~9건 / 10건+
+  unidEventCounts.forEach((cnt) => {
+    if (cnt <= 1) distBuckets[0] += 1;
+    else if (cnt <= 4) distBuckets[1] += 1;
+    else if (cnt <= 9) distBuckets[2] += 1;
+    else distBuckets[3] += 1;
+  });
+  const unidentifiedDistribution = [
+    ["1건", distBuckets[0]],
+    ["2~4건", distBuckets[1]],
+    ["5~9건", distBuckets[2]],
+    ["10건+", distBuckets[3]],
+  ];
 
   // 플랫폼
   const personPlatform = new Map();
@@ -940,14 +1051,15 @@ function computePersonStats({
     ["4일+ 방문", buckets[3]],
   ];
 
+  const installHint = computeInstallHintStats(events, excludeUidSet);
+
   return {
     events,
     participants,
-    onboardVisitors,
-    onboardCompleted,
-    unidentifiedVisitors,
     installs,
     unidentifiedInstalls,
+    unidentifiedUidCount,
+    unidentifiedDistribution,
     platformRows,
     pushAsked,
     pushGranted,
@@ -963,6 +1075,7 @@ function computePersonStats({
     liveRows,
     externalRows,
     retentionRows,
+    installHint,
   };
 }
 
@@ -993,10 +1106,6 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
         .filter(Boolean)
     ),
   ].filter((uid) => participantUids.has(uid)).length;
-
-  const visitorUids = new Set(byName("app_open").map((e) => e.uid).filter(Boolean));
-  const onboardVisitors = visitorUids.size;
-  const onboardCompleted = [...visitorUids].filter((uid) => participantUids.has(uid)).length;
 
   const uidPlatform = new Map();
   events.forEach((e) => {
@@ -1085,11 +1194,11 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     ["4일+ 방문", buckets[3]],
   ];
 
+  const installHint = computeInstallHintStats(events, excludeUidSet);
+
   return {
     events,
     participants,
-    onboardVisitors,
-    onboardCompleted,
     installs,
     platformRows,
     pushAsked,
@@ -1106,6 +1215,7 @@ function computeStats({ events, users, tokenCount, pushLogCount, admins, announc
     liveRows,
     externalRows,
     retentionRows,
+    installHint,
   };
 }
 

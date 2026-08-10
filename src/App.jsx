@@ -12,6 +12,7 @@ import { useIsDesktop } from "./hooks/useIsDesktop";
 import { AuthProvider, useAuth } from "./hooks/useAuth.jsx";
 import { logEvent } from "./lib/track";
 import { refreshPushToken } from "./lib/push";
+import InstallHint from "./components/InstallHint.jsx";
 import DesktopShell from "./components/desktop/DesktopShell.jsx";
 import Home from "./pages/Home.jsx";
 import Schedule from "./pages/Schedule.jsx";
@@ -176,6 +177,13 @@ function AppShell() {
           onClose={() => setToast(null)}
         />
       )}
+
+      {/* 브라우저 사용자에게 홈 화면 추가 안내 (모바일 + 비설치 + 프로필 등록 완료 시) */}
+      <InstallHint
+        splashDone={!splashVisible}
+        hasProfile={hasProfile}
+        isDesktop={isDesktop}
+      />
 
       {isDesktop ? (
         /* 넓은 화면(≥768px): 데스크톱 셸(전체 폭 히어로 + 가로 탭). 하단 탭은 숨김. */
