@@ -153,10 +153,10 @@ export default function InstallHint({ splashDone, hasProfile, isDesktop }) {
           <div className="mb-4 text-center">
             <p className="text-3xl">📲</p>
             <h2 className="mt-2 font-['Gowun_Batang'] text-lg font-bold text-title">
-              홈 화면에 추가하세요
+              ❗️ 먼저 앱을 홈 화면에 설치해주세요!
             </h2>
             <p className="mt-1 text-sm text-ink-soft">
-              앱처럼 빠르게 열고, 알림도 받을 수 있어요
+              설치해야 공지 알림을 받을 수 있어요
             </p>
           </div>
 
@@ -198,19 +198,22 @@ export default function InstallHint({ splashDone, hasProfile, isDesktop }) {
             </div>
           )}
 
-          {/* 하단 버튼 */}
-          <div className="flex gap-3">
+          {/* 하단 닫기 링크 — 안내를 읽기 전에 실수로 누르지 않도록 작게 배치한다 */}
+          <div className="mt-6 flex items-center justify-center gap-4">
             <button
               type="button"
               onClick={handleSnooze}
-              className="flex-1 rounded-2xl border border-basil-200 py-3 text-sm font-semibold text-basil-600 active:bg-basil-50"
+              className="py-1 text-xs text-ink-faint underline underline-offset-4 active:text-ink-soft"
             >
               나중에
             </button>
+            <span className="text-xs text-basil-200" aria-hidden="true">
+              ·
+            </span>
             <button
               type="button"
               onClick={handleDismiss}
-              className="flex-1 rounded-2xl border border-basil-100 py-3 text-sm text-ink-faint active:bg-basil-50"
+              className="py-1 text-xs text-ink-faint underline underline-offset-4 active:text-ink-soft"
             >
               다시 보지 않기
             </button>
