@@ -21,3 +21,4 @@ firestore-debug*.log
 
 # 임시 오피스 파일
 ~$*
+Stats/
