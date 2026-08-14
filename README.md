@@ -346,4 +346,4 @@ npx firebase-tools deploy --only hosting
 
 **이윤종** — 기획 · 디자인 · 개발 · 운영 단독 수행 · 2026
 
-MIT License
+MIT License.
