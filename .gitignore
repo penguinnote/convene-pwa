@@ -22,3 +22,6 @@ firestore-debug*.log
 # 임시 오피스 파일
 ~$*
 Stats/
+
+# Firebase 서비스 계정 키 (scripts/seed-dummy-data.js 용, 절대 커밋 금지)
+serviceAccountKey.json
