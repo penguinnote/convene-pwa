@@ -406,4 +406,4 @@ iOS는 홈 화면에 설치한 상태에서만 푸시 권한을 요청할 수 �
 
 기획(문제 정의·스코프·의사결정), 제품 디자인(브랜드 팔레트·타이포그래피·화면 설계), 프론트엔드 개발(React·PWA), 백엔드(Firebase·Cloud Functions), 운영 설계, 측정·분석까지 **단독 수행**했다.
 
-제품 개요는 [README](README.md), 디자인 결정 기록은 [DESIGN.md](DESIGN.md), 푸시 구현 상세는 [docs/FIREBASE_PUSH_GUIDE.md](docs/FIREBASE_PUSH_GUIDE.md)에 정리했다.
+제품 개요는 [README](README.md), 디자인 결정 기록은 [DESIGN.md](DESIGN.md), 푸시 구현 상세는 [docs/FIREBASE_PUSH_GUIDE.md](docs/FIREBASE_PUSH_GUIDE.md)에 정리했다
