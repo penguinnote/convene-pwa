@@ -567,8 +567,8 @@ https://github.com/penguinnote/convene-pwa/issues → **New issue**
 | 문서 | 내용 |
 |---|---|
 | [README](../README.md) | 앱 소개와 2026년 운영 결과 |
-| [CASE_STUDY](CASE_STUDY.md) | 왜 이렇게 만들었는지, 무엇이 잘되고 안 됐는지 |
-| [DESIGN](DESIGN.md) | 색·글꼴·화면 설계 기준 |
+| [CASE_STUDY](../CASE_STUDY.md) | 왜 이렇게 만들었는지, 무엇이 잘되고 안 됐는지 |
+| [DESIGN](../DESIGN.md) | 색·글꼴·화면 설계 기준 |
 | [FIREBASE_PUSH_GUIDE](FIREBASE_PUSH_GUIDE.md) | 푸시 알림 구현 상세 (개발자용) |
 
 **다음 행사를 준비하시는 분께** — 2026년 운영 데이터에서 배운 것들이 [README의 성과 섹션](../README.md#4-성과)에 정리돼 있습니다. 공지를 몇 건 보낼지, 무엇을 고정할지 정하기 전에 한 번 읽어보시길 권합니다.

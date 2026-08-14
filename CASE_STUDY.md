@@ -3,9 +3,9 @@
 > 다중일 오프라인 행사(워크숍·수련회·캠프)용 설치형 컴패니언 PWA
 > **첫 배포:** 로뎀나무교회 청년대학부 여름말씀캠프 (2026.7.29–8.1, 3박 4일, 참가자 96명)
 > **역할:** 기획·디자인·개발·운영·측정 단독 수행 · **상태: 배포 및 운영 완료**
-> Live: https://rodemcamp.web.app · 개요: [README](../README.md) · 디자인 기록: [DESIGN.md](DESIGN.md)
+> Live: https://rodemcamp.web.app · 개요: [README](README.md) · 디자인 기록: [DESIGN.md](DESIGN.md)
 
-이 문서는 의사결정 기록이다. 산출물의 구성은 [README](../README.md)에 정리했으며, 여기에는 결정의 근거와 사전 가설의 검증 결과를 기록한다.
+이 문서는 의사결정 기록이다. 산출물의 구성은 [README](README.md)에 정리했으며, 여기에는 결정의 근거와 사전 가설의 검증 결과를 기록한다.
 
 ---
 
@@ -163,7 +163,7 @@ PWA 역시 완전한 해법은 아니었으며, **미해결로 남긴 설치 마
 
 ## 8. 결과 — 가설 검증
 
-![운영 지표](camp_metrics_v5.png)
+![운영 지표](docs/camp_metrics_v5.png)
 
 ### 집계 기준의 재정의
 
@@ -387,7 +387,7 @@ iOS는 홈 화면에 설치한 상태에서만 푸시 권한을 요청할 수 �
 
 로그와 설문을 함께 근거로 삼은 우선순위다. 최우선 과제였던 **설치 안내 온보딩 팝업**은 캠프 종료 후 별도로 구현해 반영했다 — 첫 접속 시 iOS·Android 각각의 설치 절차를 안내하고, 안내를 읽기 전에 실수로 닫지 않도록 "나중에"(1시간 후 재노출)·"다시 보지 않기"를 하단 소형 텍스트 링크로 제공한다. 설문에서 "안내는 받았지만 설치 방법을 몰랐다" 3건과 "QR로 접속했으나 웹으로 열렸다"는 응답, 알림 미수신자 4명이 전원 미설치자였던 것이 근거였다.
 
-<img src="install-hint-late.png" alt="설치 안내 팝업" width="320">
+<img src="docs/install-hint-late.png" alt="설치 안내 팝업" width="320">
 
 캠프 중간에 합류해 최초 안내를 놓친 참가자도 미설치 상태로 재접속하면 동일하게 안내를 받는다.
 
@@ -406,4 +406,4 @@ iOS는 홈 화면에 설치한 상태에서만 푸시 권한을 요청할 수 �
 
 기획(문제 정의·스코프·의사결정), 제품 디자인(브랜드 팔레트·타이포그래피·화면 설계), 프론트엔드 개발(React·PWA), 백엔드(Firebase·Cloud Functions), 운영 설계, 측정·분석까지 **단독 수행**했다.
 
-제품 개요는 [README](../README.md), 디자인 결정 기록은 [DESIGN.md](DESIGN.md), 푸시 구현 상세는 [FIREBASE_PUSH_GUIDE.md](FIREBASE_PUSH_GUIDE.md)에 정리했다.
+제품 개요는 [README](README.md), 디자인 결정 기록은 [DESIGN.md](DESIGN.md), 푸시 구현 상세는 [docs/FIREBASE_PUSH_GUIDE.md](docs/FIREBASE_PUSH_GUIDE.md)에 정리했다.
